@@ -1,4 +1,4 @@
-package sqlite;
+package inf.uct.nmicro.sqlite;
 
 import java.util.UUID;
 

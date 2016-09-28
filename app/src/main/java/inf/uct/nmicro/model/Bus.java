@@ -1,4 +1,4 @@
-package model;
+package inf.uct.nmicro.model;
 
 /**
  * @author Javier
