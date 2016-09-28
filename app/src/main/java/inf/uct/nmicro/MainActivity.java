@@ -41,9 +41,10 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(new FragmentMapa(), "ONE");
-        adapter.addFragment(new FragmentMapa(), "TWO");
-        adapter.addFragment(new FragmentMapa(), "THREE");
+        adapter.addFragment(new FragmentMapa(), "Inicio");
+        adapter.addFragment(new FragmentMapa(), "Recorridos");
+        adapter.addFragment(new FragmentMapa(), "Favoritos");
+        adapter.addFragment(new FragmentMapa(), "Planificar Ruta");
         viewPager.setAdapter(adapter);
     }
 
