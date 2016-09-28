@@ -24,8 +24,6 @@ public class FragmentMap extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //important! set your user agent to prevent getting banned from the osm servers
-
     }
 
     @Override
