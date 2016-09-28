@@ -1,17 +1,17 @@
-package sqlite;
+package inf.uct.nmicro.sqlite;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Build;
 import android.provider.BaseColumns;
-import sqlite.ITablesDB.Buses;
-import sqlite.ITablesDB.Companies;
-import sqlite.ITablesDB.Points;
-import sqlite.ITablesDB.Routes;
-import sqlite.ITablesDB.RoutesPoints;
-import sqlite.ITablesDB.RoutesStops;
-import sqlite.ITablesDB.Stops;
+import inf.uct.nmicro.sqlite.ITablesDB.Buses;
+import inf.uct.nmicro.sqlite.ITablesDB.Companies;
+import inf.uct.nmicro.sqlite.ITablesDB.Points;
+import inf.uct.nmicro.sqlite.ITablesDB.Routes;
+import inf.uct.nmicro.sqlite.ITablesDB.RoutesPoints;
+import inf.uct.nmicro.sqlite.ITablesDB.RoutesStops;
+import inf.uct.nmicro.sqlite.ITablesDB.Stops;
 
 /**
  * @author Javier
