@@ -15,9 +15,9 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.views.MapView;
 import inf.uct.nmicro.R;
 
-public class FragmentMapa extends Fragment {
+public class FragmentMap extends Fragment {
 
-    public FragmentMapa() {
+    public FragmentMap() {
         // Required empty public constructor
     }
 
