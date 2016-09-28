@@ -14,7 +14,10 @@ import android.support.v7.widget.Toolbar;
 import java.util.ArrayList;
 import java.util.List;
 
-import inf.uct.nmicro.fragments.FragmentMapa;
+import inf.uct.nmicro.fragments.FragmentFavorites;
+import inf.uct.nmicro.fragments.FragmentMap;
+import inf.uct.nmicro.fragments.FragmentRoutes;
+import inf.uct.nmicro.fragments.FragmentToplan;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -41,10 +44,10 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(new FragmentMapa(), "Inicio");
-        adapter.addFragment(new FragmentMapa(), "Recorridos");
-        adapter.addFragment(new FragmentMapa(), "Favoritos");
-        adapter.addFragment(new FragmentMapa(), "Planificar Ruta");
+        adapter.addFragment(new FragmentMap(), "Inicio");
+        adapter.addFragment(new FragmentRoutes() , "Recorridos");
+        adapter.addFragment(new FragmentFavorites(), "Favoritos");
+        adapter.addFragment(new FragmentToplan(), "Planificar Ruta");
         viewPager.setAdapter(adapter);
     }
 
@@ -76,4 +79,5 @@ public class MainActivity extends AppCompatActivity {
             return mFragmentTitleList.get(position);
         }
     }
+
 }
