@@ -1,6 +1,7 @@
 package inf.uct.nmicro;
 
 
+import android.content.Context;
 import android.os.Bundle;
 
 import android.support.design.widget.TabLayout;
@@ -10,6 +11,8 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.widget.TextView;
 import android.view.LayoutInflater;
 
@@ -73,9 +76,11 @@ public class MainActivity extends AppCompatActivity {
         tabFour.setCompoundDrawablesWithIntrinsicBounds(0, tabIcons[0], 0, 0);
         tabLayout.getTabAt(3).setCustomView(tabFour);
 
-
-
     }
+
+
+
+
 
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
@@ -83,6 +88,7 @@ public class MainActivity extends AppCompatActivity {
         adapter.addFragment(new FragmentRoutes() , "Recorridos");
         adapter.addFragment(new FragmentFavorites(), "Favoritos");
         adapter.addFragment(new FragmentToplan(), "Mi Ruta");
+        viewPager.isHorizontalScrollBarEnabled();
         viewPager.setAdapter(adapter);
 
 
@@ -116,6 +122,8 @@ public class MainActivity extends AppCompatActivity {
             return mFragmentTitleList.get(position);
 
         }
+
     }
+
 
 }
