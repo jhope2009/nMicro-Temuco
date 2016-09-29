@@ -6,4 +6,4 @@
     android:textColor="#ffffff"
     android:textSize="@dimen/tab_label"
     android:textAlignment="center"
-    android:fontFamily="@string/font_fontFamily_medium"/>
+    android:fontFamily=no"@string/font_fontFamily_medium"/>
