@@ -6,10 +6,16 @@ package inf.uct.nmicro.fragments;
 import android.os.Bundle;
 import android.support.v4.BuildConfig;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ListView;
+import java.util.ArrayList;
+
+import inf.uct.nmicro.R;
+import inf.uct.nmicro.utils.AdapterCategory;
+import inf.uct.nmicro.utils.Category;
 
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
@@ -17,15 +23,10 @@ import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
-import inf.uct.nmicro.R;
 
 public class FragmentMap extends Fragment {
 
     private MapController   mapController;
-    public FragmentMap() {
-        // Required empty public constructor
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,7 +37,19 @@ public class FragmentMap extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+
+        ArrayList<Category> category = new ArrayList<Category>();
+
+        Category cat = new Category("Recorrido","1C 1A","micro que va al centro",getResources().getDrawable(R.drawable.ic_1a));
+        category.add(cat);
+        cat = new Category("Recorrido","1C 1A","micro que va al centro",getResources().getDrawable(R.drawable.ic_1a));
+        category.add(cat);
+        cat = new Category("Recorrido","1C 1A","micro que va al centro",getResources().getDrawable(R.drawable.ic_1a));
+        category.add(cat);
+
         View rootView = inflater.inflate(R.layout.fragment_mapa, container, false);
+
+
         org.osmdroid.tileprovider.constants.OpenStreetMapTileProviderConstants.setUserAgentValue(BuildConfig.APPLICATION_ID);
         MapView map = (MapView) rootView.findViewById(R.id.map);
         map.setTileSource(TileSourceFactory.MAPNIK);
@@ -57,6 +70,20 @@ public class FragmentMap extends Fragment {
                 mapController.animateTo(myLocationoverlay.getMyLocation());
             }
         });
+
+
+        ListView lv = (ListView) rootView.findViewById(R.id.ListView);
+        AdapterCategory adapter = new AdapterCategory(this.getActivity(), category);
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                final int pos = position;
+                //CODIGO AQUI
+
+            }
+        });
+        lv.setAdapter(adapter);
+
         return rootView;
     }
 }
