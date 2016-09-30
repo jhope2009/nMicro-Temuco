@@ -1,7 +1,7 @@
 package inf.uct.nmicro;
 
 
-import android.database.SQLException;
+import android.content.Context;
 import android.os.Bundle;
 
 import android.support.design.widget.TabLayout;
@@ -11,6 +11,10 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.AttributeSet;
+import android.view.MotionEvent;
+import android.widget.TextView;
+import android.view.LayoutInflater;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,14 +23,18 @@ import inf.uct.nmicro.fragments.FragmentFavorites;
 import inf.uct.nmicro.fragments.FragmentMap;
 import inf.uct.nmicro.fragments.FragmentRoutes;
 import inf.uct.nmicro.fragments.FragmentToplan;
-import inf.uct.nmicro.sqlite.DataBaseHelper;
 
 
 public class MainActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private TabLayout tabLayout;
     private ViewPager viewPager;
-    DataBaseHelper myDbHelper;
+    private int[] tabIcons={
+            R.drawable.ic_origfendes,
+            R.drawable.ic_maps_map,
+            R.drawable.ic_action_grade,
+            R.drawable.ic_recorrido
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,36 +42,56 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setSubtitleTextColor(1);
         setSupportActionBar(toolbar);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         viewPager = (ViewPager) findViewById(R.id.viewpager);
-
+        setupViewPager(viewPager);
 
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
+        setupTabIcons();
+    }
+    private void setupTabIcons() {
 
+        TextView tabOne = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
+        tabOne.setText("Inicio");
 
-        myDbHelper = new DataBaseHelper(this);
+        tabOne.setCompoundDrawablesWithIntrinsicBounds(0,tabIcons[1] , 0, 0);
+        tabLayout.getTabAt(0).setCustomView(tabOne);
 
-      /*  try {
-            myDbHelper.openDataBase();
-        }catch(SQLException sqle){
-            throw sqle;
-        }*/
+        TextView tabTwo = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
+        tabTwo.setText("Recorrido");
+        tabTwo.setCompoundDrawablesWithIntrinsicBounds(0, tabIcons[3], 0, 0);
+        tabLayout.getTabAt(1).setCustomView(tabTwo);
 
+        TextView tabThree = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
+        tabThree.setText("Favoritos");
+        tabThree.setCompoundDrawablesWithIntrinsicBounds(0, tabIcons[2], 0, 0);
+        tabLayout.getTabAt(2).setCustomView(tabThree);
+
+        TextView tabFour = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
+        tabFour.setText("Mi Ruta");
+        tabFour.setCompoundDrawablesWithIntrinsicBounds(0, tabIcons[0], 0, 0);
+        tabLayout.getTabAt(3).setCustomView(tabFour);
 
     }
+
+
+
+
 
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
         adapter.addFragment(new FragmentMap(), "Inicio");
         adapter.addFragment(new FragmentRoutes() , "Recorridos");
         adapter.addFragment(new FragmentFavorites(), "Favoritos");
-        adapter.addFragment(new FragmentToplan(), "Planificar Ruta");
+        adapter.addFragment(new FragmentToplan(), "Mi Ruta");
+        viewPager.isHorizontalScrollBarEnabled();
         viewPager.setAdapter(adapter);
+
+
     }
 
     class ViewPagerAdapter extends FragmentPagerAdapter {
@@ -92,7 +120,10 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public CharSequence getPageTitle(int position) {
             return mFragmentTitleList.get(position);
+
         }
+
     }
+
 
 }
