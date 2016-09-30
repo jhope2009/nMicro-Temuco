@@ -16,6 +16,7 @@ import android.view.MotionEvent;
 import android.widget.TextView;
 import android.view.LayoutInflater;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,6 +24,8 @@ import inf.uct.nmicro.fragments.FragmentFavorites;
 import inf.uct.nmicro.fragments.FragmentMap;
 import inf.uct.nmicro.fragments.FragmentRoutes;
 import inf.uct.nmicro.fragments.FragmentToplan;
+import inf.uct.nmicro.model.Company;
+import inf.uct.nmicro.sqlite.DataBaseHelper;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -52,6 +55,22 @@ public class MainActivity extends AppCompatActivity {
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
         setupTabIcons();
+
+
+        DataBaseHelper myDbHelper = new DataBaseHelper(this);
+        try {
+            myDbHelper.NoCheckCreateDataBase();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        List<Company> Lineas = myDbHelper.GetAllCompany();
+
+        for(Company linea : Lineas){
+            System.out.println(linea.getIdCompany()+" / "+linea.getName()+" / "+linea.getRut());
+        }
+
+
     }
     private void setupTabIcons() {
 
@@ -79,9 +98,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
-
-
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
         adapter.addFragment(new FragmentMap(), "Inicio");
@@ -90,7 +106,6 @@ public class MainActivity extends AppCompatActivity {
         adapter.addFragment(new FragmentToplan(), "Mi Ruta");
         viewPager.isHorizontalScrollBarEnabled();
         viewPager.setAdapter(adapter);
-
 
     }
 
@@ -124,6 +139,4 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
-
-
 }

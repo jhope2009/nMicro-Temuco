@@ -1,26 +1,34 @@
 package inf.uct.nmicro.sqlite;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.SQLException;
+import android.database.sqlite.SQLiteCantOpenDatabaseException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
+
+import inf.uct.nmicro.model.Company;
 
 /**
  * Created by Javier on 29-09-2016.
  */
 
-public class DataBaseHelper extends SQLiteOpenHelper {
+
+public class DataBaseHelper extends SQLiteOpenHelper{
 
     //The Android's default system path of your application database.
     private static String DB_PATH = "/data/data/inf.uct.nmicro/databases/";
-    //private String DB_PATH;
-    private static String DB_NAME = "myDBName";
+
+    private static String DB_NAME = "MicroDB.db";
 
     private SQLiteDatabase myDataBase;
 
@@ -40,7 +48,18 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     /**
      * Creates a empty database on the system and rewrites it with your own database.
      * */
-    public void createDataBase() throws IOException {
+    public void NoCheckCreateDataBase() throws IOException{
+        try {
+            this.getReadableDatabase();
+            copyDataBase();
+        } catch (IOException e) {
+            throw new Error("Error copying database");
+        }
+
+
+    }
+    /*
+    public void createDataBase() throws IOException{
 
         boolean dbExist = checkDataBase();
 
@@ -50,6 +69,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
             //By calling this method and empty database will be created into the default system path
             //of your application so we are gonna be able to overwrite that database with our database.
+
             this.getReadableDatabase();
 
             try {
@@ -64,6 +84,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         }
 
     }
+    */
 
     /**
      * Check if the database already exist to avoid re-copying the file each time you open the application.
@@ -77,10 +98,10 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             String myPath = DB_PATH + DB_NAME;
             checkDB = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READONLY);
 
-        }catch(SQLiteException e){
 
+        }catch(SQLiteCantOpenDatabaseException e){
+            throw new Error("database does't exist yet.");
             //database does't exist yet.
-
         }
 
         if(checkDB != null){
@@ -98,10 +119,9 @@ public class DataBaseHelper extends SQLiteOpenHelper {
      * This is done by transfering bytestream.
      * */
     private void copyDataBase() throws IOException{
-
+        System.out.println("Creating database");
         //Open your local db as the input stream
         InputStream myInput = myContext.getAssets().open(DB_NAME);
-
         // Path to the just created empty db
         String outFileName = DB_PATH + DB_NAME;
 
@@ -119,10 +139,10 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         myOutput.flush();
         myOutput.close();
         myInput.close();
-
+        System.out.println("Database Created");
     }
 
-    public void openDataBase() throws SQLException {
+    public void openDataBase() throws SQLException{
 
         //Open the database
         String myPath = DB_PATH + DB_NAME;
@@ -148,6 +168,22 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
+    }
+
+    public List<Company> GetAllCompany() {
+        System.out.println("Geting companys");
+        SQLiteDatabase db = this.getReadableDatabase();
+        if (db == null) {
+            return null;
+        }
+        Cursor cursor = db.rawQuery("select * from company", null);
+        List<Company> Lineas = new ArrayList<Company>();
+        cursor.moveToFirst();
+        while(!cursor.isAfterLast()){
+            Lineas.add(new Company(cursor.getInt(0),cursor.getString(1),cursor.getString(2)));
+            cursor.moveToNext();
+        }
+        return Lineas;
     }
 
     // Add your public helper methods to access and get content from the database.
