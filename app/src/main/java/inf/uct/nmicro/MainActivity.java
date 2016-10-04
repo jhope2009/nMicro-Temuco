@@ -33,10 +33,11 @@ public class MainActivity extends AppCompatActivity {
     private TabLayout tabLayout;
     private ViewPager viewPager;
     private int[] tabIcons={
-            R.drawable.ic_origfendes,
             R.drawable.ic_maps_map,
+            R.drawable.ic_recorrido,
             R.drawable.ic_action_grade,
-            R.drawable.ic_recorrido
+            R.drawable.ic_mapa1,
+            R.drawable.ic_2
     };
 
     @Override
@@ -77,12 +78,12 @@ public class MainActivity extends AppCompatActivity {
         TextView tabOne = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
         tabOne.setText("Inicio");
 
-        tabOne.setCompoundDrawablesWithIntrinsicBounds(0,tabIcons[1] , 0, 0);
+        tabOne.setCompoundDrawablesWithIntrinsicBounds(0,tabIcons[0] , 0, 0);
         tabLayout.getTabAt(0).setCustomView(tabOne);
 
         TextView tabTwo = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
         tabTwo.setText("Recorrido");
-        tabTwo.setCompoundDrawablesWithIntrinsicBounds(0, tabIcons[3], 0, 0);
+        tabTwo.setCompoundDrawablesWithIntrinsicBounds(0, tabIcons[1], 0, 0);
         tabLayout.getTabAt(1).setCustomView(tabTwo);
 
         TextView tabThree = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
@@ -92,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
 
         TextView tabFour = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
         tabFour.setText("Mi Ruta");
-        tabFour.setCompoundDrawablesWithIntrinsicBounds(0, tabIcons[0], 0, 0);
+        tabFour.setCompoundDrawablesWithIntrinsicBounds(0, tabIcons[3], 0, 0);
         tabLayout.getTabAt(3).setCustomView(tabFour);
 
     }
