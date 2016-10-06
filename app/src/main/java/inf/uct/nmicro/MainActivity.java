@@ -35,9 +35,8 @@ public class MainActivity extends AppCompatActivity {
     private int[] tabIcons={
             R.drawable.ic_maps_map,
             R.drawable.ic_recorrido,
-            R.drawable.ic_action_grade,
-            R.drawable.ic_mapa1,
-            R.drawable.ic_2
+            R.drawable.ic_toggle_star,
+            R.drawable.ic_rutas2
     };
 
     @Override
@@ -71,7 +70,6 @@ public class MainActivity extends AppCompatActivity {
             System.out.println(linea.getIdCompany()+" / "+linea.getName()+" / "+linea.getRut());
         }
 
-
     }
     private void setupTabIcons() {
 
@@ -98,7 +96,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
         adapter.addFragment(new FragmentMap(), "Inicio");
@@ -107,7 +104,6 @@ public class MainActivity extends AppCompatActivity {
         adapter.addFragment(new FragmentToplan(), "Mi Ruta");
         viewPager.isHorizontalScrollBarEnabled();
         viewPager.setAdapter(adapter);
-
     }
 
     class ViewPagerAdapter extends FragmentPagerAdapter {
@@ -138,6 +134,5 @@ public class MainActivity extends AppCompatActivity {
             return mFragmentTitleList.get(position);
 
         }
-
     }
 }
