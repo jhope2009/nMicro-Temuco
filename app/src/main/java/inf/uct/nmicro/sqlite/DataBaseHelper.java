@@ -259,23 +259,4 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         }
         return companies;
     }
-
-    /*
-        Obtiene todos las lineas (companies)
-    */
-    public List<Route> findRoutes() {
-        SQLiteDatabase db = this.getReadableDatabase();
-        if(db==null){
-            return null;
-        }
-        String sql = String.format("SELECT * FROM %s", Tables.ROUTE);
-        Cursor cursor = db.rawQuery(sql, null);
-        List<Route> routes = new ArrayList<Route>();
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast()) {
-            routes.add(new Route(cursor.getInt(0), cursor.getString(1), findPointsByRoute(cursor.getInt(0))));
-            cursor.moveToNext();
-        }
-        return routes;
-    }
 }

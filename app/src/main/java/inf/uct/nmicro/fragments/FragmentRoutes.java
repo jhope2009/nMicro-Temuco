@@ -5,6 +5,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.BuildConfig;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.animation.LinearOutSlowInInterpolator;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -65,9 +66,11 @@ public class FragmentRoutes extends Fragment {
 
 
         for(Company linea : Lineas){
-            cat = new Category("Recorrido",linea.getName(),"micro que va al centro",getResources().getDrawable(R.drawable.ic_1a));
-            category.add(cat);
-            //System.out.println(linea.getIdCompany()+" / "+linea.getName()+" / "+linea.getRut());
+            List<Route> rutas = linea.getRoutes();
+            for(Route ruta : rutas) {
+                cat = new Category("Recorrido", ruta.getName() + "", "micro que va al centro", getResources().getDrawable(R.drawable.ic_1a));
+                category.add(cat);
+            }
         }
 
         adapter = new AdapterCategory(this.getActivity(), category);

@@ -81,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
 
         TextView tabTwo = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
         tabTwo.setText("Recorrido");
+
         tabTwo.setCompoundDrawablesWithIntrinsicBounds(0, tabIcons[1], 0, 0);
         tabLayout.getTabAt(1).setCustomView(tabTwo);
 
