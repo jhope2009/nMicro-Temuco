@@ -11,9 +11,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import inf.uct.nmicro.R;
+import inf.uct.nmicro.model.Company;
+import inf.uct.nmicro.sqlite.DataBaseHelper;
 import inf.uct.nmicro.utils.AdapterCategory;
 import inf.uct.nmicro.utils.Category;
 
@@ -42,10 +47,23 @@ public class FragmentMap extends Fragment {
 
         Category cat = new Category("Recorrido","1C 1A","micro que va al centro",getResources().getDrawable(R.drawable.ic_1a));
         category.add(cat);
-        cat = new Category("Recorrido","1C 1A","micro que va al centro",getResources().getDrawable(R.drawable.ic_1a));
-        category.add(cat);
-        cat = new Category("Recorrido","1C 1A","micro que va al centro",getResources().getDrawable(R.drawable.ic_1a));
-        category.add(cat);
+
+        DataBaseHelper myDbHelper = new DataBaseHelper(this.getActivity());
+        try {
+            myDbHelper.NoCheckCreateDataBase();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        List<Company> Lineas = myDbHelper.findCompanies();
+
+
+        for(Company linea : Lineas){
+            cat = new Category("Recorrido",linea.getName(),"micro que va al centro",getResources().getDrawable(R.drawable.ic_1a));
+            category.add(cat);
+            //System.out.println(linea.getIdCompany()+" / "+linea.getName()+" / "+linea.getRut());
+        }
 
         View rootView = inflater.inflate(R.layout.fragment_mapa, container, false);
 

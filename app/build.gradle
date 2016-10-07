@@ -38,4 +38,5 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile files('libs/mysql-connector-java-5.1.39-bin.jar')
     compile 'com.google.android.gms:play-services-maps:9.6.1'
+    compile 'com.google.android.gms:play-services-ads:9.6.1'
 }

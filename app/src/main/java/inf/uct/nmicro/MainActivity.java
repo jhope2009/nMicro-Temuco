@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        List<Company> Lineas = myDbHelper.GetAllCompany();
+        List<Company> Lineas = myDbHelper.findCompanies();
 
         for(Company linea : Lineas){
             System.out.println(linea.getIdCompany()+" / "+linea.getName()+" / "+linea.getRut());

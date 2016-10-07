@@ -10,9 +10,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import inf.uct.nmicro.R;
+import inf.uct.nmicro.model.Company;
+import inf.uct.nmicro.model.Route;
+import inf.uct.nmicro.sqlite.DataBaseHelper;
 import inf.uct.nmicro.utils.AdapterCategory;
 import inf.uct.nmicro.utils.Category;
 
@@ -21,6 +27,10 @@ import inf.uct.nmicro.utils.Category;
  */
 public class FragmentRoutes extends Fragment {
 
+
+    private ListView lv;
+    private AdapterCategory adapter;
+    private Category cat;
 
     public FragmentRoutes() {
         // Required empty public constructor
@@ -36,38 +46,31 @@ public class FragmentRoutes extends Fragment {
 
         ArrayList<Category> category = new ArrayList<Category>();
 
-        Category cat = new Category("Recorrido","1C 1A","micro que va al centro",getResources().getDrawable(R.drawable.ic_1a));
-        category.add(cat);
         cat = new Category("Recorrido","1C 1A","micro que va al centro",getResources().getDrawable(R.drawable.ic_1a));
         category.add(cat);
-        cat = new Category("Recorrido","1C 1A","micro que va al centro",getResources().getDrawable(R.drawable.ic_1a));
-        category.add(cat);
-        cat = new Category("Recorrido","1C 1A","micro que va al centro",getResources().getDrawable(R.drawable.ic_1a));
-        category.add(cat);
-        cat = new Category("Recorrido","1C 1A","micro que va al centro",getResources().getDrawable(R.drawable.ic_1a));
-        category.add(cat);
-        cat = new Category("Recorrido","1C 1A","micro que va al centro",getResources().getDrawable(R.drawable.ic_1a));
-        category.add(cat);
-        cat = new Category("Recorrido","1C 1A","micro que va al centro",getResources().getDrawable(R.drawable.ic_1a));
-        category.add(cat);
-        cat = new Category("Recorrido","1C 1A","micro que va al centro",getResources().getDrawable(R.drawable.ic_1a));
-        category.add(cat);
-        cat = new Category("Recorrido","1C 1A","micro que va al centro",getResources().getDrawable(R.drawable.ic_1a));
-        category.add(cat);
-        cat = new Category("Recorrido","1C 1A","micro que va al centro",getResources().getDrawable(R.drawable.ic_1a));
-        category.add(cat);
-        cat = new Category("Recorrido","1C 1A","micro que va al centro",getResources().getDrawable(R.drawable.ic_1a));
-        category.add(cat);
-        cat = new Category("Recorrido","1C 1A","micro que va al centro",getResources().getDrawable(R.drawable.ic_1a));
-        category.add(cat);
-        cat = new Category("Recorrido","1C 1A","micro que va al centro",getResources().getDrawable(R.drawable.ic_1a));
-        category.add(cat);
-
 
         View rootView = inflater.inflate(R.layout.fragment_routes, container, false);
+        lv = (ListView) rootView.findViewById(R.id.ListView);
 
-        ListView lv = (ListView) rootView.findViewById(R.id.ListView);
-        AdapterCategory adapter = new AdapterCategory(this.getActivity(), category);
+
+        DataBaseHelper myDbHelper = new DataBaseHelper(this.getActivity());
+        try {
+            myDbHelper.NoCheckCreateDataBase();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        List<Company> Lineas = myDbHelper.findCompanies();
+
+
+        for(Company linea : Lineas){
+            cat = new Category("Recorrido",linea.getName(),"micro que va al centro",getResources().getDrawable(R.drawable.ic_1a));
+            category.add(cat);
+            //System.out.println(linea.getIdCompany()+" / "+linea.getName()+" / "+linea.getRut());
+        }
+
+        adapter = new AdapterCategory(this.getActivity(), category);
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -76,6 +79,7 @@ public class FragmentRoutes extends Fragment {
 
             }
         });
+
         lv.setAdapter(adapter);
         return rootView;
     }
