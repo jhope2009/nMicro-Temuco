@@ -3,14 +3,19 @@ package inf.uct.nmicro.fragments;
 /**
  * Created by jairo on 9/28/2016.
  */
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.BuildConfig;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -26,12 +31,19 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.Projection;
+import org.osmdroid.views.overlay.ItemizedIconOverlay;
+import org.osmdroid.views.overlay.ItemizedOverlayWithFocus;
+import org.osmdroid.views.overlay.Overlay;
+import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 
 public class FragmentMap extends Fragment {
 
     private MapController   mapController;
+    private ArrayList<Category> category = new ArrayList<Category>();
+    private List<Company> Lineas;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,13 +53,10 @@ public class FragmentMap extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
 
-        ArrayList<Category> category = new ArrayList<Category>();
+        View rootView = inflater.inflate(R.layout.fragment_mapa, container, false);
 
-        Category cat = new Category("Recorrido","1C 1A","micro que va al centro",getResources().getDrawable(R.drawable.ic_1a));
-        category.add(cat);
-
+        //seccion que carga reccorridos de la base de datos
         DataBaseHelper myDbHelper = new DataBaseHelper(this.getActivity());
         try {
             myDbHelper.NoCheckCreateDataBase();
@@ -55,39 +64,76 @@ public class FragmentMap extends Fragment {
             e.printStackTrace();
         }
 
-
-        List<Company> Lineas = myDbHelper.findCompanies();
-
+        Lineas = myDbHelper.findCompanies();
 
         for(Company linea : Lineas){
-            cat = new Category("Recorrido",linea.getName(),"micro que va al centro",getResources().getDrawable(R.drawable.ic_1a));
+            Category cat = new Category("Recorrido",linea.getName(),"micro que va al centro",getResources().getDrawable(R.drawable.ic_1a));
             category.add(cat);
-            //System.out.println(linea.getIdCompany()+" / "+linea.getName()+" / "+linea.getRut());
         }
 
-        View rootView = inflater.inflate(R.layout.fragment_mapa, container, false);
-
-
+        //seccion que carga el mapa y lo configura
         org.osmdroid.tileprovider.constants.OpenStreetMapTileProviderConstants.setUserAgentValue(BuildConfig.APPLICATION_ID);
         MapView map = (MapView) rootView.findViewById(R.id.map);
         map.setTileSource(TileSourceFactory.MAPNIK);
         map.setBuiltInZoomControls(true);
         map.setMultiTouchControls(true);
+        //map.setUseDataConnection(false);
 
+        //logica control del mapa
         mapController = (MapController) map.getController();
         mapController.setZoom(14);
-        //-38.7392,-72.6087?z=14
         GeoPoint Temuco = new GeoPoint(-38.7392, -72.6087);
         mapController.setCenter(Temuco);
-        final MyLocationNewOverlay myLocationoverlay = new MyLocationNewOverlay(this.getActivity(), map);
-        myLocationoverlay.enableMyLocation();
-        map.getOverlays().add(myLocationoverlay); //No añadir si no quieres una marca
+        //final MyLocationNewOverlay myLocationoverlay = new MyLocationNewOverlay(this.getActivity(), map);
+        //myLocationoverlay.enableMyLocation();
+        //map.getOverlays().add(myLocationoverlay); //No añadir si no quieres una marca
 
-        myLocationoverlay.runOnFirstFix(new Runnable() {
-            public void run() {
-                mapController.animateTo(myLocationoverlay.getMyLocation());
+        //myLocationoverlay.runOnFirstFix(new Runnable() {
+        //    public void run() {
+        //        mapController.animateTo(myLocationoverlay.getMyLocation());
+        //    }
+        //});
+
+
+
+        Overlay touchOverlay = new Overlay(this.getContext()){
+            ItemizedIconOverlay<OverlayItem> anotherItemizedIconOverlay = null;
+            @Override
+            protected void draw(Canvas arg0, MapView arg1, boolean arg2) {
+
             }
-        });
+            @Override
+            public boolean onSingleTapConfirmed(final MotionEvent e, final MapView mapView) {
+
+                final Drawable marker = getActivity().getResources().getDrawable(R.drawable.marker_default);
+                Projection proj = mapView.getProjection();
+                GeoPoint loc = (GeoPoint) proj.fromPixels((int)e.getX(), (int)e.getY());
+                String longitude = Double.toString(((double)loc.getLongitudeE6())/1000000);
+                String latitude = Double.toString(((double)loc.getLatitudeE6())/1000000);
+
+                Toast toast = Toast.makeText(getActivity(), "Latitud = " + latitude + ", Longitud = " + longitude , Toast.LENGTH_SHORT);
+                toast.show();
+
+                ArrayList<OverlayItem> overlayArray = new ArrayList<OverlayItem>();
+                OverlayItem mapItem = new OverlayItem("", "", new GeoPoint((((double)loc.getLatitudeE6())/1000000), (((double)loc.getLongitudeE6())/1000000)));
+                mapItem.setMarker(marker);
+                overlayArray.add(mapItem);
+                if(anotherItemizedIconOverlay==null){
+                    anotherItemizedIconOverlay = new ItemizedIconOverlay<OverlayItem>(getActivity(), overlayArray,null);
+                    mapView.getOverlays().add(anotherItemizedIconOverlay);
+                    mapView.invalidate();
+                }else{
+                    mapView.getOverlays().remove(anotherItemizedIconOverlay);
+                    mapView.invalidate();
+                    anotherItemizedIconOverlay = new ItemizedIconOverlay<OverlayItem>(getActivity(), overlayArray,null);
+                    mapView.getOverlays().add(anotherItemizedIconOverlay);
+                }
+                //      dlgThread();
+                return true;
+            }
+        };
+
+        map.getOverlays().add(touchOverlay);
 
 
         ListView lv = (ListView) rootView.findViewById(R.id.ListView);
@@ -103,6 +149,12 @@ public class FragmentMap extends Fragment {
         lv.setAdapter(adapter);
 
         return rootView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
     }
 }
 
