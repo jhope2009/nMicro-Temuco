@@ -8,6 +8,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.BuildConfig;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -23,7 +24,10 @@ import java.util.List;
 
 import inf.uct.nmicro.R;
 import inf.uct.nmicro.model.Company;
+import inf.uct.nmicro.model.Point;
+import inf.uct.nmicro.model.Route;
 import inf.uct.nmicro.sqlite.DataBaseHelper;
+import inf.uct.nmicro.sqlite.ITablesDB;
 import inf.uct.nmicro.utils.AdapterCategory;
 import inf.uct.nmicro.utils.Category;
 
@@ -41,9 +45,14 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 public class FragmentMap extends Fragment {
 
-    private MapController   mapController;
+    private MapController mapController;
     private ArrayList<Category> category = new ArrayList<Category>();
     private List<Company> Lineas;
+    private List<Route> routes;
+    private final int POSITION_DIAMETER = 150;
+    private Category cat;
+    private View rootView;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,7 +63,7 @@ public class FragmentMap extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View rootView = inflater.inflate(R.layout.fragment_mapa, container, false);
+        rootView = inflater.inflate(R.layout.fragment_mapa, container, false);
 
         //seccion que carga reccorridos de la base de datos
         DataBaseHelper myDbHelper = new DataBaseHelper(this.getActivity());
@@ -65,9 +74,8 @@ public class FragmentMap extends Fragment {
         }
 
         Lineas = myDbHelper.findCompanies();
-
         for(Company linea : Lineas){
-            Category cat = new Category("Recorrido",linea.getName(),"micro que va al centro",getResources().getDrawable(R.drawable.ic_1a));
+            cat = new Category("Recorrido",linea.getName(),"micro que va al centro",getResources().getDrawable(R.drawable.ic_1a));
             category.add(cat);
         }
 
@@ -114,6 +122,27 @@ public class FragmentMap extends Fragment {
                 Toast toast = Toast.makeText(getActivity(), "Latitud = " + latitude + ", Longitud = " + longitude , Toast.LENGTH_SHORT);
                 toast.show();
 
+                GeoPoint geoPointUser = new GeoPoint(Double.parseDouble(latitude),Double.parseDouble(longitude));
+                List<Company> companies = myDbHelper.findCompanies();
+                routes = new ArrayList<Route>();
+
+                for(Company c : companies){
+                    for(Route r : c.getRoutes()){
+                        if(isRouteInArea(r, geoPointUser)){
+                            routes.add(r);
+                        }
+                    }
+                }
+
+                category = new ArrayList<Category>();
+                if(routes!=null && !routes.isEmpty()){
+                    for(Route route : routes){
+                        cat = new Category("Recorrido", route.getName() + "", "micro que va al centro", getResources().getDrawable(R.drawable.ic_1a));
+                        category.add(cat);
+                    }
+                }
+                createListWithAdapter();
+
                 ArrayList<OverlayItem> overlayArray = new ArrayList<OverlayItem>();
                 OverlayItem mapItem = new OverlayItem("", "", new GeoPoint((((double)loc.getLatitudeE6())/1000000), (((double)loc.getLongitudeE6())/1000000)));
                 mapItem.setMarker(marker);
@@ -134,8 +163,20 @@ public class FragmentMap extends Fragment {
         };
 
         map.getOverlays().add(touchOverlay);
+        createListWithAdapter();
 
+        return rootView;
+    }
 
+    public boolean isRouteInArea(Route route, GeoPoint geoPoint){
+        for(Point p : route.getPoints()){
+            int distance = new GeoPoint(p.getLatitude(),p.getLongitude()).distanceTo(geoPoint);
+            if(distance<POSITION_DIAMETER) return true;
+        }
+        return false;
+    }
+
+    private void createListWithAdapter(){
         ListView lv = (ListView) rootView.findViewById(R.id.ListView);
         AdapterCategory adapter = new AdapterCategory(this.getActivity(), category);
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -143,18 +184,14 @@ public class FragmentMap extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 final int pos = position;
                 //CODIGO AQUI
-
             }
         });
         lv.setAdapter(adapter);
-
-        return rootView;
     }
 
     @Override
     public void onResume() {
         super.onResume();
-
     }
 }
 
