@@ -52,6 +52,7 @@ public class FragmentMap extends Fragment {
     private final int POSITION_DIAMETER = 150;
     private Category cat;
     private View rootView;
+    private DataBaseHelper myDbHelper;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -66,24 +67,18 @@ public class FragmentMap extends Fragment {
         rootView = inflater.inflate(R.layout.fragment_mapa, container, false);
 
         //seccion que carga reccorridos de la base de datos
-        DataBaseHelper myDbHelper = new DataBaseHelper(this.getActivity());
+        myDbHelper = new DataBaseHelper(this.getActivity());
         try {
             myDbHelper.NoCheckCreateDataBase();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        Lineas = myDbHelper.findCompanies();
-        for(Company linea : Lineas){
-            cat = new Category("Recorrido",linea.getName(),"micro que va al centro",getResources().getDrawable(R.drawable.ic_1a));
-            category.add(cat);
-        }
-
         //seccion que carga el mapa y lo configura
         org.osmdroid.tileprovider.constants.OpenStreetMapTileProviderConstants.setUserAgentValue(BuildConfig.APPLICATION_ID);
         MapView map = (MapView) rootView.findViewById(R.id.map);
         map.setTileSource(TileSourceFactory.MAPNIK);
-        map.setBuiltInZoomControls(true);
+        map.setBuiltInZoomControls(false);
         map.setMultiTouchControls(true);
         //map.setUseDataConnection(false);
 
@@ -119,28 +114,8 @@ public class FragmentMap extends Fragment {
                 String longitude = Double.toString(((double)loc.getLongitudeE6())/1000000);
                 String latitude = Double.toString(((double)loc.getLatitudeE6())/1000000);
 
-                Toast toast = Toast.makeText(getActivity(), "Latitud = " + latitude + ", Longitud = " + longitude , Toast.LENGTH_SHORT);
-                toast.show();
-
                 GeoPoint geoPointUser = new GeoPoint(Double.parseDouble(latitude),Double.parseDouble(longitude));
-                List<Company> companies = myDbHelper.findCompanies();
-                routes = new ArrayList<Route>();
-
-                for(Company c : companies){
-                    for(Route r : c.getRoutes()){
-                        if(isRouteInArea(r, geoPointUser)){
-                            routes.add(r);
-                        }
-                    }
-                }
-
-                category = new ArrayList<Category>();
-                if(routes!=null && !routes.isEmpty()){
-                    for(Route route : routes){
-                        cat = new Category("Recorrido", route.getName() + "", "micro que va al centro", getResources().getDrawable(R.drawable.ic_1a));
-                        category.add(cat);
-                    }
-                }
+                findNearRoutes(geoPointUser);
                 createListWithAdapter();
 
                 ArrayList<OverlayItem> overlayArray = new ArrayList<OverlayItem>();
@@ -176,7 +151,27 @@ public class FragmentMap extends Fragment {
         return false;
     }
 
+    public void findNearRoutes(GeoPoint geoPointUser){
+        List<Company> companies = myDbHelper.findCompanies();
+        routes = new ArrayList<Route>();
+
+        for(Company c : companies){
+            for(Route r : c.getRoutes()){
+                if(isRouteInArea(r, geoPointUser)){
+                    routes.add(r);
+                }
+            }
+        }
+    }
+
     private void createListWithAdapter(){
+        category = new ArrayList<Category>();
+        if(routes!=null && !routes.isEmpty()){
+            for(Route route : routes){
+                cat = new Category("Recorrido", route.getName() + "", "micro que va al centro", getResources().getDrawable(R.drawable.ic_1a));
+                category.add(cat);
+            }
+        }
         ListView lv = (ListView) rootView.findViewById(R.id.ListView);
         AdapterCategory adapter = new AdapterCategory(this.getActivity(), category);
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
