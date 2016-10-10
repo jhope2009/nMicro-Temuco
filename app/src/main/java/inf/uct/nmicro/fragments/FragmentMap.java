@@ -68,8 +68,7 @@ public class FragmentMap extends Fragment implements View.OnClickListener {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         rootView = inflater.inflate(R.layout.fragment_mapa, container, false);
 
@@ -110,8 +109,6 @@ public class FragmentMap extends Fragment implements View.OnClickListener {
         //    }
         //});
 
-
-
         Overlay touchOverlay = new Overlay(this.getContext()){
             ItemizedIconOverlay<OverlayItem> anotherItemizedIconOverlay = null;
             @Override
@@ -129,7 +126,11 @@ public class FragmentMap extends Fragment implements View.OnClickListener {
 
                 GeoPoint geoPointUser = new GeoPoint(Double.parseDouble(latitude),Double.parseDouble(longitude));
                 findNearRoutes(geoPointUser);
+
                 createListWithAdapter();
+
+                mapController.animateTo(geoPointUser);
+                mapController.zoomTo(16);
 
                 ArrayList<OverlayItem> overlayArray = new ArrayList<OverlayItem>();
                 OverlayItem mapItem = new OverlayItem("", "", new GeoPoint((((double)loc.getLatitudeE6())/1000000), (((double)loc.getLongitudeE6())/1000000)));
@@ -149,9 +150,7 @@ public class FragmentMap extends Fragment implements View.OnClickListener {
                 return true;
             }
         };
-
         map.getOverlays().add(touchOverlay);
-        createListWithAdapter();
 
         return rootView;
     }
@@ -179,13 +178,13 @@ public class FragmentMap extends Fragment implements View.OnClickListener {
 
     private void createListWithAdapter(){
         category = new ArrayList<Category>();
-        morph.hide();
         if(routes!=null && !routes.isEmpty()){
-            morph.show();
+
             for(Route route : routes){
                 cat = new Category("Recorrido", route.getName() + "", "micro que va al centro", getResources().getDrawable(R.drawable.ic_1a));
                 category.add(cat);
             }
+            morph.show();
         }
         ListView lv = (ListView) rootView.findViewById(R.id.ListView);
         AdapterCategory adapter = new AdapterCategory(this.getActivity(), category);
@@ -197,7 +196,12 @@ public class FragmentMap extends Fragment implements View.OnClickListener {
                 //CODIGO AQUI
             }
         });
+
         lv.setAdapter(adapter);
+    }
+
+    private void centerMapWithTouch(){
+
     }
 
     @Override
