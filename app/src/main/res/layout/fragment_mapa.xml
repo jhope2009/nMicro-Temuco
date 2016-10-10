@@ -10,6 +10,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
+
+
     <com.github.fafaldo.fabtoolbar.widget.FABToolbarLayout
         android:id="@+id/fabtoolbar"
         android:layout_width="match_parent"
@@ -18,10 +20,11 @@
         app:fabId="@+id/fab"
         app:fabToolbarId="@+id/fabtoolbar_toolbar"
         app:fadeInFraction="0.2"
-        app:hideDuration="600"
+        app:hideDuration="100"
         app:horizontalMargin="@dimen/custom_tab_layout_height"
         app:showDuration="600"
-        app:verticalMargin="@dimen/custom_tab_layout_height">
+        app:verticalMargin="@dimen/custom_tab_layout_height"
+        app:fabDrawableAnimationEnabled="false">
 
         <RelativeLayout
             android:id="@id/fabtoolbar_container"
