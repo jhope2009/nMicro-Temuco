@@ -6,6 +6,7 @@ package inf.uct.nmicro.fragments;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.BuildConfig;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -17,6 +18,8 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
+
+import com.github.fafaldo.fabtoolbar.widget.FABToolbarLayout;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -43,16 +46,20 @@ import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 
-public class FragmentMap extends Fragment {
+public class FragmentMap extends Fragment implements View.OnClickListener {
 
     private MapController mapController;
     private ArrayList<Category> category = new ArrayList<Category>();
     private List<Company> Lineas;
     private List<Route> routes;
     private final int POSITION_DIAMETER = 150;
-    private Category cat;
+
     private View rootView;
     private DataBaseHelper myDbHelper;
+    private FABToolbarLayout morph;
+    private ListView lv;
+    private AdapterCategory adapter;
+    private Category cat;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -65,6 +72,12 @@ public class FragmentMap extends Fragment {
                              Bundle savedInstanceState) {
 
         rootView = inflater.inflate(R.layout.fragment_mapa, container, false);
+
+        FloatingActionButton fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
+        morph = (FABToolbarLayout) rootView.findViewById(R.id.fabtoolbar);
+
+        morph.hide();
+        fab.setOnClickListener(this);
 
         //seccion que carga reccorridos de la base de datos
         myDbHelper = new DataBaseHelper(this.getActivity());
@@ -166,7 +179,9 @@ public class FragmentMap extends Fragment {
 
     private void createListWithAdapter(){
         category = new ArrayList<Category>();
+        morph.hide();
         if(routes!=null && !routes.isEmpty()){
+            morph.show();
             for(Route route : routes){
                 cat = new Category("Recorrido", route.getName() + "", "micro que va al centro", getResources().getDrawable(R.drawable.ic_1a));
                 category.add(cat);
@@ -178,6 +193,7 @@ public class FragmentMap extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 final int pos = position;
+                morph.hide();
                 //CODIGO AQUI
             }
         });
@@ -187,6 +203,15 @@ public class FragmentMap extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == R.id.fab) {
+            morph.show();
+        }
+
+        morph.hide();
     }
 }
 
