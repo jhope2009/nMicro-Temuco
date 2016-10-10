@@ -4,6 +4,7 @@ package inf.uct.nmicro.fragments;
  * Created by jairo on 9/28/2016.
  */
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -43,6 +44,7 @@ import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.ItemizedOverlayWithFocus;
 import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.OverlayItem;
+import org.osmdroid.views.overlay.PathOverlay;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 
@@ -60,6 +62,7 @@ public class FragmentMap extends Fragment implements View.OnClickListener {
     private ListView lv;
     private AdapterCategory adapter;
     private Category cat;
+    private List<Point> points;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -194,6 +197,16 @@ public class FragmentMap extends Fragment implements View.OnClickListener {
                 final int pos = position;
                 morph.hide();
                 //CODIGO AQUI
+                String nombres=routes.get(pos).getName();
+                points=myDbHelper.findPointsByRoute(pos);
+                PathOverlay ruta=new PathOverlay(Color.BLUE, getContext());
+                for(Point pto : points){
+                    GeoPoint gp=new GeoPoint(pto.getLatitude(),pto.getLongitude());
+                    ruta.addPoint(gp);
+                }
+                MapView map = (MapView) rootView.findViewById(R.id.map);
+                map.getOverlays().add(ruta);
+                Toast.makeText(getContext(),nombres, Toast.LENGTH_SHORT).show();
             }
         });
 
