@@ -1,6 +1,7 @@
 package inf.uct.nmicro.fragments;
 
 
+import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.graphics.Color;
@@ -25,6 +26,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import inf.uct.nmicro.MainActivity;
 import inf.uct.nmicro.R;
 import inf.uct.nmicro.model.Company;
 import inf.uct.nmicro.model.Point;
@@ -45,7 +47,27 @@ public class FragmentRoutes extends Fragment {
     public String aux="";
     private List<Point> points;
     private List<Route> routes;
+    Intent intent;
+    OnHeadlineSelectedListener mCallback;
 
+    // Container Activity must implement this interface
+    public interface OnHeadlineSelectedListener {
+        public void onroute(int position);
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+
+        // This makes sure that the container activity has implemented
+        // the callback interface. If not, it throws an exception
+        try {
+            mCallback = (OnHeadlineSelectedListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnHeadlineSelectedListener");
+        }
+    }
     public FragmentRoutes() {
         // Required empty public constructor
     }
@@ -90,7 +112,7 @@ public class FragmentRoutes extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 final int pos = position;
-                routes.get(pos);
+              /*  routes.get(pos);
                 String nombres=routes.get(pos).getName();
                 points=myDbHelper.findPointsByRoute(pos);
                 PathOverlay ruta=new PathOverlay(Color.BLUE, getContext());
@@ -102,10 +124,16 @@ public class FragmentRoutes extends Fragment {
                 map.getOverlays().add(ruta);
                 Toast.makeText(getContext(),nombres, Toast.LENGTH_SHORT).show();
                 //  GeoPoint gp=new GeoPoint(gp.getLatitude()+gp.getLatitude());
+                View listView = getActivity().findViewById(R.id.tabs);
+                */
+                mCallback.onroute(pos);
 
 
             }
+
+
         });
+
 
         lv.setAdapter(adapter);
         return rootView;

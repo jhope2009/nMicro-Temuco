@@ -1,6 +1,7 @@
 package inf.uct.nmicro;
 
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 
@@ -8,6 +9,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -28,7 +30,7 @@ import inf.uct.nmicro.model.Company;
 import inf.uct.nmicro.sqlite.DataBaseHelper;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity{
     private Toolbar toolbar;
     private TabLayout tabLayout;
     private ViewPager viewPager;
@@ -38,6 +40,36 @@ public class MainActivity extends AppCompatActivity {
             R.drawable.ic_toggle_star,
             R.drawable.ic_rutas2
     };
+    /* intentando pasar de fragment y los datos. */
+
+     public void onroute(int position) {
+        // The user selected the headline of an article from the HeadlinesFragment
+        // Do something here to display that article
+
+       FragmentMap articleFrag = (FragmentMap)
+                getSupportFragmentManager().findFragmentByTag("FragmentMap");
+
+
+            // Otherwise, we're in the one-pane layout and must swap frags...
+
+            // Create fragment and give it an argument for the selected article
+            FragmentMap newFragment = new FragmentMap();
+            Bundle args = new Bundle();
+           // args.putInt(FragmentMap.ARG_POSITION, position);
+            newFragment.setArguments(args);
+
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+
+            // Replace whatever is in the fragment_container view with this fragment,
+            // and add the transaction to the back stack so the user can navigate back
+          //  transaction.replace(R.id.FragmentRoutes, newFragment);
+            transaction.addToBackStack(null);
+
+            // Commit the transaction
+            transaction.commit();
+        }
+//terminan los dato
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,10 +157,14 @@ public class MainActivity extends AppCompatActivity {
             mFragmentTitleList.add(title);
         }
 
+
         @Override
         public CharSequence getPageTitle(int position) {
             return mFragmentTitleList.get(position);
 
         }
     }
+
+
+
 }
