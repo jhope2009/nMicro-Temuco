@@ -75,21 +75,16 @@ public class MainActivity extends AppCompatActivity {
 
         TextView tabOne = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
         tabOne.setText("Inicio");
-
         tabOne.setCompoundDrawablesWithIntrinsicBounds(0,tabIcons[0] , 0, 0);
         tabLayout.getTabAt(0).setCustomView(tabOne);
-
         TextView tabTwo = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
         tabTwo.setText("Recorrido");
-
         tabTwo.setCompoundDrawablesWithIntrinsicBounds(0, tabIcons[1], 0, 0);
         tabLayout.getTabAt(1).setCustomView(tabTwo);
-
         TextView tabThree = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
         tabThree.setText("Favoritos");
         tabThree.setCompoundDrawablesWithIntrinsicBounds(0, tabIcons[2], 0, 0);
         tabLayout.getTabAt(2).setCustomView(tabThree);
-
         TextView tabFour = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
         tabFour.setText("Mi Ruta");
         tabFour.setCompoundDrawablesWithIntrinsicBounds(0, tabIcons[3], 0, 0);

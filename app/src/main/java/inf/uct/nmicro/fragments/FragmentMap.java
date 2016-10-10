@@ -4,9 +4,9 @@ package inf.uct.nmicro.fragments;
  * Created by jairo on 9/28/2016.
  */
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.BuildConfig;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -19,12 +19,11 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import com.github.fafaldo.fabtoolbar.widget.FABToolbarLayout;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import inf.uct.nmicro.MainActivity;
 import inf.uct.nmicro.R;
 import inf.uct.nmicro.model.Company;
 import inf.uct.nmicro.model.Point;
@@ -43,23 +42,21 @@ import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.ItemizedOverlayWithFocus;
 import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.OverlayItem;
+import org.osmdroid.views.overlay.PathOverlay;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 
-public class FragmentMap extends Fragment implements View.OnClickListener {
+public class FragmentMap extends Fragment {
 
     private MapController mapController;
     private ArrayList<Category> category = new ArrayList<Category>();
     private List<Company> Lineas;
     private List<Route> routes;
     private final int POSITION_DIAMETER = 150;
-
+    private Category cat;
     private View rootView;
     private DataBaseHelper myDbHelper;
-    private FABToolbarLayout morph;
-    private ListView lv;
-    private AdapterCategory adapter;
-    private Category cat;
+    private List<Point> points;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -72,12 +69,6 @@ public class FragmentMap extends Fragment implements View.OnClickListener {
                              Bundle savedInstanceState) {
 
         rootView = inflater.inflate(R.layout.fragment_mapa, container, false);
-
-        FloatingActionButton fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
-        morph = (FABToolbarLayout) rootView.findViewById(R.id.fabtoolbar);
-
-        morph.hide();
-        fab.setOnClickListener(this);
 
         //seccion que carga reccorridos de la base de datos
         myDbHelper = new DataBaseHelper(this.getActivity());
@@ -179,22 +170,34 @@ public class FragmentMap extends Fragment implements View.OnClickListener {
 
     private void createListWithAdapter(){
         category = new ArrayList<Category>();
-        morph.hide();
         if(routes!=null && !routes.isEmpty()){
-            morph.show();
             for(Route route : routes){
                 cat = new Category("Recorrido", route.getName() + "", "micro que va al centro", getResources().getDrawable(R.drawable.ic_1a));
                 category.add(cat);
             }
         }
+        Lineas = myDbHelper.findCompanies();
         ListView lv = (ListView) rootView.findViewById(R.id.ListView);
         AdapterCategory adapter = new AdapterCategory(this.getActivity(), category);
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 final int pos = position;
-                morph.hide();
                 //CODIGO AQUI
+                routes.get(pos);
+                String nombres=routes.get(pos).getName();
+                points=myDbHelper.findPointsByRoute(routes.get(pos).getIdRoute());
+                String colores="IDA";
+                PathOverlay ruta=new PathOverlay(Color.BLUE, getContext());
+                for(Point pto : points){
+                    GeoPoint gp=new GeoPoint(pto.getLatitude(),pto.getLongitude());
+                    ruta.addPoint(gp);
+                }
+
+                MapView map = (MapView) rootView.findViewById(R.id.map);
+                map.getOverlays().add(ruta);
+                Toast.makeText(getContext(),nombres, Toast.LENGTH_SHORT).show();
+
             }
         });
         lv.setAdapter(adapter);
@@ -203,15 +206,6 @@ public class FragmentMap extends Fragment implements View.OnClickListener {
     @Override
     public void onResume() {
         super.onResume();
-    }
-
-    @Override
-    public void onClick(View v) {
-        if (v.getId() == R.id.fab) {
-            morph.show();
-        }
-
-        morph.hide();
     }
 }
 

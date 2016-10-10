@@ -1,16 +1,25 @@
 package inf.uct.nmicro.fragments;
 
 
+import android.app.FragmentTransaction;
+import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.BuildConfig;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.animation.LinearOutSlowInInterpolator;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
+
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.PathOverlay;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -18,6 +27,7 @@ import java.util.List;
 
 import inf.uct.nmicro.R;
 import inf.uct.nmicro.model.Company;
+import inf.uct.nmicro.model.Point;
 import inf.uct.nmicro.model.Route;
 import inf.uct.nmicro.sqlite.DataBaseHelper;
 import inf.uct.nmicro.utils.AdapterCategory;
@@ -32,6 +42,9 @@ public class FragmentRoutes extends Fragment {
     private ListView lv;
     private AdapterCategory adapter;
     private Category cat;
+    public String aux="";
+    private List<Point> points;
+    private List<Route> routes;
 
     public FragmentRoutes() {
         // Required empty public constructor
@@ -47,8 +60,7 @@ public class FragmentRoutes extends Fragment {
 
         ArrayList<Category> category = new ArrayList<Category>();
 
-        cat = new Category("Recorrido","1C 1A","micro que va al centro",getResources().getDrawable(R.drawable.ic_1a));
-        category.add(cat);
+
 
         View rootView = inflater.inflate(R.layout.fragment_routes, container, false);
         lv = (ListView) rootView.findViewById(R.id.ListView);
@@ -78,7 +90,19 @@ public class FragmentRoutes extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 final int pos = position;
-                //CODIGO AQUI
+                routes.get(pos);
+                String nombres=routes.get(pos).getName();
+                points=myDbHelper.findPointsByRoute(pos);
+                PathOverlay ruta=new PathOverlay(Color.BLUE, getContext());
+                for(Point pto : points){
+                    GeoPoint gp=new GeoPoint(pto.getLatitude(),pto.getLongitude());
+                    ruta.addPoint(gp);
+                }
+                MapView map = (MapView) rootView.findViewById(R.id.map);
+                map.getOverlays().add(ruta);
+                Toast.makeText(getContext(),nombres, Toast.LENGTH_SHORT).show();
+                //  GeoPoint gp=new GeoPoint(gp.getLatitude()+gp.getLatitude());
+
 
             }
         });
