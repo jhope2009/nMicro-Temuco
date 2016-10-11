@@ -36,6 +36,7 @@ import inf.uct.nmicro.sqlite.ITablesDB;
 import inf.uct.nmicro.utils.AdapterCategory;
 import inf.uct.nmicro.utils.Category;
 
+import org.osmdroid.api.Polyline;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapController;
@@ -66,6 +67,8 @@ public class FragmentMap extends Fragment implements View.OnClickListener {
     private List<Point> points;
     private List<Route> allRoutes;
     MapView map;
+    PathOverlay routesDraw;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -105,32 +108,34 @@ public class FragmentMap extends Fragment implements View.OnClickListener {
         mapController.setZoom(14);
         GeoPoint Temuco = new GeoPoint(-38.7392, -72.6087);
         mapController.setCenter(Temuco);
-        //final MyLocationNewOverlay myLocationoverlay = new MyLocationNewOverlay(this.getActivity(), map);
-        //myLocationoverlay.enableMyLocation();
-        //map.getOverlays().add(myLocationoverlay); //No añadir si no quieres una marca
+        final MyLocationNewOverlay myLocationoverlay = new MyLocationNewOverlay(this.getActivity(), map);
+        myLocationoverlay.enableMyLocation();
+        map.getOverlays().add(myLocationoverlay); //No añadir si no quieres una marca
 
-        //myLocationoverlay.runOnFirstFix(new Runnable() {
-        //    public void run() {
-        //        mapController.animateTo(myLocationoverlay.getMyLocation());
-        //    }
-        //});
+        myLocationoverlay.runOnFirstFix(new Runnable() {
+            public void run() {
+                mapController.animateTo(myLocationoverlay.getMyLocation());
+            }
+        });
 
-        Overlay touchOverlay = new Overlay(this.getContext()){
+        Overlay touchOverlay = new Overlay(this.getContext()) {
             ItemizedIconOverlay<OverlayItem> anotherItemizedIconOverlay = null;
+
             @Override
             protected void draw(Canvas arg0, MapView arg1, boolean arg2) {
 
             }
+
             @Override
-            public boolean onSingleTapConfirmed(final MotionEvent e, final MapView mapView) {
+            public boolean onLongPress(final MotionEvent e, final MapView mapView) {
 
                 final Drawable marker = getActivity().getResources().getDrawable(R.drawable.marker_default);
                 Projection proj = mapView.getProjection();
-                GeoPoint loc = (GeoPoint) proj.fromPixels((int)e.getX(), (int)e.getY());
-                String longitude = Double.toString(((double)loc.getLongitudeE6())/1000000);
-                String latitude = Double.toString(((double)loc.getLatitudeE6())/1000000);
+                GeoPoint loc = (GeoPoint) proj.fromPixels((int) e.getX(), (int) e.getY());
+                String longitude = Double.toString(((double) loc.getLongitudeE6()) / 1000000);
+                String latitude = Double.toString(((double) loc.getLatitudeE6()) / 1000000);
 
-                GeoPoint geoPointUser = new GeoPoint(Double.parseDouble(latitude),Double.parseDouble(longitude));
+                GeoPoint geoPointUser = new GeoPoint(Double.parseDouble(latitude), Double.parseDouble(longitude));
                 findNearRoutes(geoPointUser);
 
                 createListWithAdapter();
@@ -139,17 +144,17 @@ public class FragmentMap extends Fragment implements View.OnClickListener {
                 mapController.zoomTo(16);
 
                 ArrayList<OverlayItem> overlayArray = new ArrayList<OverlayItem>();
-                OverlayItem mapItem = new OverlayItem("", "", new GeoPoint((((double)loc.getLatitudeE6())/1000000), (((double)loc.getLongitudeE6())/1000000)));
+                OverlayItem mapItem = new OverlayItem("", "", new GeoPoint((((double) loc.getLatitudeE6()) / 1000000), (((double) loc.getLongitudeE6()) / 1000000)));
                 mapItem.setMarker(marker);
                 overlayArray.add(mapItem);
-                if(anotherItemizedIconOverlay==null){
-                    anotherItemizedIconOverlay = new ItemizedIconOverlay<OverlayItem>(getActivity(), overlayArray,null);
+                if (anotherItemizedIconOverlay == null) {
+                    anotherItemizedIconOverlay = new ItemizedIconOverlay<OverlayItem>(getActivity(), overlayArray, null);
                     mapView.getOverlays().add(anotherItemizedIconOverlay);
                     mapView.invalidate();
-                }else{
+                } else {
                     mapView.getOverlays().remove(anotherItemizedIconOverlay);
                     mapView.invalidate();
-                    anotherItemizedIconOverlay = new ItemizedIconOverlay<OverlayItem>(getActivity(), overlayArray,null);
+                    anotherItemizedIconOverlay = new ItemizedIconOverlay<OverlayItem>(getActivity(), overlayArray, null);
                     mapView.getOverlays().add(anotherItemizedIconOverlay);
                 }
                 //      dlgThread();
@@ -159,47 +164,46 @@ public class FragmentMap extends Fragment implements View.OnClickListener {
         map.getOverlays().add(touchOverlay);
 
 
-
         return rootView;
     }
 
-    public boolean isRouteInArea(Route route, GeoPoint geoPoint){
-        for(Point p : route.getPoints()){
-            int distance = new GeoPoint(p.getLatitude(),p.getLongitude()).distanceTo(geoPoint);
-            if(distance<POSITION_DIAMETER) return true;
+    public boolean isRouteInArea(Route route, GeoPoint geoPoint) {
+        for (Point p : route.getPoints()) {
+            int distance = new GeoPoint(p.getLatitude(), p.getLongitude()).distanceTo(geoPoint);
+            if (distance < POSITION_DIAMETER) return true;
         }
         return false;
     }
 
-    public void findNearRoutes(GeoPoint geoPointUser){
+    public void findNearRoutes(GeoPoint geoPointUser) {
         List<Company> companies = myDbHelper.findCompanies();
         routes = new ArrayList<Route>();
 
-        for(Company c : companies){
-            for(Route r : c.getRoutes()){
-                if(isRouteInArea(r, geoPointUser)){
+        for (Company c : companies) {
+            for (Route r : c.getRoutes()) {
+                if (isRouteInArea(r, geoPointUser)) {
                     routes.add(r);
                 }
             }
         }
     }
 
-    public void findAllRoutes(){
+    public void findAllRoutes() {
         List<Company> companies = myDbHelper.findCompanies();
         allRoutes = new ArrayList<Route>();
 
-        for(Company c : companies){
-            for(Route r : c.getRoutes()){
+        for (Company c : companies) {
+            for (Route r : c.getRoutes()) {
                 allRoutes.add(r);
             }
         }
     }
 
-    private void createListWithAdapter(){
+    private void createListWithAdapter() {
         category = new ArrayList<Category>();
-        if(routes!=null && !routes.isEmpty()){
+        if (routes != null && !routes.isEmpty()) {
 
-            for(Route route : routes){
+            for (Route route : routes) {
                 cat = new Category("Recorrido", route.getName() + "", "micro que va al centro", getResources().getDrawable(R.drawable.ic_1a));
                 category.add(cat);
             }
@@ -213,11 +217,11 @@ public class FragmentMap extends Fragment implements View.OnClickListener {
                 final int pos = position;
 
                 morph.hide();
-                String nombres=routes.get(pos).getName();
+                String nombres = routes.get(pos).getName();
 
-                DrawRoute(pos);
+                DrawRoute(routes.get(pos));
 
-                Toast.makeText(getContext(),nombres, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), nombres, Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -241,23 +245,27 @@ public class FragmentMap extends Fragment implements View.OnClickListener {
     @Override
     public void onStart() {
         super.onStart();
-        if (MainActivity.route != -1){
+        if (MainActivity.route != -1) {
             findAllRoutes();
             allRoutes.get(MainActivity.route);
-            DrawRoute(allRoutes.get(MainActivity.route).getIdRoute());
+            DrawRoute(allRoutes.get(MainActivity.route));
         }
-        Toast.makeText(getContext(),"Now onStart() calls", Toast.LENGTH_LONG).show(); //onStart
+        Toast.makeText(getContext(), "Now onStart() calls", Toast.LENGTH_LONG).show(); //onStart
     }
 
-    public void DrawRoute(int route){
-        points=myDbHelper.findPointsByRoute(route);
-        PathOverlay ruta=new PathOverlay(Color.BLUE,10, map.getResourceProxy());
-        for(Point pto : points){
-            GeoPoint gp=new GeoPoint(pto.getLatitude(),pto.getLongitude());
-            ruta.addPoint(gp);
+    //metodo que pinta las rutas.
+    public void DrawRoute(Route route) {
+
+        routesDraw = new PathOverlay(Color.BLUE, 10, map.getResourceProxy());
+        for (Point pto : route.getPoints()) {
+            GeoPoint gp = new GeoPoint(pto.getLatitude(), pto.getLongitude());
+            routesDraw.addPoint(gp);
+
+
         }
-        MapView map = (MapView) rootView.findViewById(R.id.map);
-        map.getOverlays().add(ruta);
+        map.getOverlay().clear();
+        map.getOverlays().remove(routesDraw);
+        map.invalidate();
+        map.getOverlays().add(routesDraw);
     }
 }
-

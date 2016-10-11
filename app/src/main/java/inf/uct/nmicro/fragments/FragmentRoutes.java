@@ -52,8 +52,6 @@ public class FragmentRoutes extends Fragment {
     public int IdRouteSelected;
 
 
-
-
     public FragmentRoutes() {
         // Required empty public constructor
 
