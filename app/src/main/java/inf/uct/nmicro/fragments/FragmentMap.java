@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import inf.uct.nmicro.MainActivity;
 import inf.uct.nmicro.R;
 import inf.uct.nmicro.model.Company;
 import inf.uct.nmicro.model.Point;
@@ -63,6 +64,8 @@ public class FragmentMap extends Fragment implements View.OnClickListener {
     private AdapterCategory adapter;
     private Category cat;
     private List<Point> points;
+    private List<Route> allRoutes;
+    MapView map;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -91,7 +94,7 @@ public class FragmentMap extends Fragment implements View.OnClickListener {
 
         //seccion que carga el mapa y lo configura
         org.osmdroid.tileprovider.constants.OpenStreetMapTileProviderConstants.setUserAgentValue(BuildConfig.APPLICATION_ID);
-        MapView map = (MapView) rootView.findViewById(R.id.map);
+        map = (MapView) rootView.findViewById(R.id.map);
         map.setTileSource(TileSourceFactory.MAPNIK);
         map.setBuiltInZoomControls(false);
         map.setMultiTouchControls(true);
@@ -155,6 +158,8 @@ public class FragmentMap extends Fragment implements View.OnClickListener {
         };
         map.getOverlays().add(touchOverlay);
 
+
+
         return rootView;
     }
 
@@ -179,6 +184,17 @@ public class FragmentMap extends Fragment implements View.OnClickListener {
         }
     }
 
+    public void findAllRoutes(){
+        List<Company> companies = myDbHelper.findCompanies();
+        allRoutes = new ArrayList<Route>();
+
+        for(Company c : companies){
+            for(Route r : c.getRoutes()){
+                allRoutes.add(r);
+            }
+        }
+    }
+
     private void createListWithAdapter(){
         category = new ArrayList<Category>();
         if(routes!=null && !routes.isEmpty()){
@@ -195,26 +211,17 @@ public class FragmentMap extends Fragment implements View.OnClickListener {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 final int pos = position;
+
                 morph.hide();
-                //CODIGO AQUI
                 String nombres=routes.get(pos).getName();
-                points=myDbHelper.findPointsByRoute(pos);
-                PathOverlay ruta=new PathOverlay(Color.BLUE, getContext());
-                for(Point pto : points){
-                    GeoPoint gp=new GeoPoint(pto.getLatitude(),pto.getLongitude());
-                    ruta.addPoint(gp);
-                }
-                MapView map = (MapView) rootView.findViewById(R.id.map);
-                map.getOverlays().add(ruta);
+
+                DrawRoute(pos);
+
                 Toast.makeText(getContext(),nombres, Toast.LENGTH_SHORT).show();
             }
         });
 
         lv.setAdapter(adapter);
-    }
-
-    private void centerMapWithTouch(){
-
     }
 
     @Override
@@ -229,6 +236,28 @@ public class FragmentMap extends Fragment implements View.OnClickListener {
         }
 
         morph.hide();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (MainActivity.route != -1){
+            findAllRoutes();
+            allRoutes.get(MainActivity.route);
+            DrawRoute(allRoutes.get(MainActivity.route).getIdRoute());
+        }
+        Toast.makeText(getContext(),"Now onStart() calls", Toast.LENGTH_LONG).show(); //onStart
+    }
+
+    public void DrawRoute(int route){
+        points=myDbHelper.findPointsByRoute(route);
+        PathOverlay ruta=new PathOverlay(Color.BLUE,10, map.getResourceProxy());
+        for(Point pto : points){
+            GeoPoint gp=new GeoPoint(pto.getLatitude(),pto.getLongitude());
+            ruta.addPoint(gp);
+        }
+        MapView map = (MapView) rootView.findViewById(R.id.map);
+        map.getOverlays().add(ruta);
     }
 }
 

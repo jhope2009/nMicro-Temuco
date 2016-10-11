@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.v4.BuildConfig;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.view.ViewPager;
 import android.support.v4.view.animation.LinearOutSlowInInterpolator;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -46,30 +47,16 @@ public class FragmentRoutes extends Fragment {
     private Category cat;
     public String aux="";
     private List<Point> points;
-    private List<Route> routes;
-    Intent intent;
-    OnHeadlineSelectedListener mCallback;
+    private ArrayList<Route> routes;
+    public Intent intent;
+    public int IdRouteSelected;
 
-    // Container Activity must implement this interface
-    public interface OnHeadlineSelectedListener {
-        public void onroute(int position);
-    }
 
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
 
-        // This makes sure that the container activity has implemented
-        // the callback interface. If not, it throws an exception
-        try {
-            mCallback = (OnHeadlineSelectedListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnHeadlineSelectedListener");
-        }
-    }
+
     public FragmentRoutes() {
         // Required empty public constructor
+
     }
 
     @Override
@@ -81,8 +68,6 @@ public class FragmentRoutes extends Fragment {
                              Bundle savedInstanceState) {
 
         ArrayList<Category> category = new ArrayList<Category>();
-
-
 
         View rootView = inflater.inflate(R.layout.fragment_routes, container, false);
         lv = (ListView) rootView.findViewById(R.id.ListView);
@@ -97,13 +82,14 @@ public class FragmentRoutes extends Fragment {
 
 
         List<Company> Lineas = myDbHelper.findCompanies();
-
+        routes =new ArrayList<Route>();
 
         for(Company linea : Lineas){
             List<Route> rutas = linea.getRoutes();
             for(Route ruta : rutas) {
                 cat = new Category("Recorrido", ruta.getName() + "", "micro que va al centro", getResources().getDrawable(R.drawable.ic_1a));
                 category.add(cat);
+                routes.add(ruta);
             }
         }
 
@@ -112,30 +98,20 @@ public class FragmentRoutes extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 final int pos = position;
-              /*  routes.get(pos);
-                String nombres=routes.get(pos).getName();
-                points=myDbHelper.findPointsByRoute(pos);
-                PathOverlay ruta=new PathOverlay(Color.BLUE, getContext());
-                for(Point pto : points){
-                    GeoPoint gp=new GeoPoint(pto.getLatitude(),pto.getLongitude());
-                    ruta.addPoint(gp);
-                }
-                MapView map = (MapView) rootView.findViewById(R.id.map);
-                map.getOverlays().add(ruta);
-                Toast.makeText(getContext(),nombres, Toast.LENGTH_SHORT).show();
-                //  GeoPoint gp=new GeoPoint(gp.getLatitude()+gp.getLatitude());
-                View listView = getActivity().findViewById(R.id.tabs);
-                */
-                mCallback.onroute(pos);
-
-
+                MainActivity.viewPager.setCurrentItem(0);
+                MainActivity.route = routes.get(pos).getIdRoute();
             }
-
-
         });
 
 
         lv.setAdapter(adapter);
         return rootView;
+    }
+
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
     }
 }
