@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/background_light"
+    android:weightSum="1">
+
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="65dp"
+        android:weightSum="10">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_weight="8"
+            android:layout_height="match_parent"
+            android:layout_width="0dp"
+            android:weightSum="5">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="Titulo Frase"
+                android:id="@+id/category"
+                android:textSize="21sp"
+                android:textColor="?attr/actionModeSplitBackground"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentStart="true"
+                android:layout_toStartOf="@+id/imageView4"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="3dp"
+                android:layout_weight="3" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:text="Texto Frase"
+                android:id="@+id/texto"
+                android:layout_below="@+id/category"
+                android:layout_alignParentStart="true"
+                android:layout_toStartOf="@+id/imageView4"
+                android:layout_marginLeft="10dp"
+                android:layout_weight="2"
+                android:textColor="@android:color/holo_blue_dark" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_weight="2"
+            android:layout_height="match_parent"
+            android:layout_width="0dp">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="73dp"
+                android:id="@+id/imageView4"
+                android:src="@drawable/marker_default"
+                android:adjustViewBounds="false"
+                android:scaleType="fitStart"
+                android:cropToPadding="false"
+                android:layout_alignTop="@+id/category"
+                android:layout_alignParentEnd="true"
+                android:layout_weight="0.81"
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="2dp" />
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

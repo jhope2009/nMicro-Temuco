@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--intento para poner en los tabs las letras y el icono :)-->
+    <string name="font_fontFamily_medium">sans-serif</string>
+</resources>
