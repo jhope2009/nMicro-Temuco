@@ -3,21 +3,46 @@ package inf.uct.nmicro;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
 import android.provider.Settings;
+import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
+import android.support.v4.*;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.AttributeSet;
+import android.view.MenuItem;
 import android.view.MotionEvent;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.view.LayoutInflater;
+import android.widget.Toast;
+
+import com.github.fafaldo.fabtoolbar.widget.FABToolbarLayout;
+
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.MapController;
+import org.osmdroid.views.MapView;
+import org.osmdroid.views.Projection;
+import org.osmdroid.views.overlay.ItemizedIconOverlay;
+import org.osmdroid.views.overlay.Overlay;
+import org.osmdroid.views.overlay.OverlayItem;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -28,11 +53,14 @@ import inf.uct.nmicro.fragments.FragmentMap;
 import inf.uct.nmicro.fragments.FragmentRoutes;
 import inf.uct.nmicro.fragments.FragmentToplan;
 import inf.uct.nmicro.model.Company;
+import inf.uct.nmicro.model.Point;
 import inf.uct.nmicro.model.Route;
 import inf.uct.nmicro.sqlite.DataBaseHelper;
+import inf.uct.nmicro.utils.AdapterCategory;
+import inf.uct.nmicro.utils.Category;
 
 
-public class MainActivity extends AppCompatActivity{
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
     private Toolbar toolbar;
     private TabLayout tabLayout;
     public static ViewPager viewPager;
@@ -43,86 +71,232 @@ public class MainActivity extends AppCompatActivity{
             R.drawable.ic_toggle_star,
             R.drawable.ic_rutas2
     };
+    private MapController mapController;
+    private ArrayList<Category> category = new ArrayList<Category>();
+    private List<Company> Lineas;
+    private List<Route> routes;
+    private final int POSITION_DIAMETER = 150;
+
+    private View rootView;
+    private DataBaseHelper myDbHelper;
+    private ListView lv;
+    private AdapterCategory adapter;
+    private Category cat;
+    private List<Point> points;
+    private List<Route> allRoutes;
+    MapView map;
+    private FABToolbarLayout morph;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        final Toolbar toolbar = (Toolbar) findViewById(R.id.MyToolbar);
         setSupportActionBar(toolbar);
-
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        viewPager = (ViewPager) findViewById(R.id.viewpager);
-        setupViewPager(viewPager);
+        CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapse_toolbar);
 
-        tabLayout = (TabLayout) findViewById(R.id.tabs);
-        tabLayout.setupWithViewPager(viewPager);
-        setupTabIcons();
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        morph = (FABToolbarLayout) findViewById(R.id.fabtoolbar);
 
+        morph.hide();
+        fab.setOnClickListener(this);
+
+
+        myDbHelper = new DataBaseHelper(this);
+        try {
+            myDbHelper.NoCheckCreateDataBase();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        //seccion que carga el mapa y lo configura
+        org.osmdroid.tileprovider.constants.OpenStreetMapTileProviderConstants.setUserAgentValue(android.support.v4.BuildConfig.APPLICATION_ID);
+        map = (MapView) findViewById(R.id.map);
+        map.setTileSource(TileSourceFactory.MAPNIK);
+        map.setBuiltInZoomControls(false);
+        map.setMultiTouchControls(true);
+
+        mapController = (MapController) map.getController();
+        mapController.setZoom(15);
+        GeoPoint Temuco = new GeoPoint(-38.7392, -72.6087);
+        mapController.setCenter(Temuco);
+
+        Overlay touchOverlay = new Overlay(this) {
+            ItemizedIconOverlay<OverlayItem> anotherItemizedIconOverlay = null;
+
+            @Override
+            protected void draw(Canvas arg0, MapView arg1, boolean arg2) {
+
+            }
+
+            @Override
+            public boolean onLongPress(final MotionEvent e, final MapView mapView) {
+
+                final Drawable marker = getApplicationContext().getResources().getDrawable(R.drawable.marker_default);
+                Projection proj = mapView.getProjection();
+                GeoPoint loc = (GeoPoint) proj.fromPixels((int) e.getX(), (int) e.getY());
+                String longitude = Double.toString(((double) loc.getLongitudeE6()) / 1000000);
+                String latitude = Double.toString(((double) loc.getLatitudeE6()) / 1000000);
+
+                GeoPoint geoPointUser = new GeoPoint(Double.parseDouble(latitude), Double.parseDouble(longitude));
+                findNearRoutes(geoPointUser);
+
+                createListWithAdapter();
+
+                mapController.animateTo(geoPointUser);
+                mapController.zoomTo(16);
+
+                ArrayList<OverlayItem> overlayArray = new ArrayList<OverlayItem>();
+                OverlayItem mapItem = new OverlayItem("", "", new GeoPoint((((double) loc.getLatitudeE6()) / 1000000), (((double) loc.getLongitudeE6()) / 1000000)));
+                mapItem.setMarker(marker);
+                overlayArray.add(mapItem);
+                if (anotherItemizedIconOverlay == null) {
+                    anotherItemizedIconOverlay = new ItemizedIconOverlay<OverlayItem>(getApplicationContext(), overlayArray, null);
+                    mapView.getOverlays().add(anotherItemizedIconOverlay);
+                    mapView.invalidate();
+                } else {
+                    mapView.getOverlays().remove(anotherItemizedIconOverlay);
+                    mapView.invalidate();
+                    anotherItemizedIconOverlay = new ItemizedIconOverlay<OverlayItem>(getApplicationContext(), overlayArray, null);
+                    mapView.getOverlays().add(anotherItemizedIconOverlay);
+                }
+                //      dlgThread();
+                return true;
+            }
+        };
+        map.getOverlays().add(touchOverlay);
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
+
+}
+
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == R.id.fab) {
+            morph.show();
+        }
+
+        morph.hide();
     }
-    private void setupTabIcons() {
 
-        TextView tabOne = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
-        tabOne.setText("Inicio");
-        tabOne.setCompoundDrawablesWithIntrinsicBounds(0,tabIcons[0] , 0, 0);
-        tabLayout.getTabAt(0).setCustomView(tabOne);
-        TextView tabTwo = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
-        tabTwo.setText("Recorrido");
-        tabTwo.setCompoundDrawablesWithIntrinsicBounds(0, tabIcons[1], 0, 0);
-        tabLayout.getTabAt(1).setCustomView(tabTwo);
-        TextView tabThree = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
-        tabThree.setText("Favoritos");
-        tabThree.setCompoundDrawablesWithIntrinsicBounds(0, tabIcons[2], 0, 0);
-        tabLayout.getTabAt(2).setCustomView(tabThree);
-        TextView tabFour = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
-        tabFour.setText("Mi Ruta");
-        tabFour.setCompoundDrawablesWithIntrinsicBounds(0, tabIcons[3], 0, 0);
-        tabLayout.getTabAt(3).setCustomView(tabFour);
-
+    public boolean isRouteInArea(Route route, GeoPoint geoPoint) {
+        for (Point p : route.getPoints()) {
+            int distance = new GeoPoint(p.getLatitude(), p.getLongitude()).distanceTo(geoPoint);
+            if (distance < POSITION_DIAMETER) return true;
+        }
+        return false;
     }
 
-    private void setupViewPager(ViewPager viewPager) {
-        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(new FragmentMap(), "Inicio");
-        adapter.addFragment(new FragmentRoutes() , "Recorridos");
-        adapter.addFragment(new FragmentFavorites(), "Favoritos");
-        adapter.addFragment(new FragmentToplan(), "Mi Ruta");
-        viewPager.isHorizontalScrollBarEnabled();
-        viewPager.setAdapter(adapter);
+    public void findNearRoutes(GeoPoint geoPointUser) {
+        List<Company> companies = myDbHelper.findCompanies();
+        routes = new ArrayList<Route>();
+
+        for (Company c : companies) {
+            for (Route r : c.getRoutes()) {
+                if (isRouteInArea(r, geoPointUser)) {
+                    routes.add(r);
+                }
+            }
+        }
     }
 
-    class ViewPagerAdapter extends FragmentPagerAdapter {
-        private final List<Fragment> mFragmentList = new ArrayList<>();
-        private final List<String> mFragmentTitleList = new ArrayList<>();
+    public void findAllRoutes() {
+        List<Company> companies = myDbHelper.findCompanies();
+        allRoutes = new ArrayList<Route>();
 
-        public ViewPagerAdapter(FragmentManager manager) {
-            super(manager);
+        for (Company c : companies) {
+            for (Route r : c.getRoutes()) {
+                allRoutes.add(r);
+            }
+        }
+    }
+
+    private void createListWithAdapter() {
+        category = new ArrayList<Category>();
+        if (routes != null && !routes.isEmpty()) {
+
+            for (Route route : routes) {
+                cat = new Category("Recorrido", route.getName() + "", "micro que va al centro", getResources().getDrawable(R.drawable.ic_1a));
+                category.add(cat);
+            }
+            morph.show();
+        }
+        ListView lv = (ListView) findViewById(R.id.ListView);
+        AdapterCategory adapter = new AdapterCategory(this, category);
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                final int pos = position;
+
+                morph.hide();
+                String nombres = routes.get(pos).getName();
+
+                //DrawRoute(routes.get(pos));
+
+                Toast.makeText(getApplicationContext(), nombres, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        lv.setAdapter(adapter);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (MainActivity.route != -1) {
+            findAllRoutes();
+            allRoutes.get(MainActivity.route);
+            //DrawRoute(allRoutes.get(MainActivity.route));
+        }
+        Toast.makeText(this, "Now onStart() calls", Toast.LENGTH_LONG).show(); //onStart
+    }
+
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+
+        if (id == R.id.nav_camera) {
+            // Handle the camera action
+        } else if (id == R.id.nav_gallery) {
+
+        } else if (id == R.id.nav_slideshow) {
+
+        } else if (id == R.id.nav_manage) {
+
+        } else if (id == R.id.nav_share) {
+
+        } else if (id == R.id.nav_send) {
+
         }
 
-        @Override
-        public Fragment getItem(int position) {
-            return mFragmentList.get(position);
-        }
-
-        @Override
-        public int getCount() {
-            return mFragmentList.size();
-        }
-
-        public void addFragment(Fragment fragment, String title) {
-            mFragmentList.add(fragment);
-            mFragmentTitleList.add(title);
-        }
-
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            return mFragmentTitleList.get(position);
-
-        }
-        public void setTab(int tab){
-            viewPager.setCurrentItem(tab);
-        }
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
     }
 }

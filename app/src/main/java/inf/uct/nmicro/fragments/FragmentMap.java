@@ -102,7 +102,7 @@ public class FragmentMap extends Fragment implements View.OnClickListener {
         map.setBuiltInZoomControls(false);
         map.setMultiTouchControls(true);
         //map.setUseDataConnection(false);
-
+/*
         //logica control del mapa
         mapController = (MapController) map.getController();
         mapController.setZoom(14);
@@ -117,7 +117,7 @@ public class FragmentMap extends Fragment implements View.OnClickListener {
                 mapController.animateTo(myLocationoverlay.getMyLocation());
             }
         });
-
+*/
         Overlay touchOverlay = new Overlay(this.getContext()) {
             ItemizedIconOverlay<OverlayItem> anotherItemizedIconOverlay = null;
 
@@ -219,7 +219,7 @@ public class FragmentMap extends Fragment implements View.OnClickListener {
                 morph.hide();
                 String nombres = routes.get(pos).getName();
 
-                DrawRoute(routes.get(pos));
+                //DrawRoute(routes.get(pos));
 
                 Toast.makeText(getContext(), nombres, Toast.LENGTH_SHORT).show();
             }
@@ -248,11 +248,11 @@ public class FragmentMap extends Fragment implements View.OnClickListener {
         if (MainActivity.route != -1) {
             findAllRoutes();
             allRoutes.get(MainActivity.route);
-            DrawRoute(allRoutes.get(MainActivity.route));
+            //DrawRoute(allRoutes.get(MainActivity.route));
         }
         Toast.makeText(getContext(), "Now onStart() calls", Toast.LENGTH_LONG).show(); //onStart
     }
-
+/*
     //metodo que pinta las rutas.
     public void DrawRoute(Route route) {
 
@@ -268,4 +268,5 @@ public class FragmentMap extends Fragment implements View.OnClickListener {
         map.invalidate();
         map.getOverlays().add(routesDraw);
     }
+    */
 }
