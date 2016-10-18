@@ -8,10 +8,27 @@
     android:weightSum="10">
 
     <LinearLayout
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="9"
+        android:layout_weight="4"
+        android:gravity="bottom">
+
+        <TextView
+            android:text="¿Donde deseas ir?"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView2"
+            android:gravity="center_horizontal"
+            android:textSize="30sp"
+            android:fontFamily="sans-serif"
+            android:textColor="@color/colorAccent" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="3"
         android:weightSum="10">
 
         <LinearLayout
@@ -25,16 +42,9 @@
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                app:srcCompat="@drawable/center"
-                android:id="@+id/imageView5"
-                android:layout_weight="2" />
-
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                app:srcCompat="@drawable/center"
+                app:srcCompat="@drawable/ic_rutas2"
                 android:id="@+id/imageView3"
-                android:layout_weight="2" />
+                android:layout_weight="6" />
         </LinearLayout>
 
         <LinearLayout
@@ -43,32 +53,26 @@
             android:layout_height="match_parent"
             android:layout_weight="6"
             android:weightSum="10"
-            android:gravity="center_vertical">
+            android:gravity="bottom">
 
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:inputType="textPersonName"
-                android:text="Name"
+                android:text="Origen"
                 android:ems="10"
                 android:id="@+id/editText4"
-                android:layout_weight="2" />
+                android:layout_weight="5" />
 
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:inputType="textPersonName"
-                android:text="Name"
+                android:text="Destino"
                 android:ems="10"
                 android:id="@+id/editText3"
-                android:layout_weight="2" />
+                android:layout_weight="5" />
 
-            <Button
-                android:text="Buscar Rutas"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:id="@+id/button4"
-                android:layout_weight="2" />
         </LinearLayout>
 
         <LinearLayout
@@ -77,14 +81,14 @@
             android:layout_height="match_parent"
             android:layout_weight="2"
             android:weightSum="10"
-            android:gravity="center_vertical|center_horizontal">
+            android:gravity="center_vertical">
 
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:srcCompat="@drawable/center"
+                app:srcCompat="@android:drawable/stat_sys_download_done"
                 android:id="@+id/imageView7"
-                android:layout_weight="4" />
+                android:layout_weight="2" />
         </LinearLayout>
 
     </LinearLayout>
@@ -93,17 +97,27 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_weight="3"
         android:weightSum="10"
         android:gravity="bottom">
+
+        <Button
+            android:text="Buscar Rutas"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:id="@+id/button4"
+            android:layout_weight="5"
+            android:elevation="7dp" />
 
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="0dp"
             app:srcCompat="@drawable/points"
             android:id="@+id/imageView9"
-            android:layout_weight="7"
-            android:background="@color/common_google_signin_btn_text_light_default" />
+            android:layout_weight="2"
+            android:background="@color/colorPrimaryDark"
+            android:paddingBottom="3dp"
+            android:paddingTop="3dp" />
 
     </LinearLayout>
 

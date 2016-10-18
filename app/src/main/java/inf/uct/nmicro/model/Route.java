@@ -1,5 +1,8 @@
 package inf.uct.nmicro.model;
 
+import android.graphics.drawable.Drawable;
+import android.widget.ImageView;
+
 import java.util.List;
 
 /**
@@ -12,8 +15,18 @@ public class Route {
 	private String name;
 	private List<Stop> stops;
 	private List<Point> points;
+	private Drawable img;
 	
 	public Route(){}
+
+	public Route(int idRoute, String name, List<Stop> stops, List<Point> points, Drawable img) {
+		super();
+		this.idRoute = idRoute;
+		this.name = name;
+		this.stops = stops;
+		this.points = points;
+		this.img = img;
+	}
 
 	public Route(int idRoute, String name, List<Stop> stops, List<Point> points) {
 		super();
@@ -46,6 +59,8 @@ public class Route {
 		return points;
 	}
 
+	public Drawable getImg() { return img;}
+
 	public void setIdRoute(int idRoute) {
 		this.idRoute = idRoute;
 	}
@@ -61,4 +76,6 @@ public class Route {
 	public void setPoints(List<Point> points) {
 		this.points = points;
 	}
+
+	public void setImg(Drawable img){ this.img = img; }
 }

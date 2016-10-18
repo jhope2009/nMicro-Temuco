@@ -26,9 +26,9 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
-            android:background="@drawable/temuco"
+            android:background="@color/colorPrimary"
             android:fitsSystemWindows="true"
-            app:contentScrim="@drawable/temuco"
+            app:contentScrim="@color/colorPrimaryDark"
             app:titleEnabled="false">
 
             <include
@@ -42,7 +42,7 @@
                 app:popupTheme="@style/AppTheme.PopupOverlay"
                 app:layout_collapseMode="pin"
                 android:elevation="10dp"
-                android:background="@color/common_google_signin_btn_text_light_disabled" />
+                android:background="@color/colorPrimaryDark"/>
 
 
         </android.support.design.widget.CollapsingToolbarLayout>
@@ -63,10 +63,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="10">
-
                     <include
                         layout="@layout/content_map" />
-
                 </LinearLayout>
 
 
@@ -82,7 +80,12 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:fitsSystemWindows="true"
-        app:headerLayout="@layout/nav_header_drawer"
-        app:menu="@menu/content_drawer" />
+        android:fitsSystemWindows="true">
+
+        <include
+            layout="@layout/content_drawer"/>
+
+    </android.support.design.widget.NavigationView>
+
+
 </android.support.v4.widget.DrawerLayout>

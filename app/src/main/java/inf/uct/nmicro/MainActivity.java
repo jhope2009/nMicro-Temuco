@@ -1,36 +1,26 @@
 package inf.uct.nmicro;
 
-
-import android.app.Activity;
-import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 
-import android.provider.Settings;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
-import android.support.v4.*;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.AttributeSet;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.TextView;
-import android.view.LayoutInflater;
 import android.widget.Toast;
 
 import com.github.fafaldo.fabtoolbar.widget.FABToolbarLayout;
@@ -48,16 +38,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import inf.uct.nmicro.fragments.FragmentFavorites;
-import inf.uct.nmicro.fragments.FragmentMap;
-import inf.uct.nmicro.fragments.FragmentRoutes;
-import inf.uct.nmicro.fragments.FragmentToplan;
 import inf.uct.nmicro.model.Company;
 import inf.uct.nmicro.model.Point;
 import inf.uct.nmicro.model.Route;
 import inf.uct.nmicro.sqlite.DataBaseHelper;
-import inf.uct.nmicro.utils.AdapterCategory;
-import inf.uct.nmicro.utils.Category;
+import inf.uct.nmicro.utils.AdapterRoute;
 
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
@@ -72,7 +57,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             R.drawable.ic_rutas2
     };
     private MapController mapController;
-    private ArrayList<Category> category = new ArrayList<Category>();
+    private ArrayList<Route> category = new ArrayList<Route>();
     private List<Company> Lineas;
     private List<Route> routes;
     private final int POSITION_DIAMETER = 150;
@@ -80,8 +65,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private View rootView;
     private DataBaseHelper myDbHelper;
     private ListView lv;
-    private AdapterCategory adapter;
-    private Category cat;
+    private AdapterRoute adapter;
+    private Route cat;
     private List<Point> points;
     private List<Route> allRoutes;
     MapView map;
@@ -94,7 +79,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapse_toolbar);
+        CollapsingToolbarLayout collapsin879gToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapse_toolbar);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         morph = (FABToolbarLayout) findViewById(R.id.fabtoolbar);
@@ -122,6 +107,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         GeoPoint Temuco = new GeoPoint(-38.7392, -72.6087);
         mapController.setCenter(Temuco);
 
+        /*
+        //logica control del mapa
+        mapController = (MapController) map.getController();
+        mapController.setZoom(14);
+        GeoPoint Temuco = new GeoPoint(-38.7392, -72.6087);
+        mapController.setCenter(Temuco);
+        final MyLocationNewOverlay myLocationoverlay = new MyLocationNewOverlay(this.getActivity(), map);
+        myLocationoverlay.enableMyLocation();
+        map.getOverlays().add(myLocationoverlay); //No añadir si no quieres una marca
+
+        myLocationoverlay.runOnFirstFix(new Runnable() {
+            public void run() {
+                mapController.animateTo(myLocationoverlay.getMyLocation());
+            }
+        });
+*/
+
         Overlay touchOverlay = new Overlay(this) {
             ItemizedIconOverlay<OverlayItem> anotherItemizedIconOverlay = null;
 
@@ -130,6 +132,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             }
 
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Override
             public boolean onLongPress(final MotionEvent e, final MapView mapView) {
 
@@ -220,18 +223,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void createListWithAdapter() {
-        category = new ArrayList<Category>();
+        category = new ArrayList<Route>();
         if (routes != null && !routes.isEmpty()) {
 
             for (Route route : routes) {
-                cat = new Category("Recorrido", route.getName() + "", "micro que va al centro", getResources().getDrawable(R.drawable.ic_1a));
+                cat = new Route(route.getIdRoute(), route.getName(), route.getStops(), route.getPoints(), getDrawable(R.drawable.ic_1a));
                 category.add(cat);
             }
             morph.show();
         }
         ListView lv = (ListView) findViewById(R.id.ListView);
-        AdapterCategory adapter = new AdapterCategory(this, category);
+        ListView lv1 = (ListView) findViewById(R.id.ListView1);
+        AdapterRoute adapter = new AdapterRoute(this, category);
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -245,8 +250,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Toast.makeText(getApplicationContext(), nombres, Toast.LENGTH_SHORT).show();
             }
         });
+        lv1.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                final int pos = position;
 
+                morph.hide();
+                String nombres = routes.get(pos).getName();
+
+                //DrawRoute(routes.get(pos));
+
+                Toast.makeText(getApplicationContext(), nombres, Toast.LENGTH_SHORT).show();
+            }
+        });
         lv.setAdapter(adapter);
+        lv1.setAdapter(adapter);
     }
 
     @Override

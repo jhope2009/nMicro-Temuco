@@ -16,20 +16,21 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import inf.uct.nmicro.R;
+import inf.uct.nmicro.model.Route;
 
 
-public class AdapterCategory extends BaseAdapter {
+public class AdapterRoute extends BaseAdapter {
 
     protected Activity activity;
     protected Fragment fragment;
-    protected ArrayList<Category> items;
+    protected ArrayList<Route> items;
 
-    public AdapterCategory (Activity activity, ArrayList<Category> items) {
+    public AdapterRoute(Activity activity, ArrayList<Route> items) {
         this.activity = activity;
         this.items = items;
     }
 
-    public AdapterCategory (Fragment fragment, ArrayList<Category> items) {
+    public AdapterRoute(Fragment fragment, ArrayList<Route> items) {
         this.fragment = fragment;
         this.items = items;
     }
@@ -43,9 +44,9 @@ public class AdapterCategory extends BaseAdapter {
         items.clear();
     }
 
-    public void addAll(ArrayList<Category> category) {
-        for (int i = 0; i < category.size(); i++) {
-            items.add(category.get(i));
+    public void addAll(ArrayList<Route> route) {
+        for (int i = 0; i < route.size(); i++) {
+            items.add(route.get(i));
         }
     }
 
@@ -56,7 +57,7 @@ public class AdapterCategory extends BaseAdapter {
 
     @Override
     public long getItemId(int position) {
-        return position;
+        return items.get(position).getIdRoute();
     }
 
     @Override
@@ -69,16 +70,13 @@ public class AdapterCategory extends BaseAdapter {
             v = inf.inflate(R.layout.item_category, null);
         }
 
-        Category dir = items.get(position);
+        Route dir = items.get(position);
 
         TextView title = (TextView) v.findViewById(R.id.category);
-        title.setText(dir.getTitle());
-
-        TextView description = (TextView) v.findViewById(R.id.texto);
-        description.setText(dir.getDescription());
+        title.setText(dir.getName());
 
         ImageView imagen = (ImageView) v.findViewById(R.id.imageView4);
-        imagen.setImageDrawable(dir.getImage());
+        imagen.setImageDrawable(dir.getImg());
 
         return v;
     }
