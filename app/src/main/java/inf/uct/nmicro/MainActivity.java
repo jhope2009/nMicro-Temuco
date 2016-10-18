@@ -20,6 +20,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ExpandableListView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -36,6 +37,7 @@ import org.osmdroid.views.overlay.OverlayItem;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import inf.uct.nmicro.model.Company;
@@ -43,6 +45,7 @@ import inf.uct.nmicro.model.Point;
 import inf.uct.nmicro.model.Route;
 import inf.uct.nmicro.sqlite.DataBaseHelper;
 import inf.uct.nmicro.utils.AdapterRoute;
+import inf.uct.nmicro.utils.ExpandableListAdapter;
 
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
@@ -71,6 +74,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private List<Route> allRoutes;
     MapView map;
     private FABToolbarLayout morph;
+
+    ExpandableListAdapter listAdapter;
+    ExpandableListView expListView;
+    List<String> listDataHeader;
+    HashMap<String, List<Route>> listDataChild;
+
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -106,6 +117,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mapController.setZoom(15);
         GeoPoint Temuco = new GeoPoint(-38.7392, -72.6087);
         mapController.setCenter(Temuco);
+
+        // get the listview
+        expListView = (ExpandableListView) findViewById(R.id.lvExp);
+
+        // preparing list data
+        prepareListData();
+
+        listAdapter = new ExpandableListAdapter(this, listDataHeader, listDataChild);
+
+        // setting list adapter
+        expListView.setAdapter(listAdapter);
 
         /*
         //logica control del mapa
@@ -168,6 +190,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 return true;
             }
         };
+
         map.getOverlays().add(touchOverlay);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -235,7 +258,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             morph.show();
         }
         ListView lv = (ListView) findViewById(R.id.ListView);
-        ListView lv1 = (ListView) findViewById(R.id.ListView1);
+
         AdapterRoute adapter = new AdapterRoute(this, category);
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -250,21 +273,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Toast.makeText(getApplicationContext(), nombres, Toast.LENGTH_SHORT).show();
             }
         });
-        lv1.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                final int pos = position;
 
-                morph.hide();
-                String nombres = routes.get(pos).getName();
-
-                //DrawRoute(routes.get(pos));
-
-                Toast.makeText(getApplicationContext(), nombres, Toast.LENGTH_SHORT).show();
-            }
-        });
         lv.setAdapter(adapter);
-        lv1.setAdapter(adapter);
     }
 
     @Override
@@ -275,12 +285,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onStart() {
         super.onStart();
-        if (MainActivity.route != -1) {
             findAllRoutes();
-            allRoutes.get(MainActivity.route);
             //DrawRoute(allRoutes.get(MainActivity.route));
-        }
-        Toast.makeText(this, "Now onStart() calls", Toast.LENGTH_LONG).show(); //onStart
     }
 
     @Override
@@ -316,5 +322,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    private void prepareListData() {
+        listDataHeader = new ArrayList<String>();
+        listDataChild = new HashMap<String, List<Route>>();
+
+        // Adding child data
+        listDataHeader.add("Recorridos");
+        listDataHeader.add("Paraderos");
+        listDataHeader.add("mmm nose");
+
+        // Adding child data
+        findAllRoutes();
+        List<Route> top250 = new ArrayList<Route>();
+        for (Route route : allRoutes) {
+            cat = new Route(route.getIdRoute(), route.getName(), route.getStops(), route.getPoints(), getDrawable(R.drawable.ic_1a));
+            top250.add(cat);
+        }
+
+        listDataChild.put(listDataHeader.get(0), top250); // Header, Child data
     }
 }
