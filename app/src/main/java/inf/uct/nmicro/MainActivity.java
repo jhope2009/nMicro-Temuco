@@ -2,6 +2,7 @@ package inf.uct.nmicro;
 
 import android.annotation.TargetApi;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
@@ -38,6 +39,7 @@ import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.OverlayItem;
+import org.osmdroid.views.overlay.PathOverlay;
 import org.osmdroid.views.overlay.ScaleBarOverlay;
 
 import java.io.IOException;
@@ -60,12 +62,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private TabLayout tabLayout;
     public static ViewPager viewPager;
     public static int route = -1;
-    private int[] tabIcons={
+    private int[] tabIcons = {
             R.drawable.ic_maps_map,
             R.drawable.ic_recorrido,
             R.drawable.ic_toggle_star,
             R.drawable.ic_rutas2
     };
+
     private MapController mapController;
     private ArrayList<Route> category = new ArrayList<Route>();
     private List<Company> Lineas;
@@ -87,6 +90,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     List<String> listDataHeader;
     HashMap<String, List<Route>> listDataChild;
     ArrayList<OverlayItem> anotherOverlayItemArray;
+    PathOverlay routesDraw;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -125,7 +129,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mapController.setCenter(Temuco);
 
 
-
         //espacio de trabajo para mostrar los paraderos en el mapa.
         /*
         anotherOverlayItemArray = new ArrayList<OverlayItem>();
@@ -144,10 +147,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         map.getOverlays().add(anotherItemizedIconOverlay);
         */
 
-        ArrayList<Stop> paraderos=myDbHelper.findAllStops();
-        for(Stop st : paraderos){
-            GeoPoint gp=new GeoPoint(st.getLatitude(),st.getLongitude());
-            Marker p1=new Marker(map);
+        ArrayList<Stop> paraderos = myDbHelper.findAllStops();
+        for (Stop st : paraderos) {
+            GeoPoint gp = new GeoPoint(st.getLatitude(), st.getLongitude());
+            Marker p1 = new Marker(map);
             p1.setIcon(this.getResources().getDrawable(R.drawable.ic_bustop));
             p1.setPosition(gp);
             p1.setTitle(st.getAddress());
@@ -160,12 +163,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         // preparing list data
         prepareListData();
-
         listAdapter = new ExpandableListAdapter(this, listDataHeader, listDataChild);
-
         // setting list adapter
         expListView.setAdapter(listAdapter);
-
         Overlay touchOverlay = new Overlay(this) {
             ItemizedIconOverlay<OverlayItem> anotherItemizedIconOverlay = null;
 
@@ -223,7 +223,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         navigationView.setNavigationItemSelectedListener(this);
 
 
-}
+    }
 
     @Override
     public void onClick(View v) {
@@ -288,7 +288,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 morph.hide();
                 String nombres = routes.get(pos).getName();
 
-                //DrawRoute(routes.get(pos));
+                DrawRoute(routes.get(pos));
 
                 Toast.makeText(getApplicationContext(), nombres, Toast.LENGTH_SHORT).show();
             }
@@ -305,8 +305,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onStart() {
         super.onStart();
-            findAllRoutes();
-            //DrawRoute(allRoutes.get(MainActivity.route));
+        findAllRoutes();
+        //DrawRoute(allRoutes.get(MainActivity.route));
     }
 
     @Override
@@ -364,5 +364,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         listDataChild.put(listDataHeader.get(0), top250); // Header, Child data
+    }
+
+    //metodo que pinta las rutas.
+    public void DrawRoute(Route route) {
+
+        routesDraw = new PathOverlay(Color.BLUE, 10, this);
+        for (Point pto : route.getPoints()) {
+            GeoPoint gp = new GeoPoint(pto.getLatitude(), pto.getLongitude());
+            routesDraw.addPoint(gp);
+        }
+
+
+
+
+
+
+
     }
 }
