@@ -1,7 +1,10 @@
 package inf.uct.nmicro;
 
+import android.annotation.TargetApi;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -32,17 +35,21 @@ import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.Projection;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
+import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.OverlayItem;
+import org.osmdroid.views.overlay.ScaleBarOverlay;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 import inf.uct.nmicro.model.Company;
 import inf.uct.nmicro.model.Point;
 import inf.uct.nmicro.model.Route;
+import inf.uct.nmicro.model.Stop;
 import inf.uct.nmicro.sqlite.DataBaseHelper;
 import inf.uct.nmicro.utils.AdapterRoute;
 import inf.uct.nmicro.utils.ExpandableListAdapter;
@@ -79,7 +86,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     ExpandableListView expListView;
     List<String> listDataHeader;
     HashMap<String, List<Route>> listDataChild;
-
+    ArrayList<OverlayItem> anotherOverlayItemArray;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -112,12 +119,42 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         map.setTileSource(TileSourceFactory.MAPNIK);
         map.setBuiltInZoomControls(false);
         map.setMultiTouchControls(true);
-
         mapController = (MapController) map.getController();
         mapController.setZoom(15);
         GeoPoint Temuco = new GeoPoint(-38.7392, -72.6087);
         mapController.setCenter(Temuco);
 
+
+
+        //espacio de trabajo para mostrar los paraderos en el mapa.
+        /*
+        anotherOverlayItemArray = new ArrayList<OverlayItem>();
+        Drawable iconsMarker1=this.getResources().getDrawable(R.drawable.ic_bustop);
+        ArrayList<Stop> paraderos=myDbHelper.findAllStops();
+        for(Stop st : paraderos){
+
+            OverlayItem p1=new OverlayItem(st.getAddress(),String.valueOf(st.getIdStop()),new GeoPoint(st.getLatitude(),st.getLongitude()));
+            p1.setMarker(iconsMarker1);
+
+            anotherOverlayItemArray.add(p1);
+
+        }
+        ItemizedIconOverlay<OverlayItem> anotherItemizedIconOverlay =
+                new ItemizedIconOverlay<OverlayItem>( this, anotherOverlayItemArray, null);
+        map.getOverlays().add(anotherItemizedIconOverlay);
+        */
+
+        ArrayList<Stop> paraderos=myDbHelper.findAllStops();
+        for(Stop st : paraderos){
+            GeoPoint gp=new GeoPoint(st.getLatitude(),st.getLongitude());
+            Marker p1=new Marker(map);
+            p1.setIcon(this.getResources().getDrawable(R.drawable.ic_bustop));
+            p1.setPosition(gp);
+            p1.setTitle(st.getAddress());
+            map.getOverlays().add(p1);
+        }
+        map.invalidate();
+        //termina codigo para mostrar los paraderos en el mapa.
         // get the listview
         expListView = (ExpandableListView) findViewById(R.id.lvExp);
 
@@ -128,23 +165,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         // setting list adapter
         expListView.setAdapter(listAdapter);
-
-        /*
-        //logica control del mapa
-        mapController = (MapController) map.getController();
-        mapController.setZoom(14);
-        GeoPoint Temuco = new GeoPoint(-38.7392, -72.6087);
-        mapController.setCenter(Temuco);
-        final MyLocationNewOverlay myLocationoverlay = new MyLocationNewOverlay(this.getActivity(), map);
-        myLocationoverlay.enableMyLocation();
-        map.getOverlays().add(myLocationoverlay); //No añadir si no quieres una marca
-
-        myLocationoverlay.runOnFirstFix(new Runnable() {
-            public void run() {
-                mapController.animateTo(myLocationoverlay.getMyLocation());
-            }
-        });
-*/
 
         Overlay touchOverlay = new Overlay(this) {
             ItemizedIconOverlay<OverlayItem> anotherItemizedIconOverlay = null;
@@ -324,6 +344,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return true;
     }
 
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void prepareListData() {
         listDataHeader = new ArrayList<String>();

@@ -5,11 +5,8 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteCantOpenDatabaseException;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.database.sqlite.SQLiteQueryBuilder;
 
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,6 +16,7 @@ import java.util.List;
 
 import inf.uct.nmicro.model.Route;
 import inf.uct.nmicro.model.Point;
+import inf.uct.nmicro.model.Stop;
 import inf.uct.nmicro.sqlite.ITablesDB.Tables;
 import inf.uct.nmicro.sqlite.ITablesDB.Routes;
 import inf.uct.nmicro.sqlite.ITablesDB.Companies;
@@ -156,10 +154,12 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     }
 
     @Override
-    public void onCreate(SQLiteDatabase db) { }
+    public void onCreate(SQLiteDatabase db) {
+    }
 
     @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) { }
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+    }
 
     /*public List<Company> GetAllCompany() {
         System.out.println("Geting companys");
@@ -185,7 +185,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
      */
     public List<Route> findRoutesByCompany(int idCompany) {
         SQLiteDatabase db = this.getReadableDatabase();
-        if(db==null){
+        if (db == null) {
             return null;
         }
         String sql = String.format("SELECT ID_ROUTE, NAME FROM %s WHERE %s=?", Tables.ROUTE, Routes.ID_COMPANY);
@@ -205,7 +205,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
      */
     public List<Point> findPointsByRoute(int idRoute) {
         SQLiteDatabase db = this.getReadableDatabase();
-        if(db==null){
+        if (db == null) {
             return null;
         }
         String sql = String.format("SELECT ID_POINT, LATITUDE, LONGITUDE FROM %s WHERE %s=?",
@@ -215,7 +215,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         List<Point> points = new ArrayList<Point>();
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            points.add(new Point(cursor.getInt(0), cursor.getDouble(1),cursor.getDouble(2)));
+            points.add(new Point(cursor.getInt(0), cursor.getDouble(1), cursor.getDouble(2)));
             cursor.moveToNext();
         }
         return points;
@@ -226,7 +226,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     */
     public List<Company> findCompanies() {
         SQLiteDatabase db = this.getReadableDatabase();
-        if(db==null){
+        if (db == null) {
             return null;
         }
         String sql = String.format("SELECT * FROM %s", Tables.COMPANY);
@@ -245,7 +245,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     */
     public List<Company> findCompaniesById(int idCompany) {
         SQLiteDatabase db = this.getReadableDatabase();
-        if(db==null){
+        if (db == null) {
             return null;
         }
         String sql = String.format("SELECT * FROM %s WHERE %s=?", Tables.COMPANY, Companies.ID_COMPANY);
@@ -259,4 +259,23 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         }
         return companies;
     }
+
+    public ArrayList<Stop> findAllStops() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        if (db == null) {
+            return null;
+        }
+        String sql = String.format("SELECT * FROM %s", Tables.STOP);
+        Cursor cursor = db.rawQuery(sql, null);
+        ArrayList<Stop> stops = new ArrayList<>();
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            stops.add(new Stop(cursor.getInt(0), cursor.getString(1), cursor.getDouble(2), cursor.getDouble(3)));
+            cursor.moveToNext();
+        }
+        return stops;
+
+
+    }
+
 }

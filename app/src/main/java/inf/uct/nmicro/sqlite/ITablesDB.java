@@ -28,7 +28,8 @@ public class ITablesDB {
 	interface ColumnsStop{
 		String ID_STOP = "id_stop";
 		String ADDRESS = "address";
-		String ID_POINT = "id_point";
+		String LATITUDE = "latitude";
+		String LONGITUDE = "longitude";
 	}
 	
 	interface ColumnsCompany{
