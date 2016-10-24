@@ -178,13 +178,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         GeoPoint Temuco = new GeoPoint(-38.7392, -72.6087);
         mapController.setCenter(Temuco);
 
-        ArrayList<Stop> paraderos = myDbHelper.findAllStops();
-        for (Stop st : paraderos) {
+        ArrayList<Stop> stops = myDbHelper.findAllStops();
+        for (Stop st : stops) {
             GeoPoint gp = new GeoPoint(st.getLatitude(), st.getLongitude());
             Marker p1 = new Marker(map);
             p1.setIcon(this.getResources().getDrawable(R.drawable.ic_bustop));
             p1.setPosition(gp);
-            p1.setTitle(st.getAddress());
+            String title="- ";
+            for(Route r : st.getRoutes()){
+                title = title + r.getName() + "- ";
+            }
+            p1.setTitle(st.getAddress() + " : "+title);
             map.getOverlays().add(p1);
         }
         map.invalidate();
@@ -282,7 +286,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             hijos = new ArrayList<TreeNode>();
 
             for (Route route : c.getRoutes()) {
-                cat = new Route(route.getIdRoute(), route.getName(), route.getStops(), route.getPoints(), getDrawable(R.drawable.ic_1a));
+                cat = new Route(route.getIdRoute(), route.getName(), route.getStops(), route.getPoints(), getDrawable(R.drawable.ic_1a), route.getSignLatitude(), route.getSignLongitude());
                 r.add(cat);
                 hijo = new TreeNode(new PlaceHolderHolder.PlaceItem(route.getName())).setViewHolder(new PlaceHolderHolder(getApplicationContext()));
                 hijos.add(hijo);
@@ -372,7 +376,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (routes != null && !routes.isEmpty()) {
 
             for (Route route : routes) {
-                cat = new Route(route.getIdRoute(), route.getName(), route.getStops(), route.getPoints(), getDrawable(R.drawable.ic_1a));
+                cat = new Route(route.getIdRoute(), route.getName(), route.getStops(), route.getPoints(), getDrawable(R.drawable.ic_1a), route.getSignLatitude(), route.getSignLongitude());
                 category.add(cat);
             }
             morph.show();
@@ -456,7 +460,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             hijos = new ArrayList<TreeNode>();
 
             for (Route route : c.getRoutes()) {
-                cat = new Route(route.getIdRoute(), route.getName(), route.getStops(), route.getPoints(), getDrawable(R.drawable.ic_1a));
+                cat = new Route(route.getIdRoute(), route.getName(), route.getStops(), route.getPoints(), getDrawable(R.drawable.ic_1a), route.getSignLatitude(), route.getSignLongitude());
                 r.add(cat);
                 hijo = new TreeNode(route.getName());
                 hijos.add(hijo);

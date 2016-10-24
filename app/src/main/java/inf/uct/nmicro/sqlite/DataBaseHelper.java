@@ -189,13 +189,14 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         if (db == null) {
             return null;
         }
-        String sql = String.format("SELECT ID_ROUTE, NAME FROM %s WHERE %s=?", Tables.ROUTE, Routes.ID_COMPANY);
+        String sql = String.format("SELECT %s, %s, %s, %s FROM %s WHERE %s=?", Routes.ID_ROUTE, Routes.NAME,
+                Routes.S_LATITUDE, Routes.S_LONGITUDE, Tables.ROUTE, Routes.ID_COMPANY);
         String[] selectionArgs = {Integer.toString(idCompany)};
         Cursor cursor = db.rawQuery(sql, selectionArgs);
         List<Route> routes = new ArrayList<Route>();
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            routes.add(new Route(cursor.getInt(0), cursor.getString(1), findPointsByRoute(cursor.getInt(0))));
+            routes.add(new Route(cursor.getInt(0), cursor.getString(1), findPointsByRoute(cursor.getInt(0)), cursor.getDouble(2), cursor.getDouble(3)));
             cursor.moveToNext();
         }
         return routes;
