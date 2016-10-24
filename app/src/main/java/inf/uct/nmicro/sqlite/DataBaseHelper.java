@@ -282,8 +282,8 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         if (db == null) {
             return null;
         }
-        String sql = String.format("SELECT * FROM %s INNER JOIN %s ON %s.%s=%s.%s WHERE %s=?",
-                Tables.STOP_ROUTE, Tables.ROUTE, Tables.STOP_ROUTE, StopRoute.ID_ROUTE, Tables.ROUTE, Routes.ID_ROUTE, StopRoute.ID_STOP);
+        String sql = String.format("SELECT * FROM %s INNER JOIN %s ON %s = %s WHERE %s = ?",
+                Tables.STOP_ROUTE, Tables.ROUTE, Tables.STOP_ROUTE+"."+StopRoute.ID_ROUTE, Tables.ROUTE+"."+Routes.ID_ROUTE, StopRoute.ID_STOP);
         String[] selectionArgs = {Integer.toString(idStop)};
         Cursor cursor = db.rawQuery(sql, selectionArgs);
         List<Route> routes = new ArrayList<Route>();

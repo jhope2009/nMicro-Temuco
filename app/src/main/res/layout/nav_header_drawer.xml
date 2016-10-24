@@ -25,7 +25,7 @@
         android:layout_height="match_parent"
         android:id="@+id/textView"
         android:layout_weight="6"
-        android:textColor="@color/common_google_signin_btn_text_light_pressed"
+        android:textColor="@color/colorPrimary"
         android:gravity="center_vertical"
         android:textSize="40dp" />
 

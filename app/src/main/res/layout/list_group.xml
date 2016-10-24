@@ -6,9 +6,10 @@
     <TextView
         android:id="@+id/lblListHeader"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="60dp"
         android:paddingLeft="30dip"
         android:textSize="20dp"
-        android:textColor="@color/colorPrimaryDark" />
+        android:textColor="@color/colorPrimaryDark"
+        android:gravity="center_vertical"/>
 
 </LinearLayout>

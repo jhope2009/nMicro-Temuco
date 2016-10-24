@@ -47,9 +47,9 @@ public class ITablesDB {
 	}
 
 	interface ColumnsStopRoute{
-		String ID_STOP_ROUTE="";
-		String ID_STOP="";
-		String ID_ROUTE="";
+		String ID_STOP_ROUTE="id_stop_route";
+		String ID_STOP="id_stop";
+		String ID_ROUTE="id_route";
 	}
 
 	public static class Routes implements ColumnsRoute{	}

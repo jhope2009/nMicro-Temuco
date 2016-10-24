@@ -1,6 +1,7 @@
 package inf.uct.nmicro;
 
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -20,15 +21,27 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.LayoutAnimationController;
+import android.view.animation.TranslateAnimation;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ExpandableListView;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.fafaldo.fabtoolbar.widget.FABToolbarLayout;
+import com.unnamed.b.atv.model.TreeNode;
+import com.unnamed.b.atv.view.AndroidTreeView;
 
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
@@ -55,7 +68,10 @@ import inf.uct.nmicro.model.Stop;
 import inf.uct.nmicro.sqlite.DataBaseHelper;
 import inf.uct.nmicro.utils.AdapterRoute;
 import inf.uct.nmicro.utils.ExpandableListAdapter;
-
+import inf.uct.nmicro.utils.HeaderHolder;
+import inf.uct.nmicro.utils.IconTreeItemHolder;
+import inf.uct.nmicro.utils.PlaceHolderHolder;
+import inf.uct.nmicro.utils.ProfileHolder;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
     private Toolbar toolbar;
@@ -82,6 +98,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Route cat;
     private List<Point> points;
     private List<Route> allRoutes;
+    private List<Company> companie;
     MapView map;
     private FABToolbarLayout morph;
 
@@ -92,6 +109,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     ArrayList<OverlayItem> anotherOverlayItemArray;
     PathOverlay routesDraw;
 
+    private LinearLayout layoutAnimado;
+    private LinearLayout layoutAnimado1;
+    private LinearLayout layoutAnimado2;
+    private LinearLayout layoutAnimado3;
+    private LinearLayout layoutAnimado4;
+
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,8 +123,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         final Toolbar toolbar = (Toolbar) findViewById(R.id.MyToolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+/*
+*
+*
+*
+*/
+        layoutAnimado = (LinearLayout) findViewById(R.id.animado);
+        layoutAnimado1 = (LinearLayout) findViewById(R.id.animado1);
+        layoutAnimado2 = (LinearLayout) findViewById(R.id.animado2);
+        layoutAnimado3 = (LinearLayout) findViewById(R.id.animado3);
+        layoutAnimado4 = (LinearLayout) findViewById(R.id.animado4);
 
-        CollapsingToolbarLayout collapsin879gToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapse_toolbar);
+        Button but = (Button) findViewById(R.id.button2);
+        Button but1 = (Button) findViewById(R.id.button3);
+        Button but2 = (Button) findViewById(R.id.button5);
+        Button but3 = (Button) findViewById(R.id.button6);
+        Button but4 = (Button) findViewById(R.id.button7);
+        but.setOnClickListener(new View.OnClickListener() {@Override public void onClick(View v) {mostrar(v);}});
+        but1.setOnClickListener(new View.OnClickListener() {@Override public void onClick(View v) {mostrar1(v);}});
+        but2.setOnClickListener(new View.OnClickListener() {@Override public void onClick(View v) {mostrar2(v);}});
+        but3.setOnClickListener(new View.OnClickListener() {@Override public void onClick(View v) {mostrar3(v);}});
+        but4.setOnClickListener(new View.OnClickListener() {@Override public void onClick(View v) {mostrar4(v);}});
+
+
+
+        CollapsingToolbarLayout collapsinToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapse_toolbar);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         morph = (FABToolbarLayout) findViewById(R.id.fabtoolbar);
@@ -116,7 +162,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } catch (IOException e) {
             e.printStackTrace();
         }
-
+/*
+*
+*
+*
+*/
         //seccion que carga el mapa y lo configura
         org.osmdroid.tileprovider.constants.OpenStreetMapTileProviderConstants.setUserAgentValue(android.support.v4.BuildConfig.APPLICATION_ID);
         map = (MapView) findViewById(R.id.map);
@@ -128,25 +178,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         GeoPoint Temuco = new GeoPoint(-38.7392, -72.6087);
         mapController.setCenter(Temuco);
 
-
-        //espacio de trabajo para mostrar los paraderos en el mapa.
-        /*
-        anotherOverlayItemArray = new ArrayList<OverlayItem>();
-        Drawable iconsMarker1=this.getResources().getDrawable(R.drawable.ic_bustop);
-        ArrayList<Stop> paraderos=myDbHelper.findAllStops();
-        for(Stop st : paraderos){
-
-            OverlayItem p1=new OverlayItem(st.getAddress(),String.valueOf(st.getIdStop()),new GeoPoint(st.getLatitude(),st.getLongitude()));
-            p1.setMarker(iconsMarker1);
-
-            anotherOverlayItemArray.add(p1);
-
-        }
-        ItemizedIconOverlay<OverlayItem> anotherItemizedIconOverlay =
-                new ItemizedIconOverlay<OverlayItem>( this, anotherOverlayItemArray, null);
-        map.getOverlays().add(anotherItemizedIconOverlay);
-        */
-
         ArrayList<Stop> paraderos = myDbHelper.findAllStops();
         for (Stop st : paraderos) {
             GeoPoint gp = new GeoPoint(st.getLatitude(), st.getLongitude());
@@ -157,6 +188,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             map.getOverlays().add(p1);
         }
         map.invalidate();
+/*
+*
+*
+*
+*/
         //termina codigo para mostrar los paraderos en el mapa.
         // get the listview
         expListView = (ExpandableListView) findViewById(R.id.lvExp);
@@ -166,6 +202,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         listAdapter = new ExpandableListAdapter(this, listDataHeader, listDataChild);
         // setting list adapter
         expListView.setAdapter(listAdapter);
+
+
         Overlay touchOverlay = new Overlay(this) {
             ItemizedIconOverlay<OverlayItem> anotherItemizedIconOverlay = null;
 
@@ -222,6 +260,48 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        List<TreeNode> hijos;
+        TreeNode padre;
+        TreeNode hijo;
+
+        TreeNode root = TreeNode.root();
+        TreeNode abuelo = new TreeNode(new IconTreeItemHolder.IconTreeItem(R.string.ic_person, "Recoridos")).setViewHolder(new ProfileHolder(getApplicationContext()));
+
+
+
+        listDataHeader = new ArrayList<String>();
+        listDataChild = new HashMap<String, List<Route>>();
+
+        findAllRoutes();
+        List<Route> r = new ArrayList<Route>();
+
+        for (Company c : companie) {
+
+            listDataHeader.add(c.getRut());
+            r = new ArrayList<Route>();
+            hijos = new ArrayList<TreeNode>();
+
+            for (Route route : c.getRoutes()) {
+                cat = new Route(route.getIdRoute(), route.getName(), route.getStops(), route.getPoints(), getDrawable(R.drawable.ic_1a));
+                r.add(cat);
+                hijo = new TreeNode(new PlaceHolderHolder.PlaceItem(route.getName())).setViewHolder(new PlaceHolderHolder(getApplicationContext()));
+                hijos.add(hijo);
+            }
+            padre = new TreeNode(new IconTreeItemHolder.IconTreeItem(R.string.ic_people, c.getRut())).setViewHolder(new HeaderHolder(getApplicationContext()));
+
+            padre.addChildren(hijos);
+            abuelo.addChildren(padre);
+
+            listDataChild.put(c.getRut(),r);
+        }
+
+        root.addChild(abuelo);
+
+        AndroidTreeView tView = new AndroidTreeView(getApplicationContext(), root);
+        tView.setDefaultAnimation(true);
+        tView.setDefaultContainerStyle(R.style.TreeNodeStyleDivided, true);
+        layoutAnimado3.addView(tView.getView());
+
 
     }
 
@@ -231,7 +311,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             morph.show();
         }
 
+
         morph.hide();
+        switch (v.getId()){
+            case R.id.button2:
+                Toast.makeText(getApplication(),"desplegado layout 1",Toast.LENGTH_LONG).show();
+                mostrar(v);
+                break;
+            case R.id.button3:
+                mostrar1(v);
+                break;
+            case R.id.button5:
+                mostrar2(v);
+                break;
+            case R.id.button6:
+                mostrar3(v);
+                break;
+            case R.id.button7:
+                mostrar4(v);
+                break;
+        }
     }
 
     public boolean isRouteInArea(Route route, GeoPoint geoPoint) {
@@ -258,8 +357,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void findAllRoutes() {
         List<Company> companies = myDbHelper.findCompanies();
         allRoutes = new ArrayList<Route>();
-
+        companie = new ArrayList<Company>();
         for (Company c : companies) {
+            companie.add(c);
             for (Route r : c.getRoutes()) {
                 allRoutes.add(r);
             }
@@ -298,18 +398,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        findAllRoutes();
-        //DrawRoute(allRoutes.get(MainActivity.route));
-    }
-
-    @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
@@ -338,7 +426,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else if (id == R.id.nav_send) {
 
         }
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
@@ -347,23 +434,44 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void prepareListData() {
+        /*
+        */
+        List<TreeNode> hijos;
+        TreeNode padre;
+
+        TreeNode root = TreeNode.root();
+        TreeNode abuelo = new TreeNode("Recorridos");
+        TreeNode hijo;
+
         listDataHeader = new ArrayList<String>();
         listDataChild = new HashMap<String, List<Route>>();
 
-        // Adding child data
-        listDataHeader.add("Recorridos");
-        listDataHeader.add("Paraderos");
-        listDataHeader.add("mmm nose");
-
-        // Adding child data
         findAllRoutes();
-        List<Route> top250 = new ArrayList<Route>();
-        for (Route route : allRoutes) {
-            cat = new Route(route.getIdRoute(), route.getName(), route.getStops(), route.getPoints(), getDrawable(R.drawable.ic_1a));
-            top250.add(cat);
-        }
+        List<Route> r = new ArrayList<Route>();
 
-        listDataChild.put(listDataHeader.get(0), top250); // Header, Child data
+        for (Company c : companie) {
+
+            listDataHeader.add(c.getRut());
+            r = new ArrayList<Route>();
+            hijos = new ArrayList<TreeNode>();
+
+            for (Route route : c.getRoutes()) {
+                cat = new Route(route.getIdRoute(), route.getName(), route.getStops(), route.getPoints(), getDrawable(R.drawable.ic_1a));
+                r.add(cat);
+                hijo = new TreeNode(route.getName());
+                hijos.add(hijo);
+            }
+            padre = new TreeNode(c.getRut());
+
+            padre.addChildren(hijos);
+            abuelo.addChildren(padre);
+
+            listDataChild.put(c.getRut(),r);
+        }
+        root.addChild(abuelo);
+
+        AndroidTreeView tView = new AndroidTreeView(this, root);
+        layoutAnimado2.addView(tView.getView());
     }
 
     //metodo que pinta las rutas.
@@ -374,12 +482,118 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             GeoPoint gp = new GeoPoint(pto.getLatitude(), pto.getLongitude());
             routesDraw.addPoint(gp);
         }
-
-
-
-
-
-
-
     }
+
+    public void mostrar(View button) {
+                if (layoutAnimado.getVisibility() == View.GONE) {
+                    animar(true,1);
+                    layoutAnimado.setVisibility(View.VISIBLE);
+                    layoutAnimado1.setVisibility(View.GONE);
+                    layoutAnimado2.setVisibility(View.GONE);
+                    layoutAnimado3.setVisibility(View.GONE);
+                    layoutAnimado4.setVisibility(View.GONE);
+                } else {
+                    animar(false,1);
+                    layoutAnimado.setVisibility(View.GONE);
+                }
+    }
+    public void mostrar1(View button) {
+                if (layoutAnimado1.getVisibility() == View.GONE) {
+                    animar(true, 2);
+                    layoutAnimado1.setVisibility(View.VISIBLE);
+                    layoutAnimado.setVisibility(View.GONE);
+                    layoutAnimado2.setVisibility(View.GONE);
+                    layoutAnimado3.setVisibility(View.GONE);
+                    layoutAnimado4.setVisibility(View.GONE);
+                } else {
+                    animar(false, 2);
+                    layoutAnimado1.setVisibility(View.GONE);
+                }
+    }
+    public void mostrar2(View button) {
+                if (layoutAnimado2.getVisibility() == View.GONE) {
+                    animar(true, 3);
+                    layoutAnimado2.setVisibility(View.VISIBLE);
+                    layoutAnimado1.setVisibility(View.GONE);
+                    layoutAnimado3.setVisibility(View.GONE);
+                    layoutAnimado.setVisibility(View.GONE);
+                    layoutAnimado4.setVisibility(View.GONE);
+                } else {
+                    animar(false, 3);
+                    layoutAnimado2.setVisibility(View.GONE);
+                }
+    }
+    public void mostrar3(View button) {
+                if (layoutAnimado3.getVisibility() == View.GONE) {
+                    animar(true, 4);
+                    layoutAnimado3.setVisibility(View.VISIBLE);
+                    layoutAnimado1.setVisibility(View.GONE);
+                    layoutAnimado2.setVisibility(View.GONE);
+                    layoutAnimado.setVisibility(View.GONE);
+                    layoutAnimado4.setVisibility(View.GONE);
+                } else {
+                    animar(false, 4);
+                    layoutAnimado3.setVisibility(View.GONE);
+                }
+    }
+    public void mostrar4(View button) {
+                if (layoutAnimado4.getVisibility() == View.GONE) {
+                    animar(true, 5);
+                    layoutAnimado4.setVisibility(View.VISIBLE);
+                    layoutAnimado1.setVisibility(View.GONE);
+                    layoutAnimado2.setVisibility(View.GONE);
+                    layoutAnimado3.setVisibility(View.GONE);
+                    layoutAnimado.setVisibility(View.GONE);
+                } else {
+                    animar(false, 5);
+                    layoutAnimado4.setVisibility(View.GONE);
+                }
+        }
+
+    private void animar(boolean mostrar, int id) {
+        AnimationSet set = new AnimationSet(true);
+        Animation animation = null;
+        if (mostrar)
+        {
+            //desde la esquina inferior derecha a la superior izquierda
+            animation = new TranslateAnimation(Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF, 1.0f, Animation.RELATIVE_TO_SELF, 0.0f);
+        }
+        else
+        {    //desde la esquina superior izquierda a la esquina inferior derecha
+            animation = new TranslateAnimation(Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF, 1.0f);
+        }
+        //duración en milisegundos
+        animation.setDuration(500);
+        set.addAnimation(animation);
+        LayoutAnimationController controller = new LayoutAnimationController(set, 0.25f);
+
+        switch (id){
+            case 1:
+                Toast.makeText(getApplication(),"desplegado layout "+id,Toast.LENGTH_LONG).show();
+                layoutAnimado.setLayoutAnimation(controller);
+                layoutAnimado.startAnimation(animation);
+                break;
+            case 2:
+                Toast.makeText(getApplication(),"desplegado layout "+id,Toast.LENGTH_LONG).show();
+                layoutAnimado1.setLayoutAnimation(controller);
+                layoutAnimado1.startAnimation(animation);
+                break;
+            case 3:
+                Toast.makeText(getApplication(),"desplegado layout "+id,Toast.LENGTH_LONG).show();
+                layoutAnimado2.setLayoutAnimation(controller);
+                layoutAnimado2.startAnimation(animation);
+                break;
+            case 4:
+                Toast.makeText(getApplication(),"desplegado layout "+id,Toast.LENGTH_LONG).show();
+                layoutAnimado3.setLayoutAnimation(controller);
+                layoutAnimado3.startAnimation(animation);
+                break;
+            case 5:
+                Toast.makeText(getApplication(),"desplegado layout "+id,Toast.LENGTH_LONG).show();
+                layoutAnimado4.setLayoutAnimation(controller);
+                layoutAnimado4.startAnimation(animation);
+                break;
+        }
+    }
+
 }
