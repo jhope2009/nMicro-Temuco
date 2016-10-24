@@ -21,6 +21,7 @@ import inf.uct.nmicro.sqlite.ITablesDB.Tables;
 import inf.uct.nmicro.sqlite.ITablesDB.Routes;
 import inf.uct.nmicro.sqlite.ITablesDB.Companies;
 import inf.uct.nmicro.sqlite.ITablesDB.Points;
+import inf.uct.nmicro.sqlite.ITablesDB.StopRoute;
 import inf.uct.nmicro.model.Company;
 
 public class DataBaseHelper extends SQLiteOpenHelper {
@@ -208,8 +209,8 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         if (db == null) {
             return null;
         }
-        String sql = String.format("SELECT ID_POINT, LATITUDE, LONGITUDE FROM %s WHERE %s=?",
-                Tables.POINT, Points.ID_ROUTE);
+        String sql = String.format("SELECT %s, %s, %s FROM %s WHERE %s=?", Points.ID_POINT,
+                Points.LATITUDE, Points.LONGITUDE, Tables.POINT, Points.ID_ROUTE);
         String[] selectionArgs = {Integer.toString(idRoute)};
         Cursor cursor = db.rawQuery(sql, selectionArgs);
         List<Point> points = new ArrayList<Point>();
@@ -270,12 +271,28 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         ArrayList<Stop> stops = new ArrayList<>();
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            stops.add(new Stop(cursor.getInt(0), cursor.getString(1), cursor.getDouble(2), cursor.getDouble(3)));
+            stops.add(new Stop(cursor.getInt(0), cursor.getString(1), cursor.getDouble(2), cursor.getDouble(3), findRoutesByStop(cursor.getInt(0))));
             cursor.moveToNext();
         }
         return stops;
+    }
 
-
+    public List<Route> findRoutesByStop(int idStop) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        if (db == null) {
+            return null;
+        }
+        String sql = String.format("SELECT * FROM %s INNER JOIN %s ON %s.%s=%s.%s WHERE %s=?",
+                Tables.STOP_ROUTE, Tables.ROUTE, Tables.STOP_ROUTE, StopRoute.ID_ROUTE, Tables.ROUTE, Routes.ID_ROUTE, StopRoute.ID_STOP);
+        String[] selectionArgs = {Integer.toString(idStop)};
+        Cursor cursor = db.rawQuery(sql, selectionArgs);
+        List<Route> routes = new ArrayList<Route>();
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            routes.add(new Route(cursor.getInt(3), cursor.getString(5)));
+            cursor.moveToNext();
+        }
+        return routes;
     }
 
 }

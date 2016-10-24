@@ -10,6 +10,7 @@ public class ITablesDB {
 		String STOP = "stop";
 		String COMPANY = "company";
 		String POINT = "point";
+		String STOP_ROUTE = "stop_routes";
 	}
 
 	interface ColumnsRoute{
@@ -17,27 +18,27 @@ public class ITablesDB {
 		String ID_COMPANY = "id_company";
 		String NAME = "name";
 	}
-	
+
 	interface ColumnsBus{
 		String ID_BUS = "id_bus";
 		String ID_ROUTE_GOING = "id_route_going";
 		String ID_ROUTE_RETURN = "id_route_return";
 		String REGISTER = "register";
 	}
-	
+
 	interface ColumnsStop{
 		String ID_STOP = "id_stop";
 		String ADDRESS = "address";
 		String LATITUDE = "latitude";
 		String LONGITUDE = "longitude";
 	}
-	
+
 	interface ColumnsCompany{
 		String ID_COMPANY = "id_company";
 		String NAME = "name";
 		String RUT = "rut";
 	}
-	
+
 	interface ColumnsPoint{
 		String ID_POINT = "id_point";
 		String LATITUDE = "latitude";
@@ -45,10 +46,17 @@ public class ITablesDB {
 		String ID_ROUTE = "id_route";
 	}
 
+	interface ColumnsStopRoute{
+		String ID_STOP_ROUTE="";
+		String ID_STOP="";
+		String ID_ROUTE="";
+	}
+
 	public static class Routes implements ColumnsRoute{	}
 	public static class Buses implements ColumnsBus{ }
 	public static class Stops implements ColumnsStop{ }
 	public static class Companies implements ColumnsCompany{ }
 	public static class Points implements ColumnsPoint{	}
+	public static class StopRoute implements ColumnsStopRoute{ }
 
 }

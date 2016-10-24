@@ -10,13 +10,13 @@ import java.util.List;
  *
  */
 public class Route {
-	
+
 	private int idRoute;
 	private String name;
 	private List<Stop> stops;
 	private List<Point> points;
 	private Drawable img;
-	
+
 	public Route(){}
 
 	public Route(int idRoute, String name, List<Stop> stops, List<Point> points, Drawable img) {
@@ -37,6 +37,13 @@ public class Route {
 	}
 
 	public Route(int idRoute, String name, List<Point> points) {
+		super();
+		this.idRoute = idRoute;
+		this.name = name;
+		this.points = points;
+	}
+
+	public Route(int idRoute, String name) {
 		super();
 		this.idRoute = idRoute;
 		this.name = name;
