@@ -78,7 +78,6 @@ public class DrawInMap extends Activity {
         map.getOverlayManager().add(routesDraw);
         map.invalidate();
     }
-
     public void DrawFindLocation(MapView map, List<Address> ub1, List<Address> ub2){
         if(ub1!=null) {
             Address ad = ub1.get(0);

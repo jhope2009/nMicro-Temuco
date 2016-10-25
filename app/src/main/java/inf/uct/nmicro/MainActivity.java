@@ -16,6 +16,7 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
+import android.support.design.widget.TextInputEditText;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -33,6 +34,7 @@ import android.view.animation.LayoutAnimationController;
 import android.view.animation.TranslateAnimation;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -63,6 +65,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
+import inf.uct.nmicro.fragments.DrawInMap;
 import inf.uct.nmicro.model.Company;
 import inf.uct.nmicro.model.Point;
 import inf.uct.nmicro.model.Route;
@@ -86,6 +89,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             R.drawable.ic_toggle_star,
             R.drawable.ic_rutas2
     };
+    Drawable icon1;
+
 
     private MapController mapController;
     private ArrayList<Route> category = new ArrayList<Route>();
@@ -103,6 +108,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private List<Company> companie;
     MapView map;
     private FABToolbarLayout morph;
+    DrawInMap DrawinMap=new DrawInMap();
 
     ExpandableListAdapter listAdapter;
     ExpandableListView expListView;
@@ -129,6 +135,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        final EditText inicio=(EditText)findViewById(R.id.editText4);
+        final EditText destino=(EditText)findViewById(R.id.editText3);
+        Geocoder geocoder= new Geocoder(getApplication(), Locale.getDefault());
+
+
 
         layoutAnimado = (LinearLayout) findViewById(R.id.animado);
         layoutAnimado1 = (LinearLayout) findViewById(R.id.animado1);
@@ -136,16 +147,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         layoutAnimado3 = (LinearLayout) findViewById(R.id.animado3);
         layoutAnimado4 = (LinearLayout) findViewById(R.id.animado4);
 
-        Button but = (Button) findViewById(R.id.button2);
+        Button but  = (Button) findViewById(R.id.button2);
         Button but1 = (Button) findViewById(R.id.button3);
+        Button butS = (Button) findViewById(R.id.button4);
         Button but2 = (Button) findViewById(R.id.button5);
         Button but3 = (Button) findViewById(R.id.button6);
         Button but4 = (Button) findViewById(R.id.button7);
-        but.setOnClickListener(new View.OnClickListener() {@Override public void onClick(View v) {mostrar(v);}});
+        but.setOnClickListener(new View.OnClickListener()  {@Override public void onClick(View v) {mostrar(v);}});
         but1.setOnClickListener(new View.OnClickListener() {@Override public void onClick(View v) {mostrar1(v);}});
         but2.setOnClickListener(new View.OnClickListener() {@Override public void onClick(View v) {mostrar2(v);}});
         but3.setOnClickListener(new View.OnClickListener() {@Override public void onClick(View v) {mostrar3(v);}});
         but4.setOnClickListener(new View.OnClickListener() {@Override public void onClick(View v) {mostrar4(v);}});
+        butS.setOnClickListener(new View.OnClickListener() {@Override public void onClick(View v) {
+
+
+            List<Address> ub1 = DrawinMap.findLocationByAddress(inicio.getText().toString()  +" Temuco, Araucania, Chile",geocoder);
+            List<Address> ub2 = DrawinMap.findLocationByAddress(destino.getText().toString() +" Temuco, Araucania, Chile",geocoder);
+            DrawFindAddress(ub1,ub2,map);
+
+        }});
 
         CollapsingToolbarLayout collapsinToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapse_toolbar);
 
@@ -175,11 +195,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mapController.setZoom(15);
         GeoPoint Temuco = new GeoPoint(-38.7392, -72.6087);
         mapController.setCenter(Temuco);
-
         //evita caer en un null Pointer Exeption
         routesDraw = new PathOverlay(Color.BLUE, 10, this);
         map.getOverlays().add(routesDraw);
-
+        DrawinMap.Draw_Stops(map,myDbHelper,icon1=this.getResources().getDrawable(R.drawable.ic_bustop));
+/*
         ArrayList<Stop> stops = myDbHelper.findAllStops();
         for (Stop st : stops) {
             GeoPoint gp = new GeoPoint(st.getLatitude(), st.getLongitude());
@@ -194,7 +214,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             map.getOverlays().add(p1);
         }
         map.invalidate();
-
+*/
         // get the listview
         expListView = (ExpandableListView) findViewById(R.id.lvExp);
 
@@ -346,7 +366,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 morph.hide();
                 String nombres = routes.get(pos).getName();
 
-                DrawRoute(routes.get(pos));
+                DrawinMap.DrawRoute(map,routes.get(pos),routesDraw);
 
                 Toast.makeText(getApplicationContext(), nombres, Toast.LENGTH_SHORT).show();
             }
@@ -421,7 +441,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void onClick(TreeNode node, Object value) {
                         Toast.makeText(getApplication(),"pintando "+route.getName(),Toast.LENGTH_LONG).show();
-                        DrawRoute(route);
+                        DrawinMap.DrawRoute(map,route,routesDraw);
                     }
                 });
                 hijos.add(hijo);
@@ -440,21 +460,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         tView.setDefaultAnimation(true);
         tView.setDefaultContainerStyle(R.style.TreeNodeStyleDivided, true);
         layoutAnimado3.addView(tView.getView());
-    }
-
-    //metodo que pinta las rutas.
-    public void DrawRoute(Route route) {
-
-        routesDraw = new PathOverlay(Color.BLUE, 10, this);
-        for (Point pto : route.getPoints()) {
-            GeoPoint gp = new GeoPoint(pto.getLatitude(), pto.getLongitude());
-            routesDraw.addPoint(gp);
-        }
-        //map.getOverlays().remove(routesDraw);
-        Toast.makeText(getApplication(),"desplegado layout "+map.getOverlays().toString(),Toast.LENGTH_LONG).show();
-        drawer.closeDrawer(GravityCompat.START);
-        map.getOverlays().add(routesDraw);
-
     }
 
     public void mostrar(View button) {
@@ -567,6 +572,33 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 layoutAnimado4.startAnimation(animation);
                 break;
         }
+    }
+
+    private void DrawFindAddress(List<Address>ub1,List<Address>ub2, MapView map){
+        Marker inicio = new Marker(map);
+        Marker destino = new Marker(map);
+        if(ub1!=null && ub2!=null) {
+            if(ub1.size()!=0 && ub2.size()!=0){
+            Address ad = ub1.get(0);
+            System.out.print(ad.getLatitude() + ":" + ad.getLongitude());
+            GeoPoint marcado = new GeoPoint(ad.getLatitude(), ad.getLongitude());
+            inicio.setPosition(marcado);
+            inicio.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+            map.getOverlayManager().add(inicio);
+            //agrego el marcador de la segunda ubicacion
+            Address ad1 = ub2.get(0);
+            GeoPoint ma2 = new GeoPoint(ad1.getLatitude(), ad1.getLongitude());
+            destino.setPosition(ma2);
+            destino.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+            map.getOverlayManager().add(destino);
+            map.invalidate();}
+            else{
+                Toast.makeText(getApplication(),"NO SE OBTUVIERON DIRECCIONES",Toast.LENGTH_LONG).show();
+
+            }
+
+        }
+
     }
 
 }
