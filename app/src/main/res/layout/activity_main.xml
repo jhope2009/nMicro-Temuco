@@ -25,7 +25,7 @@
             android:id="@+id/collapse_toolbar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:layout_scrollFlags="scroll|snap"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
             android:background="@color/colorPrimary"
             android:fitsSystemWindows="true"
             app:contentScrim="@color/colorPrimaryDark"
