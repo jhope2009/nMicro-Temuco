@@ -272,7 +272,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         ArrayList<Stop> stops = new ArrayList<>();
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            stops.add(new Stop(cursor.getInt(0), cursor.getString(1), cursor.getDouble(2), cursor.getDouble(3), findRoutesByStop(cursor.getInt(0))));
+            stops.add(new Stop(cursor.getInt(0), cursor.getString(1), cursor.getDouble(2), cursor.getDouble(3)));
             cursor.moveToNext();
         }
         return stops;

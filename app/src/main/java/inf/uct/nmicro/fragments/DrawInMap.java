@@ -17,7 +17,6 @@ import android.widget.Toast;
 
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
-import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.PathOverlay;
 
 import java.io.IOException;
@@ -38,12 +37,11 @@ public class DrawInMap extends Activity {
         ArrayList<Stop> stops = myDbHelper.findAllStops();
         for (Stop st : stops) {
             GeoPoint gp = new GeoPoint(st.getLatitude(), st.getLongitude());
-            Marker p1 = new Marker(map);
+            CustomMarker p1 = new CustomMarker(map);
             p1.setIcon(dra);
             p1.setPosition(gp);
-            String title="- ";
-            for(Route r : st.getRoutes()){title = title + r.getName() + "- ";}
-            p1.setTitle(st.getAddress() + " : "+title);
+            p1.setTitle(st.getAddress());
+            p1.setIdMarker(st.getIdStop());
             map.getOverlays().add(p1);
         }
         map.invalidate();
@@ -84,18 +82,18 @@ public class DrawInMap extends Activity {
             Log.i(String.valueOf(ad.getLatitude()),"datos recibidos: "+ String.valueOf(ad.getLatitude()) + String.valueOf(ad.getLongitude()));
             System.out.print(ad.getLatitude() + ":" + ad.getLongitude());
             GeoPoint marcado = new GeoPoint(ad.getLatitude(), ad.getLongitude());
-            Marker sele = new Marker(map);
+            CustomMarker sele = new CustomMarker(map);
             //sele.setTitle("la ubicacion 1: " + inicio);
             sele.setPosition(marcado);
-            sele.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+            sele.setAnchor(CustomMarker.ANCHOR_CENTER, CustomMarker.ANCHOR_BOTTOM);
             map.getOverlayManager().add(sele);
         }
         if(ub2 !=null){
             Address ad1 = ub2.get(0);
             GeoPoint ma2 = new GeoPoint(ad1.getLatitude(), ad1.getLongitude());
-            Marker sele2 = new Marker(map);
+            CustomMarker sele2 = new CustomMarker(map);
             sele2.setPosition(ma2);
-            sele2.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+            sele2.setAnchor(CustomMarker.ANCHOR_CENTER, CustomMarker.ANCHOR_BOTTOM);
             map.getOverlayManager().add(sele2);
             map.invalidate();
         }

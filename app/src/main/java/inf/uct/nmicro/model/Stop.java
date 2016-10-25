@@ -12,8 +12,6 @@ public class Stop {
 	private String address;
 	private double latitude;
 	private double longitude;
-	private List<Route> routes;
-
 
 	public Stop(){}
 
@@ -24,15 +22,6 @@ public class Stop {
 		this.latitude=lat;
 		this.longitude=lon;
 
-	}
-
-	public Stop(int idStop, String address, double lat, double lon, List<Route> routes) {
-		super();
-		this.idStop = idStop;
-		this.address = address;
-		this.latitude=lat;
-		this.longitude=lon;
-		this.routes = routes;
 	}
 
 	public int getIdStop() {
@@ -76,11 +65,4 @@ public class Stop {
 		this.longitude = longitude;
 	}
 
-	public List<Route> getRoutes() {
-		return routes;
-	}
-
-	public void setRoutes(List<Route> routes) {
-		this.routes = routes;
-	}
 }
