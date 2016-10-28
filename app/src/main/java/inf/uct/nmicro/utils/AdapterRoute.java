@@ -25,6 +25,11 @@ public class AdapterRoute extends BaseAdapter {
     protected Fragment fragment;
     protected ArrayList<Route> items;
 
+    public AdapterRoute(Activity activity) {
+        this.activity = activity;
+        items = new ArrayList<Route>();
+    }
+
     public AdapterRoute(Activity activity, ArrayList<Route> items) {
         this.activity = activity;
         this.items = items;

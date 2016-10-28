@@ -51,7 +51,7 @@ public class Route {
 		this.signLongitude=signLongitude;
 	}
 
-	public Route(int idRoute, String name) {
+	public Route(int idRoute, String name, List<Point> points) {
 		super();
 		this.idRoute = idRoute;
 		this.name = name;

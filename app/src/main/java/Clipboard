@@ -1,0 +1,170 @@
+private void prepareListData() {
+        List<TreeNode> hijos;
+        TreeNode padre;
+        TreeNode hijo;
+
+        TreeNode root = TreeNode.root();
+        TreeNode abuelo = new TreeNode(new IconTreeItemHolder.IconTreeItem(R.string.ic_person, "Recoridos")).setViewHolder(new ProfileHolder(getApplicationContext()));
+
+        listDataHeader = new ArrayList<String>();
+        listDataChild = new HashMap<String, List<Route>>();
+
+        findAllRoutes();
+        List<Route> r = new ArrayList<Route>();
+
+        for (Company c : companie) {
+
+            listDataHeader.add(c.getRut());
+            r = new ArrayList<Route>();
+            hijos = new ArrayList<TreeNode>();
+
+            for (Route route : c.getRoutes()) {
+                cat = new Route(route.getIdRoute(), route.getName(), route.getStops(), route.getPoints(), getDrawable(R.drawable.ic_1a), route.getSignLatitude(), route.getSignLongitude());
+                r.add(cat);
+                hijo = new TreeNode(new PlaceHolderHolder.PlaceItem(route.getName())).setViewHolder(new PlaceHolderHolder(getApplicationContext()));
+                hijo.setClickListener(new TreeNode.TreeNodeClickListener() {
+                    @Override
+                    public void onClick(TreeNode node, Object value) {
+                        DrawinMap.DrawRoute(map,route,routesDraw);
+                        map.getOverlays().remove(routesDraw);
+                        System.out.println(map.getOverlays().toString());
+                        drawer.closeDrawer(GravityCompat.START);
+                    }
+                });
+                hijos.add(hijo);
+            }
+            padre = new TreeNode(new IconTreeItemHolder.IconTreeItem(R.string.ic_people, c.getRut())).setViewHolder(new HeaderHolder(getApplicationContext()));
+
+            padre.addChildren(hijos);
+            abuelo.addChildren(padre);
+
+            listDataChild.put(c.getRut(),r);
+        }
+
+        root.addChild(abuelo);
+
+        AndroidTreeView tView = new AndroidTreeView(getApplicationContext(), root);
+        tView.setDefaultAnimation(true);
+        tView.setDefaultContainerStyle(R.style.TreeNodeStyleDivided, true);
+        layout_menu.removeAllViews();
+        layout_menu.addView(tView.getView());
+}
+
+
+
+
+public void mostrar(View button) {
+                if (layoutAnimado.getVisibility() == View.GONE) {
+                    animar(true,1);
+                    layoutAnimado.setVisibility(View.VISIBLE);
+                    layoutAnimado1.setVisibility(View.GONE);
+                    layoutAnimado2.setVisibility(View.GONE);
+                    layoutAnimado3.setVisibility(View.GONE);
+                    layoutAnimado4.setVisibility(View.GONE);
+                } else {
+                    animar(false,1);
+                    layoutAnimado.setVisibility(View.GONE);
+                }
+    }
+
+
+
+private void animar(boolean mostrar, int id) {
+        AnimationSet set = new AnimationSet(true);
+        Animation animation = null;
+        if (mostrar)
+        {
+            //desde la esquina inferior derecha a la superior izquierda
+            animation = new TranslateAnimation(Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF, 1.0f, Animation.RELATIVE_TO_SELF, 0.0f);
+        }
+        else
+        {    //desde la esquina superior izquierda a la esquina inferior derecha
+            animation = new TranslateAnimation(Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF, 1.0f);
+        }
+        //duración en milisegundos
+        animation.setDuration(500);
+        set.addAnimation(animation);
+        LayoutAnimationController controller = new LayoutAnimationController(set, 0.25f);
+/*
+        switch (id){
+            case 1:
+                Toast.makeText(getApplication(),"desplegado layout "+id,Toast.LENGTH_LONG).show();
+                layoutAnimado.setLayoutAnimation(controller);
+                layoutAnimado.startAnimation(animation);
+                break;
+            case 2:
+                Toast.makeText(getApplication(),"desplegado layout "+id,Toast.LENGTH_LONG).show();
+                layoutAnimado1.setLayoutAnimation(controller);
+                layoutAnimado1.startAnimation(animation);
+                break;
+            case 3:
+                Toast.makeText(getApplication(),"desplegado layout "+id,Toast.LENGTH_LONG).show();
+                layoutAnimado2.setLayoutAnimation(controller);
+                layoutAnimado2.startAnimation(animation);
+                break;
+            case 4:
+                Toast.makeText(getApplication(),"desplegado layout "+id,Toast.LENGTH_LONG).show();
+                layoutAnimado3.setLayoutAnimation(controller);
+                layoutAnimado3.startAnimation(animation);
+                break;
+            case 5:
+                Toast.makeText(getApplication(),"desplegado layout "+id,Toast.LENGTH_LONG).show();
+                layoutAnimado4.setLayoutAnimation(controller);
+                layoutAnimado4.startAnimation(animation);
+                break;
+        }
+        */
+    }
+
+
+    // get the listview
+            expListView = (ExpandableListView) findViewById(R.id.lvExp);
+            // preparing list data
+            prepareListData();
+            listAdapter = new ExpandableListAdapter(this, listDataHeader, listDataChild);
+            // setting list adapter
+            expListView.setAdapter(listAdapter);
+
+
+private void createListWithAdapter(List) {
+        category = new ArrayList<Route>();
+        if (routes != null && !routes.isEmpty()) {
+
+            for (Route route : rout) {
+                cat = new Route(route.getIdRoute(), route.getName(), route.getStops(), route.getPoints(), getDrawable(R.drawable.ic_1a), route.getSignLatitude(), route.getSignLongitude());
+                category.add(cat);
+            }
+            morph.show();
+            bar.setExpanded(false);
+        }
+        ListView lv = (ListView) findViewById(R.id.ListView);
+
+        AdapterRoute adapter = new AdapterRoute(this, category);
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                final int pos = position;
+                morph.hide();
+                DrawinMap.DrawRoute(map,routes.get(pos),routesDraw);
+                //Toast.makeText(getApplicationContext(), nombres, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        lv.setAdapter(adapter);
+    }
+
+
+ArrayList<Stop> stops = myDbHelper.findAllStops();
+        for (Stop st : stops) {
+            GeoPoint gp = new GeoPoint(st.getLatitude(), st.getLongitude());
+            Marker p1 = new Marker(map);
+            p1.setIcon(this.getResources().getDrawable(R.drawable.ic_bustop));
+            p1.setPosition(gp);
+            String title="- ";
+            for(Route r : st.getRoutes()){
+                title = title + r.getName() + "- ";
+            }
+            p1.setTitle(st.getAddress() + " : "+title);
+            map.getOverlays().add(p1);
+        }
+        map.invalidate();

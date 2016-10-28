@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.PathOverlay;
 
 import java.io.IOException;
@@ -33,8 +34,9 @@ import inf.uct.nmicro.sqlite.DataBaseHelper;
 
 public class DrawInMap extends Activity {
 
-    public void Draw_Stops(MapView map, DataBaseHelper myDbHelper, Drawable dra){
+    public List<CustomMarker> Draw_Stops(MapView map, DataBaseHelper myDbHelper, Drawable dra){
         ArrayList<Stop> stops = myDbHelper.findAllStops();
+        List<CustomMarker> p2 = new ArrayList<CustomMarker>();
         for (Stop st : stops) {
             GeoPoint gp = new GeoPoint(st.getLatitude(), st.getLongitude());
             CustomMarker p1 = new CustomMarker(map);
@@ -42,9 +44,11 @@ public class DrawInMap extends Activity {
             p1.setPosition(gp);
             p1.setTitle(st.getAddress());
             p1.setIdMarker(st.getIdStop());
+            p2.add(p1);
             map.getOverlays().add(p1);
         }
         map.invalidate();
+        return p2;
     }
 
     public List<Address> findLocationByAddress(String text, Geocoder geocoder){
@@ -69,9 +73,11 @@ public class DrawInMap extends Activity {
     //metodo que pinta las rutas.
     //se le pasa como parametro el mapa, la ruta y el Pathoverlay
     public void DrawRoute(MapView map, Route route, PathOverlay routesDraw) {
+        routesDraw.clearPath();
             for (Point pto : route.getPoints()) {
             GeoPoint gp = new GeoPoint(pto.getLatitude(), pto.getLongitude());
-            routesDraw.addPoint(gp);
+
+                routesDraw.addPoint(gp);
         }
         map.getOverlayManager().add(routesDraw);
         map.invalidate();

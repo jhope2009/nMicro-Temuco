@@ -290,7 +290,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         List<Route> routes = new ArrayList<Route>();
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            routes.add(new Route(cursor.getInt(3), cursor.getString(5)));
+            routes.add(new Route(cursor.getInt(3), cursor.getString(5), findPointsByRoute(cursor.getInt(3))));
             cursor.moveToNext();
         }
         return routes;
