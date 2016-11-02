@@ -18,6 +18,7 @@ import android.widget.Toast;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.PathOverlay;
 
 import java.io.IOException;
@@ -78,29 +79,23 @@ public class DrawInMap extends Activity {
             GeoPoint gp = new GeoPoint(pto.getLatitude(), pto.getLongitude());
 
                 routesDraw.addPoint(gp);
+
         }
         map.getOverlayManager().add(routesDraw);
         map.invalidate();
     }
-    public void DrawFindLocation(MapView map, List<Address> ub1, List<Address> ub2){
-        if(ub1!=null) {
+
+    public void DrawFindLocation(List<Address> ub1, List<Address> ub2, MapView map, PathOverlay routesDraw){
+        if(ub1!=null && ub2 !=null) {
+            routesDraw.clearPath();
             Address ad = ub1.get(0);
-            Log.i(String.valueOf(ad.getLatitude()),"datos recibidos: "+ String.valueOf(ad.getLatitude()) + String.valueOf(ad.getLongitude()));
-            System.out.print(ad.getLatitude() + ":" + ad.getLongitude());
-            GeoPoint marcado = new GeoPoint(ad.getLatitude(), ad.getLongitude());
-            CustomMarker sele = new CustomMarker(map);
-            //sele.setTitle("la ubicacion 1: " + inicio);
-            sele.setPosition(marcado);
-            sele.setAnchor(CustomMarker.ANCHOR_CENTER, CustomMarker.ANCHOR_BOTTOM);
-            map.getOverlayManager().add(sele);
-        }
-        if(ub2 !=null){
             Address ad1 = ub2.get(0);
-            GeoPoint ma2 = new GeoPoint(ad1.getLatitude(), ad1.getLongitude());
-            CustomMarker sele2 = new CustomMarker(map);
-            sele2.setPosition(ma2);
-            sele2.setAnchor(CustomMarker.ANCHOR_CENTER, CustomMarker.ANCHOR_BOTTOM);
-            map.getOverlayManager().add(sele2);
+            Log.i(String.valueOf(ad.getLatitude()),"datos recibidos: "+ String.valueOf(ad.getLatitude()) + String.valueOf(ad.getLongitude()));
+            GeoPoint punto1 = new GeoPoint(ad.getLatitude(), ad.getLongitude());
+            GeoPoint punto2 = new GeoPoint(ad1.getLatitude(), ad1.getLongitude());
+            routesDraw.addPoint(punto1);
+            routesDraw.addPoint(punto2);
+            map.getOverlayManager().add(routesDraw);
             map.invalidate();
         }
         else
