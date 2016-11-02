@@ -16,46 +16,34 @@ public class Route {
 	private List<Stop> stops;
 	private List<Point> points;
 	private Drawable img;
-	private double signLatitude;
-	private double signLongitude;
+	private String icon;
 
 	public Route(){}
 
-	public Route(int idRoute, String name, List<Stop> stops, List<Point> points, Drawable img, double signLatitude, double signLongitude) {
+	public Route(int idRoute, String name, List<Stop> stops, List<Point> points, Drawable img) {
 		super();
 		this.idRoute = idRoute;
 		this.name = name;
 		this.stops = stops;
 		this.points = points;
 		this.img = img;
-		this.signLatitude=signLatitude;
-		this.signLongitude=signLongitude;
 	}
 
-	public Route(int idRoute, String name, List<Stop> stops, List<Point> points, double signLatitude, double signLongitude) {
+	public Route(int idRoute, String name, List<Stop> stops, List<Point> points, String icon) {
 		super();
 		this.idRoute = idRoute;
 		this.name = name;
 		this.stops = stops;
 		this.points = points;
-		this.signLatitude=signLatitude;
-		this.signLongitude=signLongitude;
+        this.icon = icon;
 	}
 
-	public Route(int idRoute, String name, List<Point> points, double signLatitude, double signLongitude) {
+	public Route(int idRoute, String name, List<Point> points, String icon) {
 		super();
 		this.idRoute = idRoute;
 		this.name = name;
 		this.points = points;
-		this.signLatitude=signLatitude;
-		this.signLongitude=signLongitude;
-	}
-
-	public Route(int idRoute, String name, List<Point> points) {
-		super();
-		this.idRoute = idRoute;
-		this.name = name;
-		this.points = points;
+		this.icon = icon;
 	}
 
 	public int getIdRoute() {
@@ -94,7 +82,11 @@ public class Route {
 
 	public void setImg(Drawable img){ this.img = img; }
 
-	public double getSignLatitude() { return signLatitude; }
+	public String getIcon() {
+		return icon;
+	}
 
-	public double getSignLongitude() { return signLongitude; }
+	public void setIcon(String icon) {
+		this.icon = icon;
+	}
 }

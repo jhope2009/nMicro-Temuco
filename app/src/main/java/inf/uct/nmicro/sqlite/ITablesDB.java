@@ -17,8 +17,7 @@ public class ITablesDB {
 		String ID_ROUTE = "id_route";
 		String ID_COMPANY = "id_company";
 		String NAME = "name";
-		String S_LATITUDE = "S_LATITUDE";
-		String S_LONGITUDE = "S_LONGITUDE";
+		String ICON = "icon";
 	}
 
 	interface ColumnsBus{
