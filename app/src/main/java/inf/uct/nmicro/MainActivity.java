@@ -79,7 +79,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public static int route = -1;
     Drawable icon1;
 
-
     private MapController mapController;
     private ArrayList<Route> category = new ArrayList<Route>();
     private final int POSITION_DIAMETER = 150;
@@ -105,7 +104,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private DrawerLayout drawer;
     private AdapterRoute adapter;
     private List<CustomMarker> Markers_stop;
-    MyLocationOverlay myLocationOverlay = null;
     LocationManager locationManager;
     String mprovider;
 
@@ -141,7 +139,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onClick(View v) {
                 List<Route> compa= new ArrayList<Route>();
-                if (inicio.equals("Ubicación Actual") && destino.equals("Destino")) {
+                if (destino.equals("Destino")) {
                     Toast.makeText(getApplicationContext(), "Debes ingresar destino.", Toast.LENGTH_LONG).show();
                 }
                 if (inicio.equals("Ubicación Actual")) {
@@ -168,8 +166,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 }
 
                             }}
-
-
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -356,7 +352,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Route cat;
             if (routes != null && !routes.isEmpty()) {
                 for (Route route : routes) {
-                    cat = new Route(route.getIdRoute(), route.getName(), route.getStops(), route.getPoints(), getDrawable(getResources().getIdentifier(route.getIcon(),"drawabe", getPackageName())));
+                    cat = new Route(route.getIdRoute(), route.getName(), route.getStops(), route.getPoints(), getDrawable(getResources().getIdentifier(route.getIcon(),"drawable", getPackageName())));
                     category.add(cat);
                 }
             }
@@ -430,7 +426,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             hijos = new ArrayList<TreeNode>();
 
             for (Route route : c.getRoutes()) {
-                cat = new Route(route.getIdRoute(), route.getName(), route.getStops(), route.getPoints(), getDrawable(getResources().getIdentifier(route.getIcon(),"drawabe", getPackageName())));
+                cat = new Route(route.getIdRoute(), route.getName(), route.getStops(), route.getPoints(), getDrawable(getResources().getIdentifier(route.getIcon(),"drawable", getPackageName())));
                 r.add(cat);
                 hijo = new TreeNode(new PlaceHolderHolder.PlaceItem(route.getName())).setViewHolder(new PlaceHolderHolder(getApplicationContext()));
                 hijo.setClickListener(new TreeNode.TreeNodeClickListener() {
