@@ -3,6 +3,7 @@ package inf.uct.nmicro;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -12,6 +13,7 @@ import android.location.Criteria;
 import android.location.Geocoder;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -63,6 +65,7 @@ import java.util.Locale;
 
 import inf.uct.nmicro.fragments.CustomMarker;
 import inf.uct.nmicro.fragments.DrawInMap;
+import inf.uct.nmicro.fragments.traveling;
 import inf.uct.nmicro.model.Company;
 import inf.uct.nmicro.model.Point;
 import inf.uct.nmicro.model.Route;
@@ -106,6 +109,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private List<CustomMarker> Markers_stop;
     LocationManager locationManager;
     String mprovider;
+    public final static String rutasSeleccionadas = "inf.uct.cl.traveler";
+    public ArrayList<Integer> ParaActivityTraveler=new ArrayList<>();
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -353,6 +358,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             if (routes != null && !routes.isEmpty()) {
                 for (Route route : routes) {
                     cat = new Route(route.getIdRoute(), route.getName(), route.getStops(), route.getPoints(), getDrawable(getResources().getIdentifier(route.getIcon(),"drawable", getPackageName())));
+                    ParaActivityTraveler.add(route.getIdRoute());
                     category.add(cat);
                 }
             }
@@ -373,6 +379,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         routes.clear();
         morph.hide();
         bar.setExpanded(false);
+
+
     }
 
     @Override

@@ -278,6 +278,25 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return stops;
     }
 
+    public List<Stop> findStopByidRoute(int idroute){
+        SQLiteDatabase db = this.getReadableDatabase();
+        if (db == null) {
+            return null;
+        }
+        String sql = String.format("SELECT * FROM %s WHERE %s=?", Tables.STOP);
+        String[] selectionArgs = {Integer.toString(idroute)};
+        Cursor cursor = db.rawQuery(sql, selectionArgs);
+        ArrayList<Stop> stops = new ArrayList<>();
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            stops.add(new Stop(cursor.getInt(0), cursor.getString(1), cursor.getDouble(2), cursor.getDouble(3)));
+            cursor.moveToNext();
+        }
+        return stops;
+
+    }
+
+
     public List<Route> findRoutesByStop(int idStop) {
         SQLiteDatabase db = this.getReadableDatabase();
         if (db == null) {
@@ -295,5 +314,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         }
         return routes;
     }
+
+
 
 }

@@ -27,5 +27,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity android:name=".fragments.traveling"
+                  android:label="@string/app_name">
+
+                <meta-data
+                    android:name="android.suport.PARENT_ACTIVITY"
+                    android:value="inf.uct.nmicro.fragment.traveler"
+                />
+
+
+        </activity>
+
     </application>
 </manifest>
