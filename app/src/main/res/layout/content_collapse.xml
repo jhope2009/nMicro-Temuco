@@ -59,7 +59,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:inputType="textPersonName"
-                android:text="Ubicación Actual"
+                android:hint="Origen"
                 android:ems="10"
                 android:id="@+id/editText4"
                 android:layout_weight="5" />
@@ -68,7 +68,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:inputType="textPersonName"
-                android:text="Destino"
+                android:hint="Destino"
                 android:ems="10"
                 android:id="@+id/editText3"
                 android:layout_weight="5" />
