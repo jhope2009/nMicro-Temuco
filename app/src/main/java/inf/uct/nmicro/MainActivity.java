@@ -133,6 +133,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             GeoPoint pto1 = new GeoPoint(ub0.get(0).getLatitude(), ub0.get(0).getLongitude());
                             GeoPoint pto2 = new GeoPoint(ub2.get(0).getLatitude(), ub2.get(0).getLongitude());
                             List<Company> companies = myDbHelper.findCompanies();
+                            compa.clear();
                             for (Company c : companies) {
                                 for (Route r : c.getRoutes()) {
                                     if (isRouteInArea(r, pto1) && isRouteInArea(r, pto2)) {
@@ -140,16 +141,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                         int b = isRouteInArea2(r, pto2);
                                         if (a < b) {
                                             compa.add(r);
-                                            createListWithAdapter(compa,1);
+
                                             Toast.makeText(getApplicationContext(), r.getName() + " Pasa cerca de los 2 puntos " + "orientacion del recorrido: ", Toast.LENGTH_LONG).show();
                                         }
                                     }
                                 }
                             }
+                            createListWithAdapter(compa,1);
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
                     }
+                    //
                     else {
                         List<Address> ub1 = DrawinMap.findLocationByAddress(inicio.getText().toString() + " Temuco, Araucania, Chile", geocoder);
                         List<Address> ub2 = DrawinMap.findLocationByAddress(destino.getText().toString() + " Temuco, Araucania, Chile", geocoder);
@@ -164,12 +167,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     int b = isRouteInArea2(r, pto2);
                                     if (a < b) {
                                         compa.add(r);
-                                        createListWithAdapter(compa,1);
                                         Toast.makeText(getApplicationContext(), r.getName() + " Pasa cerca de los 2 puntos " + "orientacion del recorrido: ", Toast.LENGTH_LONG).show();
                                     }
                                 }
                             }
                         }
+                        createListWithAdapter(compa,1);
+                        compa.clear();
                     }
                 }
                 else{
@@ -223,7 +227,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 String latitude = Double.toString(((double) loc.getLatitudeE6()) / 1000000);
 
                 GeoPoint geoPointUser = new GeoPoint(Double.parseDouble(latitude), Double.parseDouble(longitude));
-
 
                 createListWithAdapter(findNearRoutes(geoPointUser),0);
 

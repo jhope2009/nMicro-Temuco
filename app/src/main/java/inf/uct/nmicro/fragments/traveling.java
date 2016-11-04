@@ -85,25 +85,26 @@ public class traveling extends Activity {
         List<Company> companies = myDbHelper.findCompanies();
         List<Stop> paradas;
         List<Route> rutas=FindRoutes(companies,getRoutes);
-        CustomMarker p1 = new CustomMarker(map);
+
         for(Route r : rutas) {
             if(!r.getStops().isEmpty()) {
-                Toast.makeText(getApplicationContext(), r.getName() + "no envio nada", Toast.LENGTH_LONG).show();
                 for (Stop st : r.getStops()) {
+                    org.osmdroid.views.overlay.Marker p1=new org.osmdroid.views.overlay.Marker(map);
                     GeoPoint gp = new GeoPoint(st.getLatitude(), st.getLongitude());
                     p1.setPosition(gp);
                     p1.setIcon(this.getResources().getDrawable(R.drawable.ic_bustop));
                     p1.setPosition(gp);
                     p1.setTitle(st.getAddress());
-                    p1.setIdMarker(st.getIdStop());
+                   // p1.setIdMarker(st.getIdStop());
                     map.getOverlays().add(p1);
-                    //Toast.makeText(getApplicationContext(), r.getName() + st.getAddress(), Toast.LENGTH_LONG).show();
                 }
-                map.invalidate();
+
             }
               DrawinMap.DrawRoute(map,r,pathO);
         }
+        map.invalidate();
     }
+
 
     public List<Route> FindRoutes(List<Company> co, List<Integer> ru){
         List<Route> rutas=new ArrayList<>();
