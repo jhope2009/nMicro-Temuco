@@ -1,6 +1,8 @@
 package inf.uct.nmicro.model;
 
 import android.graphics.drawable.Drawable;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.widget.ImageView;
 
 import java.util.List;
@@ -19,6 +21,7 @@ public class Route {
 	private String icon;
 
 	public Route(){}
+
 
 	public Route(int idRoute, String name, List<Stop> stops, List<Point> points, Drawable img) {
 		super();
