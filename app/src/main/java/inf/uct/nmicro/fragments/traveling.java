@@ -3,6 +3,7 @@ package inf.uct.nmicro.fragments;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
@@ -27,6 +28,7 @@ import inf.uct.nmicro.model.Company;
 import inf.uct.nmicro.model.Route;
 import inf.uct.nmicro.model.Stop;
 import inf.uct.nmicro.sqlite.DataBaseHelper;
+import inf.uct.nmicro.fragments.CustomMarker;
 
 /**
  * Created by Esteban Campos A on 02-11-2016.
@@ -39,7 +41,7 @@ o compuesta.
 
 public class traveling extends Activity {
 
-    org.osmdroid.views.MapView map;
+    //org.osmdroid.views.MapView map;
     private MapController mMapController;
     private MapController mapController;
     int mIncr = 10000;
@@ -50,6 +52,7 @@ public class traveling extends Activity {
     List<Stop> paradas;
     DrawInMap DrawinMap = new DrawInMap();
     PathOverlay pathO;
+    MapView map;
 
 
     @Override
@@ -80,9 +83,37 @@ public class traveling extends Activity {
         Intent intent = getIntent();
         getRoutes = intent.getIntegerArrayListExtra(MainActivity.rutasSeleccionadas);
         List<Company> companies = myDbHelper.findCompanies();
-
-
-
-
+        List<Stop> paradas;
+        List<Route> rutas=FindRoutes(companies,getRoutes);
+        CustomMarker p1 = new CustomMarker(map);
+        for(Route r : rutas) {
+            if(!r.getStops().isEmpty()) {
+                Toast.makeText(getApplicationContext(), r.getName() + "no envio nada", Toast.LENGTH_LONG).show();
+                for (Stop st : r.getStops()) {
+                    GeoPoint gp = new GeoPoint(st.getLatitude(), st.getLongitude());
+                    p1.setPosition(gp);
+                    p1.setIcon(this.getResources().getDrawable(R.drawable.ic_bustop));
+                    p1.setPosition(gp);
+                    p1.setTitle(st.getAddress());
+                    p1.setIdMarker(st.getIdStop());
+                    map.getOverlays().add(p1);
+                    //Toast.makeText(getApplicationContext(), r.getName() + st.getAddress(), Toast.LENGTH_LONG).show();
+                }
+                map.invalidate();
+            }
+              DrawinMap.DrawRoute(map,r,pathO);
+        }
     }
+
+    public List<Route> FindRoutes(List<Company> co, List<Integer> ru){
+        List<Route> rutas=new ArrayList<>();
+        for(Company c :co){
+            for(Route r : c.getRoutes()){
+                for(Integer i :ru){
+                    if(i==r.getIdRoute()){rutas.add(r);}}
+            }
+        }
+    return rutas;
+    }
+
 }

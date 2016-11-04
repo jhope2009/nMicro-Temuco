@@ -52,6 +52,24 @@ public class DrawInMap extends Activity {
         return p2;
     }
 
+    public void Draw_StopsByIdRoutes(MapView map, List<Stop> stops, Drawable dra){
+       // List<CustomMarker> p2 = new ArrayList<CustomMarker>();
+        for (Stop st : stops) {
+            GeoPoint gp = new GeoPoint(st.getLatitude(), st.getLongitude());
+            CustomMarker p1 = new CustomMarker(map);
+            p1.setIcon(dra);
+            p1.setPosition(gp);
+            p1.setTitle(st.getAddress());
+            p1.setIdMarker(st.getIdStop());
+           // p2.add(p1);
+            map.getOverlays().add(p1);
+        }
+        map.invalidate();
+    }
+
+
+
+
     public List<Address> findLocationByAddress(String text, Geocoder geocoder){
         List<Address> direcciones;
         try{
@@ -103,5 +121,10 @@ public class DrawInMap extends Activity {
                 Toast.makeText(getApplicationContext(),"Debes introducir una direccion valida", Toast.LENGTH_LONG).show();
             }
     }
+    public void drawStopsSelected(List<Stop> a){
+
+    }
+
+
 
 }//final de la clase

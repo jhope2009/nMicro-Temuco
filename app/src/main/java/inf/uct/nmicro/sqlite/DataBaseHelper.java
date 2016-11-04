@@ -22,6 +22,7 @@ import inf.uct.nmicro.sqlite.ITablesDB.Routes;
 import inf.uct.nmicro.sqlite.ITablesDB.Companies;
 import inf.uct.nmicro.sqlite.ITablesDB.Points;
 import inf.uct.nmicro.sqlite.ITablesDB.StopRoute;
+import inf.uct.nmicro.sqlite.ITablesDB.Stops;
 import inf.uct.nmicro.model.Company;
 
 public class DataBaseHelper extends SQLiteOpenHelper {
@@ -196,7 +197,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         List<Route> routes = new ArrayList<Route>();
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            routes.add(new Route(cursor.getInt(0), cursor.getString(1), findPointsByRoute(cursor.getInt(0)), cursor.getString(2)));
+            routes.add(new Route(cursor.getInt(0), cursor.getString(1), findStopByidRoute(0), findPointsByRoute(cursor.getInt(0)), cursor.getString(2)));
             cursor.moveToNext();
         }
         return routes;
@@ -283,7 +284,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         if (db == null) {
             return null;
         }
-        String sql= String.format("SELECT * FROM %s WHERE %s=?",Tables.ROUTE);
+        String sql= String.format("SELECT * FROM %s WHERE %s=?",Tables.ROUTE, Routes.ID_ROUTE);
         String[] selectionargs = {Integer.toString(id)};
         Cursor cursor= db.rawQuery(sql, selectionargs);
         Route ruta= new Route(cursor.getInt(0),cursor.getString(2),findStopByidRoute(cursor.getInt(0)),findPointsByRoute(cursor.getInt(0)),cursor.getString(3));
@@ -296,7 +297,9 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         if (db == null) {
             return null;
         }
-        String sql = String.format("SELECT * FROM %s WHERE %s=?", Tables.STOP);
+        String sql = String.format("SELECT * FROM %s INNER JOIN %s ON %s=%s WHERE %s=?",
+                Tables.STOP_ROUTE,Tables.STOP, Tables.STOP_ROUTE+"."+StopRoute.ID_STOP, Tables.STOP+"."+
+                        Stops.ID_STOP, StopRoute.ID_ROUTE );
         String[] selectionArgs = {Integer.toString(idroute)};
         Cursor cursor = db.rawQuery(sql, selectionArgs);
         ArrayList<Stop> stops = new ArrayList<>();
@@ -316,7 +319,8 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             return null;
         }
         String sql = String.format("SELECT * FROM %s INNER JOIN %s ON %s = %s WHERE %s = ?",
-                Tables.STOP_ROUTE, Tables.ROUTE, Tables.STOP_ROUTE+"."+StopRoute.ID_ROUTE, Tables.ROUTE+"."+Routes.ID_ROUTE, StopRoute.ID_STOP);
+                Tables.STOP_ROUTE, Tables.ROUTE, Tables.STOP_ROUTE+"."+StopRoute.ID_ROUTE, Tables.ROUTE+"."+
+                        Routes.ID_ROUTE, StopRoute.ID_STOP);
         String[] selectionArgs = {Integer.toString(idStop)};
         Cursor cursor = db.rawQuery(sql, selectionArgs);
         List<Route> routes = new ArrayList<Route>();
