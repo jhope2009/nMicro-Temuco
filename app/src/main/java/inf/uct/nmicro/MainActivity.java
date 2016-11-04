@@ -101,8 +101,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         final EditText inicio = (EditText) findViewById(R.id.editText4);
         final EditText destino = (EditText) findViewById(R.id.editText3);
-        inicio.setHint("Origen");
-        destino.setHint("Destino");
+        inicio.setText("");
+        destino.setText("");
         Geocoder geocoder = new Geocoder(getApplication(), Locale.getDefault());
         routesDraw = new PathOverlay(Color.BLUE, 10, this);
         layout_menu = (LinearLayout) findViewById(R.id.layout_menu);
