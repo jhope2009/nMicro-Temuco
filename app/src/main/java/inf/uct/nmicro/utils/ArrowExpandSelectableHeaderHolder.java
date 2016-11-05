@@ -33,7 +33,7 @@ public class ArrowExpandSelectableHeaderHolder extends TreeNode.BaseNodeViewHold
         tvValue.setText(value.text);
 
         final PrintView iconView = (PrintView) view.findViewById(R.id.icon);
-        iconView.setIconText(context.getResources().getString(value.icon));
+        iconView.setImageDrawable(value.icon);
 
         arrowView = (PrintView) view.findViewById(R.id.arrow_icon);
         arrowView.setPadding(20,10,10,10);

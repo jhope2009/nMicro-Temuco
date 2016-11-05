@@ -22,86 +22,28 @@
         app:iconFont="fonts/material-icon-font.ttf"
         app:iconSize="20dp" />
 
-    <com.github.johnkil.print.PrintView
-        app:iconColor="@color/text_lgray"
-        app:iconFont="fonts/material-icon-font.ttf"
-        app:iconSize="20dp"
-        android:layout_centerVertical="true"
-        android:textSize="13sp"
-        android:layout_alignParentRight="true"
-        android:textColor="@android:color/white"
-        android:layout_marginLeft="10dp"
-        android:id="@+id/like"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
     <LinearLayout
         android:layout_toRightOf="@id/arrow_icon"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true"
         android:id="@+id/info"
         android:layout_marginLeft="10dp"
-        android:layout_toLeftOf="@id/like"
         android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_width="60dp"
+        android:layout_height="45dp">
 
-        <TextView
-            android:textSize="14sp"
-            android:textColor="@color/text_lgray"
-
-            android:id="@+id/place_name"
-            android:text="My Hotel"
+        <com.github.johnkil.print.PrintView
+            app:iconColor="@color/text_lgray"
+            app:iconFont="fonts/material-icon-font.ttf"
+            android:layout_centerVertical="true"
+            android:textSize="13sp"
+            android:layout_alignParentRight="true"
+            android:textColor="@android:color/white"
+            android:layout_marginLeft="10dp"
+            android:id="@+id/like"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="match_parent" />
 
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-
-            <com.github.johnkil.print.PrintView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:iconText="@string/ic_star"
-                app:iconColor="@color/text_lgray"
-                app:iconFont="fonts/material-icon-font.ttf"
-                app:iconSize="9dp" />
-
-            <com.github.johnkil.print.PrintView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:iconText="@string/ic_star"
-                app:iconColor="@color/text_lgray"
-                app:iconFont="fonts/material-icon-font.ttf"
-                app:iconSize="9dp" />
-
-            <com.github.johnkil.print.PrintView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:iconText="@string/ic_star"
-                app:iconColor="@color/text_lgray"
-                app:iconFont="fonts/material-icon-font.ttf"
-                app:iconSize="9dp" />
-
-            <com.github.johnkil.print.PrintView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:iconText="@string/ic_star"
-                app:iconColor="@color/text_lgray"
-                app:iconFont="fonts/material-icon-font.ttf"
-                app:iconSize="9dp" />
-
-            <com.github.johnkil.print.PrintView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:iconText="@string/ic_star_outline"
-                app:iconColor="@color/text_lgray"
-                app:iconFont="fonts/material-icon-font.ttf"
-                app:iconSize="9dp" />
-
-
-        </LinearLayout>
     </LinearLayout>
 
 

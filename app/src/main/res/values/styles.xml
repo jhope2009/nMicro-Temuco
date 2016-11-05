@@ -38,5 +38,10 @@
         <item name="android:divider">@android:drawable/divider_horizontal_bright</item>
     </style>
 
+    <style name="MyEditText" parent="Theme.AppCompat.Light">
+        <item name="colorControlNormal">@color/colorPrimaryDark</item>
+        <item name="colorControlActivated">@color/colorAccent</item>
+    </style>
+
 
 </resources>

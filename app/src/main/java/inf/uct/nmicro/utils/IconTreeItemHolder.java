@@ -1,6 +1,7 @@
 package inf.uct.nmicro.utils;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
@@ -28,15 +29,15 @@ public class IconTreeItemHolder extends TreeNode.BaseNodeViewHolder<IconTreeItem
         tvValue = (TextView) view.findViewById(R.id.node_value);
         tvValue.setText(value.text);
 
-        final PrintView iconView = (PrintView) view.findViewById(R.id.icon);
-        iconView.setIconText(context.getResources().getString(value.icon));
+        //final PrintView iconView = (PrintView) view.findViewById(R.id.icon);
+        //iconView.setImageDrawable(value.icon);
 
-        arrowView = (PrintView) view.findViewById(R.id.arrow_icon);
+        //arrowView = (PrintView) view.findViewById(R.id.arrow_icon);
 
         view.findViewById(R.id.btn_addFolder).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                TreeNode newFolder = new TreeNode(new IconTreeItemHolder.IconTreeItem(R.string.ic_folder, "New Folder"));
+                TreeNode newFolder = new TreeNode(new IconTreeItemHolder.IconTreeItem(context.getDrawable(R.drawable.moreinfo_arrow), "New Folder"));
                 getTreeView().addNode(node, newFolder);
             }
         });
@@ -58,14 +59,14 @@ public class IconTreeItemHolder extends TreeNode.BaseNodeViewHolder<IconTreeItem
 
     @Override
     public void toggle(boolean active) {
-        arrowView.setIconText(context.getResources().getString(active ? R.string.ic_keyboard_arrow_down : R.string.ic_keyboard_arrow_right));
+        arrowView.setImageDrawable(context.getDrawable(active ? R.drawable.moreinfo_arrow : R.drawable.moreinfo_arrow_pressed));
     }
 
     public static class IconTreeItem {
-        public int icon;
+        public Drawable icon;
         public String text;
 
-        public IconTreeItem(int icon, String text) {
+        public IconTreeItem(Drawable icon, String text) {
             this.icon = icon;
             this.text = text;
         }

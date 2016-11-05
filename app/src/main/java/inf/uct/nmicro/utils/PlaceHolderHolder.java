@@ -1,6 +1,7 @@
 package inf.uct.nmicro.utils;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
@@ -27,14 +28,12 @@ public class PlaceHolderHolder extends TreeNode.BaseNodeViewHolder<PlaceHolderHo
         final View view = inflater.inflate(R.layout.layout_place_node, null, false);
 
 
-        TextView placeName = (TextView) view.findViewById(R.id.place_name);
-        placeName.setText(value.name);
+        //TextView placeName = (TextView) view.findViewById(R.id.place_name);
+        //placeName.setText(value.name);
 
-        Random r = new Random();
-        boolean like = r.nextBoolean();
+        final PrintView iconView = (PrintView) view.findViewById(R.id.like);
+        iconView.setImageDrawable(value.icon);
 
-        PrintView likeView = (PrintView) view.findViewById(R.id.like);
-        likeView.setIconText(context.getString(like ? R.string.ic_thumbs_up : R.string.ic_thumbs_down));
         return view;
     }
 
@@ -45,9 +44,14 @@ public class PlaceHolderHolder extends TreeNode.BaseNodeViewHolder<PlaceHolderHo
 
     public static class PlaceItem {
         public String name;
+        public Drawable icon;
 
         public PlaceItem(String name) {
             this.name = name;
+        }
+        public PlaceItem(String name, Drawable icon) {
+            this.name = name;
+            this.icon = icon;
         }
         // rest will be hardcoded
     }

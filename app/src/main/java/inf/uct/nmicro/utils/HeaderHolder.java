@@ -28,8 +28,8 @@ public class HeaderHolder extends TreeNode.BaseNodeViewHolder<IconTreeItemHolder
         TextView tvValue = (TextView) view.findViewById(R.id.node_value);
         tvValue.setText(value.text);
 
-        final PrintView iconView = (PrintView) view.findViewById(R.id.icon);
-        iconView.setIconText(context.getResources().getString(value.icon));
+        //final PrintView iconView = (PrintView) view.findViewById(R.id.icon);
+        //iconView.setImageDrawable(value.icon);
 
         arrowView = (PrintView) view.findViewById(R.id.arrow_icon);
         if (node.isLeaf()) {

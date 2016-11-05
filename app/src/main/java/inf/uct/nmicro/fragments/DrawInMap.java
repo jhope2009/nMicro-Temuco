@@ -51,12 +51,12 @@ public class DrawInMap extends Activity {
         map.invalidate();
         return p2;
     }
-    public List<Address> findLocationByAddress(String text, Geocoder geocoder){
-        List<Address> direcciones;
+    public List<Address> findLocationByAddress(String text, Geocoder geocoder, Context contexto){
+        List<Address> direcciones = new ArrayList<Address>();
         try{
             direcciones = geocoder.getFromLocationName(text,3);
             if(direcciones ==null){
-                Toast.makeText(getApplicationContext(),"No se encontro Direccion", Toast.LENGTH_LONG).show();
+                Toast.makeText(contexto,"No se encontro Direccion", Toast.LENGTH_LONG).show();
             }
             else{
                 return direcciones;
@@ -65,8 +65,8 @@ public class DrawInMap extends Activity {
         }
         catch (IOException e) {
             e.printStackTrace();
-            Toast.makeText(getApplicationContext(),"NO se cargo direccion:" +text, Toast.LENGTH_LONG).show();
-            return direcciones=null;
+            Toast.makeText(contexto,"NO se cargo direccion:" +text, Toast.LENGTH_LONG).show();
+            return direcciones;
         }
     }
 
@@ -82,7 +82,7 @@ public class DrawInMap extends Activity {
         map.invalidate();
     }
 
-    public void DrawFindLocation(List<Address> ub1, List<Address> ub2, MapView map, PathOverlay routesDraw){
+    public void DrawFindLocation(List<Address> ub1, List<Address> ub2, MapView map, PathOverlay routesDraw, Context contexto){
         if(ub1!=null && ub2 !=null) {
             routesDraw.clearPath();
             Address ad = ub1.get(0);
@@ -97,7 +97,7 @@ public class DrawInMap extends Activity {
         }
         else
             if(ub2==null){
-                Toast.makeText(getApplicationContext(),"Debes introducir una direccion valida", Toast.LENGTH_LONG).show();
+                Toast.makeText(contexto, "Debes introducir una direccion valida", Toast.LENGTH_LONG).show();
             }
     }
     public void drawStopsSelected(List<Stop> a){

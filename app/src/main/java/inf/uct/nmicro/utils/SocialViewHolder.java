@@ -15,7 +15,7 @@ import inf.uct.nmicro.R;
 /**
  * Created by Bogdan Melnychuk on 2/13/15.
  */
-public class SocialViewHolder extends TreeNode.BaseNodeViewHolder<SocialViewHolder.SocialItem> {
+public class  SocialViewHolder extends TreeNode.BaseNodeViewHolder<SocialViewHolder.SocialItem> {
 
     private static final String[] NAMES = new String[]{"Bruce Wayne", "Clark Kent", "Barry Allen", "Hal Jordan"};
 

@@ -15,7 +15,7 @@
         android:gravity="bottom">
 
         <TextView
-            android:text="¿Donde deseas ir?"
+            android:text="Planifica tu viaje"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/textView2"
@@ -28,30 +28,15 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="3"
-        android:weightSum="10">
+        android:layout_weight="5"
+        android:weightSum="10"
+        android:gravity="center_horizontal">
 
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="2"
-            android:weightSum="10"
-            android:gravity="center_vertical">
-
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                app:srcCompat="@drawable/ic_rutas2"
-                android:id="@+id/imageView3"
-                android:layout_weight="6" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="6"
+            android:layout_weight="8"
             android:weightSum="10"
             android:gravity="bottom">
 
@@ -59,38 +44,35 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:inputType="textPersonName"
-                android:hint="@string/txt_origen"
-                android:ellipsize="end"
+                android:text=""
                 android:ems="10"
-                android:id="@+id/editText4"
-                android:layout_weight="5" />
+                android:id="@+id/editText3"
+                android:layout_weight="3"
+                android:hint="Origen"
+                android:drawableStart="@android:drawable/ic_menu_mylocation"
+                android:theme="@style/MyEditText"
+                android:drawableEnd="@drawable/arrows" />
 
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:inputType="textPersonName"
-                android:hint="@string/txt_destino"
-                android:ellipsize="end"
+                android:text=""
                 android:ems="10"
-                android:id="@+id/editText3"
-                android:layout_weight="5" />
+                android:id="@+id/editText4"
+                android:layout_weight="3"
+                android:hint="Destino"
+                android:drawableStart="@android:drawable/ic_menu_myplaces"
+                android:theme="@style/MyEditText" />
 
-        </LinearLayout>
-
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="2"
-            android:weightSum="10"
-            android:gravity="center_vertical">
-
-            <ImageView
+            <Button
+                android:text="Buscar Rutas"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:srcCompat="@android:drawable/stat_sys_download_done"
-                android:id="@+id/imageView7"
-                android:layout_weight="2" />
+                android:layout_height="0dp"
+                android:id="@+id/button4"
+                android:layout_weight="3"
+                android:elevation="7dp" />
+
         </LinearLayout>
 
     </LinearLayout>
@@ -99,24 +81,16 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="3"
+        android:layout_weight="1"
         android:weightSum="10"
         android:gravity="bottom">
-
-        <Button
-            android:text="Buscar Rutas"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:id="@+id/button4"
-            android:layout_weight="5"
-            android:elevation="7dp" />
 
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="0dp"
             app:srcCompat="@drawable/points"
             android:id="@+id/imageView9"
-            android:layout_weight="2"
+            android:layout_weight="7"
             android:background="@color/colorPrimaryDark"
             android:paddingBottom="3dp"
             android:paddingTop="3dp" />
