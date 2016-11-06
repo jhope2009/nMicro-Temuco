@@ -84,21 +84,27 @@ public class DrawInMap extends Activity {
 
     public void DrawFindLocation(List<Address> ub1, List<Address> ub2, MapView map, PathOverlay routesDraw, Context contexto){
         if(ub1!=null && ub2 !=null) {
-            routesDraw.clearPath();
-            Address ad = ub1.get(0);
-            Address ad1 = ub2.get(0);
-            Log.i(String.valueOf(ad.getLatitude()),"datos recibidos: "+ String.valueOf(ad.getLatitude()) + String.valueOf(ad.getLongitude()));
-            GeoPoint punto1 = new GeoPoint(ad.getLatitude(), ad.getLongitude());
-            GeoPoint punto2 = new GeoPoint(ad1.getLatitude(), ad1.getLongitude());
-            routesDraw.addPoint(punto1);
-            routesDraw.addPoint(punto2);
-            map.getOverlayManager().add(routesDraw);
-            map.invalidate();
-        }
-        else
-            if(ub2==null){
+            if(ub1.size() > 0) {
+                if(ub2.size() > 0) {
+                    routesDraw.clearPath();
+                    Address ad = ub1.get(0);
+                    Address ad1 = ub2.get(0);
+                    Log.i(String.valueOf(ad.getLatitude()), "datos recibidos: " + String.valueOf(ad.getLatitude()) + String.valueOf(ad.getLongitude()));
+                    GeoPoint punto1 = new GeoPoint(ad.getLatitude(), ad.getLongitude());
+                    GeoPoint punto2 = new GeoPoint(ad1.getLatitude(), ad1.getLongitude());
+                    routesDraw.addPoint(punto1);
+                    routesDraw.addPoint(punto2);
+                    map.getOverlayManager().add(routesDraw);
+                    map.invalidate();
+                } else {
+                    Toast.makeText(contexto, "Debes introducir una direccion valida", Toast.LENGTH_LONG).show();
+                }
+            } else {
                 Toast.makeText(contexto, "Debes introducir una direccion valida", Toast.LENGTH_LONG).show();
             }
+        }
+        else
+                Toast.makeText(contexto, "Debes introducir una direccion valida", Toast.LENGTH_LONG).show();
     }
     public void drawStopsSelected(List<Stop> a){
 

@@ -123,43 +123,39 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 InputMethodManager inputMethodManager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
                 inputMethodManager.hideSoftInputFromWindow(destino.getWindowToken(), 0);
                 List<Route> compa= new ArrayList<Route>();
+                if (!destino.equals("")) {
                     if (inicio.equals("")) {
                         Location loc = GetCurrentLocation();
                         try {
                             List<Address> ub0 = geocoder.getFromLocation(loc.getLatitude(), loc.getLongitude(), 1);
-                            List<Address> ub2 = DrawinMap.findLocationByAddress(destino.getText().toString() + " Temuco, Araucania, Chile", geocoder, getApplication());
-                            if(!ub0.isEmpty() && !ub2.isEmpty()) {
-                                DrawinMap.DrawFindLocation(ub0, ub2, map, routesDraw, getApplication());
-                                GeoPoint pto1 = new GeoPoint(ub0.get(0).getLatitude(), ub0.get(0).getLongitude());
-                                GeoPoint pto2 = new GeoPoint(ub2.get(0).getLatitude(), ub2.get(0).getLongitude());
-                                List<Company> companies = myDbHelper.findCompanies();
-                                compa.clear();
-                                for (Company c : companies) {
-                                    for (Route r : c.getRoutes()) {
-                                        if (isRouteInArea(r, pto1) && isRouteInArea(r, pto2)) {
-                                            int a = isRouteInArea2(r, pto1);
-                                            int b = isRouteInArea2(r, pto2);
-                                            if (a < b) {
-                                                compa.add(r);
-
-                                                Toast.makeText(getApplicationContext(), r.getName() + " Pasa cerca de los 2 puntos " + "orientacion del recorrido: ", Toast.LENGTH_LONG).show();
-                                            }
+                            List<Address> ub2 = DrawinMap.findLocationByAddress(destino.getText().toString() + " Temuco, Araucania, Chile", geocoder,getApplication());
+                            DrawinMap.DrawFindLocation(ub0, ub2, map, routesDraw,getApplication());
+                            GeoPoint pto1 = new GeoPoint(ub0.get(0).getLatitude(), ub0.get(0).getLongitude());
+                            GeoPoint pto2 = new GeoPoint(ub2.get(0).getLatitude(), ub2.get(0).getLongitude());
+                            List<Company> companies = myDbHelper.findCompanies();
+                            for (Company c : companies) {
+                                for (Route r : c.getRoutes()) {
+                                    if (isRouteInArea(r, pto1) && isRouteInArea(r, pto2)) {
+                                        int a = isRouteInArea2(r, pto1);
+                                        int b = isRouteInArea2(r, pto2);
+                                        if (a < b) {
+                                            compa.add(r);
+                                            createListWithAdapter(compa);
+                                            Toast.makeText(getApplicationContext(), r.getName() + " Pasa cerca de los 2 puntos " + "orientacion del recorrido: ", Toast.LENGTH_LONG).show();
                                         }
                                     }
                                 }
-                                createListWithAdapter(compa, 1);
                             }
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
                     }
                     else {
-                        List<Address> ub1 =new ArrayList<Address>();
-                        List<Address> ub2 =new ArrayList<Address>();
-                        ub1 = DrawinMap.findLocationByAddress(inicio.getText().toString() + " Temuco, Araucania, Chile", geocoder, getApplication());
-                        ub2 = DrawinMap.findLocationByAddress(destino.getText().toString() + " Temuco, Araucania, Chile", geocoder, getApplication());
+                        List<Address> ub1 = DrawinMap.findLocationByAddress(inicio.getText().toString() + " Temuco, Araucania, Chile", geocoder, getApplication());
+                        List<Address> ub2 = DrawinMap.findLocationByAddress(destino.getText().toString() + " Temuco, Araucania, Chile", geocoder, getApplication());
+
                         DrawinMap.DrawFindLocation(ub1, ub2, map, routesDraw, getApplication());
-                        if(!ub1.isEmpty() && !ub2.isEmpty()) {
+                        if (ub1.size() > 0 && ub2.size() >0) {
                             GeoPoint pto1 = new GeoPoint(ub1.get(0).getLatitude(), ub1.get(0).getLongitude());
                             GeoPoint pto2 = new GeoPoint(ub2.get(0).getLatitude(), ub2.get(0).getLongitude());
                             List<Company> companies = myDbHelper.findCompanies();
@@ -170,20 +166,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                         int b = isRouteInArea2(r, pto2);
                                         if (a < b) {
                                             compa.add(r);
+                                            createListWithAdapter(compa);
                                             Toast.makeText(getApplicationContext(), r.getName() + " Pasa cerca de los 2 puntos " + "orientacion del recorrido: ", Toast.LENGTH_LONG).show();
                                         }
                                     }
                                 }
                             }
-                            createListWithAdapter(compa, 1);
-                            compa.clear();
-                        }else {
-                            Toast.makeText(getApplicationContext(), "Debes ingresar Origen y/o Destino Validos.", Toast.LENGTH_LONG).show();
+                        }else{
+                            Toast.makeText(getApplicationContext(), "No se encontraron rutas", Toast.LENGTH_LONG).show();
                         }
                     }
-
+                }
+                else{
+                    Toast.makeText(getApplicationContext(), "Debes ingresar destino.", Toast.LENGTH_LONG).show();
+                }
             }
         });
+
         bar = (AppBarLayout) findViewById(R.id.MyAppbar);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         morph = (FABToolbarLayout) findViewById(R.id.fabtoolbar);
@@ -205,7 +204,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             mak.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
                 @Override
                 public boolean onMarkerClick(Marker marker, MapView mapView) {
-                    createListWithAdapter(myDbHelper.findRoutesByStop(mak.getIdMarker()),0);
+                    createListWithAdapter(myDbHelper.findRoutesByStop(mak.getIdMarker()));
                     return false;
                 }
             });
@@ -231,7 +230,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 GeoPoint geoPointUser = new GeoPoint(Double.parseDouble(latitude), Double.parseDouble(longitude));
 
-                createListWithAdapter(findNearRoutes(geoPointUser),0);
+                createListWithAdapter(findNearRoutes(geoPointUser));
 
                 mapController.animateTo(geoPointUser);
                 mapController.zoomTo(16);
@@ -324,41 +323,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    public void createListWithAdapter(List<Route> routes, int called) {
+    public void createListWithAdapter(List<Route> routes) {
         //si se llama al metodo desde el evento del boton.
-        if(called == 1) {
-            if (routes.size() > 0) {
-                ArrayList<Route> category = new ArrayList<Route>();
-                Route cat;
-                if (routes != null && !routes.isEmpty()) {
-                    for (Route route : routes) {
-                        cat = new Route(route.getIdRoute(), route.getName(), route.getStops(), route.getPoints(), getDrawable(getResources().getIdentifier(route.getIcon(), "drawable", getPackageName())));
-                        category.add(cat);
-                    }
-                }
-                ListView lv = (ListView) findViewById(R.id.ListView);
-                adapter = new AdapterRoute(this, category);
-                lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        final int pos = position;
-                        System.out.println(category.get(pos).getPoints());
-                        ParaActivityTraveler.add(category.get(pos).getIdRoute());
-                       // DrawinMap.DrawRoute(map, category.get(pos), routesDraw);
-                        morph.hide();
-                        Intent intent=new Intent(getApplicationContext(),traveling.class);
-                        intent.putExtra(rutasSeleccionadas,ParaActivityTraveler);
-                        startActivity(intent);
-                    }
-                });
-                morph.show();
-                lv.setAdapter(adapter);
-            }
-            routes.clear();
-            morph.hide();
-            bar.setExpanded(false);
-        }
-        else{
             if (routes.size() > 0) {
                 ArrayList<Route> category = new ArrayList<Route>();
                 Route cat;
@@ -385,7 +351,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             routes.clear();
             morph.hide();
             bar.setExpanded(false);
-        }
     }
 
     @Override

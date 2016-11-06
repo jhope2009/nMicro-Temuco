@@ -70,16 +70,20 @@ public class traveling extends Activity {
 
         //recibo los datos del main_activity
         pathO = new PathOverlay(Color.BLACK, 10, this);
+
         setContentView(R.layout.traveling);
         org.osmdroid.tileprovider.constants.OpenStreetMapTileProviderConstants.setUserAgentValue(android.support.v4.BuildConfig.APPLICATION_ID);
+
         map = (MapView) findViewById(R.id.map);
         map.setTileSource(TileSourceFactory.MAPNIK);
         map.setBuiltInZoomControls(false);
         map.setMultiTouchControls(true);
+
         mapController = (MapController) map.getController();
         mapController.setZoom(15);
         GeoPoint Temuco = new GeoPoint(-38.7392, -72.6087);
         mapController.setCenter(Temuco);
+
         Intent intent = getIntent();
         getRoutes = intent.getIntegerArrayListExtra(MainActivity.rutasSeleccionadas);
         List<Company> companies = myDbHelper.findCompanies();
@@ -89,7 +93,7 @@ public class traveling extends Activity {
         for(Route r : rutas) {
             if(!r.getStops().isEmpty()) {
                 for (Stop st : r.getStops()) {
-                    org.osmdroid.views.overlay.Marker p1=new org.osmdroid.views.overlay.Marker(map);
+                    CustomMarker p1=new CustomMarker(map);
                     GeoPoint gp = new GeoPoint(st.getLatitude(), st.getLongitude());
                     p1.setPosition(gp);
                     p1.setIcon(this.getResources().getDrawable(R.drawable.ic_bustop));
