@@ -140,12 +140,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                         int b = isRouteInArea2(r, pto2);
                                         if (a < b) {
                                             compa.add(r);
-                                            createListWithAdapter(compa);
-                                            Toast.makeText(getApplicationContext(), r.getName() + " Pasa cerca de los 2 puntos " + "orientacion del recorrido: ", Toast.LENGTH_LONG).show();
+                                            Toast.makeText(getApplicationContext(), r.getName() + " Pasa cerca  " + String.valueOf(r.getIdRoute()), Toast.LENGTH_LONG).show();
                                         }
                                     }
                                 }
                             }
+                            createListWithAdapter(compa,1);
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -166,12 +166,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                         int b = isRouteInArea2(r, pto2);
                                         if (a < b) {
                                             compa.add(r);
-                                            createListWithAdapter(compa);
+
                                             Toast.makeText(getApplicationContext(), r.getName() + " Pasa cerca de los 2 puntos " + "orientacion del recorrido: ", Toast.LENGTH_LONG).show();
                                         }
                                     }
                                 }
                             }
+                            createListWithAdapter(compa,1);
                         }else{
                             Toast.makeText(getApplicationContext(), "No se encontraron rutas", Toast.LENGTH_LONG).show();
                         }
@@ -204,7 +205,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             mak.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
                 @Override
                 public boolean onMarkerClick(Marker marker, MapView mapView) {
-                    createListWithAdapter(myDbHelper.findRoutesByStop(mak.getIdMarker()));
+                    createListWithAdapter(myDbHelper.findRoutesByStop(mak.getIdMarker()),0);
                     return false;
                 }
             });
@@ -230,7 +231,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 GeoPoint geoPointUser = new GeoPoint(Double.parseDouble(latitude), Double.parseDouble(longitude));
 
-                createListWithAdapter(findNearRoutes(geoPointUser));
+                createListWithAdapter(findNearRoutes(geoPointUser),0);
 
                 mapController.animateTo(geoPointUser);
                 mapController.zoomTo(16);
@@ -323,8 +324,41 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    public void createListWithAdapter(List<Route> routes) {
+    public void createListWithAdapter(List<Route> routes, int a) {
         //si se llama al metodo desde el evento del boton.
+        if(a==1) {
+            if (routes.size() > 0) {
+                ArrayList<Route> category = new ArrayList<Route>();
+                Route cat;
+                if (routes != null && !routes.isEmpty()) {
+                    for (Route route : routes) {
+                        cat = new Route(route.getIdRoute(), route.getName(), route.getStops(), route.getPoints(), getDrawable(getResources().getIdentifier(route.getIcon(), "drawable", getPackageName())));
+                        category.add(cat);
+                    }
+                }
+                ListView lv = (ListView) findViewById(R.id.ListView);
+                adapter = new AdapterRoute(this, category);
+                lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        final int pos = position;
+                        System.out.println(category.get(pos).getPoints());
+                       // DrawinMap.DrawRoute(map, category.get(pos), routesDraw);
+                       // morph.hide();
+                        ParaActivityTraveler.add(category.get(pos).getIdRoute());
+                        Intent intent=new Intent(getApplicationContext(),traveling.class);
+                        intent.putExtra(rutasSeleccionadas,ParaActivityTraveler);
+                        startActivity(intent);
+                    }
+                });
+                morph.show();
+                lv.setAdapter(adapter);
+            }
+            routes.clear();
+            morph.hide();
+            bar.setExpanded(false);
+        }
+        else{
             if (routes.size() > 0) {
                 ArrayList<Route> category = new ArrayList<Route>();
                 Route cat;
@@ -351,6 +385,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             routes.clear();
             morph.hide();
             bar.setExpanded(false);
+
+
+        }
     }
 
     @Override

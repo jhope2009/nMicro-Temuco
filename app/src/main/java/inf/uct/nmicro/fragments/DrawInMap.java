@@ -51,6 +51,24 @@ public class DrawInMap extends Activity {
         map.invalidate();
         return p2;
     }
+    public void DrawStopsByRoute(List<Route> ruras,DataBaseHelper mydb, Drawable dra, MapView map){
+      for(Route r : ruras) {
+          for (Stop st : r.getStops()) {
+              GeoPoint gp = new GeoPoint(st.getLatitude(), st.getLongitude());
+              CustomMarker cm = new CustomMarker(map);
+              cm.setIcon(dra);
+              cm.setPosition(gp);
+              cm.setTitle(st.getAddress());
+              cm.setIdMarker(st.getIdStop());
+              map.getOverlays().add(cm);
+
+          }
+      }
+        map.invalidate();
+    }
+
+
+
     public List<Address> findLocationByAddress(String text, Geocoder geocoder, Context contexto){
         List<Address> direcciones = new ArrayList<Address>();
         try{
