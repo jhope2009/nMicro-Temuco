@@ -1,128 +1,488 @@
 package inf.uct.nmicro;
 
-
-import android.app.Activity;
+import android.Manifest;
+import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.location.Address;
+import android.location.Criteria;
+import android.location.Geocoder;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 
-import android.provider.Settings;
-import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.ViewPager;
+import android.support.annotation.RequiresApi;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.AttributeSet;
+import android.view.MenuItem;
 import android.view.MotionEvent;
-import android.widget.TextView;
-import android.view.LayoutInflater;
-
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.Toast;
+import android.location.Location;
+import com.github.fafaldo.fabtoolbar.widget.FABToolbarLayout;
+import com.unnamed.b.atv.model.TreeNode;
+import com.unnamed.b.atv.view.AndroidTreeView;
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.MapController;
+import org.osmdroid.views.MapView;
+import org.osmdroid.views.Projection;
+import org.osmdroid.views.overlay.ItemizedIconOverlay;
+import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.overlay.Overlay;
+import org.osmdroid.views.overlay.OverlayItem;
+import org.osmdroid.views.overlay.PathOverlay;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
-import inf.uct.nmicro.fragments.FragmentFavorites;
-import inf.uct.nmicro.fragments.FragmentMap;
-import inf.uct.nmicro.fragments.FragmentRoutes;
-import inf.uct.nmicro.fragments.FragmentToplan;
+import inf.uct.nmicro.fragments.CustomMarker;
+import inf.uct.nmicro.fragments.DrawInMap;
+import inf.uct.nmicro.fragments.traveling;
 import inf.uct.nmicro.model.Company;
+import inf.uct.nmicro.model.Point;
 import inf.uct.nmicro.model.Route;
 import inf.uct.nmicro.sqlite.DataBaseHelper;
+import inf.uct.nmicro.utils.AdapterRoute;
+import inf.uct.nmicro.utils.HeaderHolder;
+import inf.uct.nmicro.utils.IconTreeItemHolder;
+import inf.uct.nmicro.utils.PlaceHolderHolder;
+import inf.uct.nmicro.utils.ProfileHolder;
 
-
-public class MainActivity extends AppCompatActivity{
-    private Toolbar toolbar;
-    private TabLayout tabLayout;
-    public static ViewPager viewPager;
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
     public static int route = -1;
-    private int[] tabIcons={
-            R.drawable.ic_maps_map,
-            R.drawable.ic_recorrido,
-            R.drawable.ic_toggle_star,
-            R.drawable.ic_rutas2
-    };
+    Drawable icon1;
+    private MapController mapController;
+    private final int POSITION_DIAMETER = 150;
+    private DataBaseHelper myDbHelper;
+    private Route cat;
+    private List<Route> allRoutes;
+    private List<Company> companie;
+    MapView map;
+    private FABToolbarLayout morph;
+    DrawInMap DrawinMap = new DrawInMap();
+    PathOverlay routesDraw;
+    private LinearLayout layout_menu;
+    private AppBarLayout bar;
+    private DrawerLayout drawer;
+    private AdapterRoute adapter;
+    private List<CustomMarker> Markers_stop;
+    LocationManager locationManager;
+    String mprovider;
+    public final static String rutasSeleccionadas = "traveling";
+    public ArrayList<Integer> ParaActivityTraveler=new ArrayList<>();
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        final Toolbar toolbar = (Toolbar) findViewById(R.id.MyToolbar);
         setSupportActionBar(toolbar);
-
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        final EditText inicio = (EditText) findViewById(R.id.editText4);
+        final EditText destino = (EditText) findViewById(R.id.editText3);
+        inicio.setText("");
+        destino.setText("");
+        Geocoder geocoder = new Geocoder(getApplication(), Locale.getDefault());
+        routesDraw = new PathOverlay(Color.BLUE, 10, this);
+        layout_menu = (LinearLayout) findViewById(R.id.layout_menu);
+        adapter = new AdapterRoute(this);
 
-        viewPager = (ViewPager) findViewById(R.id.viewpager);
-        setupViewPager(viewPager);
+        myDbHelper = new DataBaseHelper(this);
+        try {
+            myDbHelper.NoCheckCreateDataBase();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        prepareListData();
+        Button butS = (Button) findViewById(R.id.button4);
 
-        tabLayout = (TabLayout) findViewById(R.id.tabs);
-        tabLayout.setupWithViewPager(viewPager);
-        setupTabIcons();
+        butS.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                InputMethodManager inputMethodManager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                inputMethodManager.hideSoftInputFromWindow(destino.getWindowToken(), 0);
+                List<Route> compa= new ArrayList<Route>();
+                if (!destino.equals("")) {
+                    if (inicio.equals("")) {
+                        Location loc = GetCurrentLocation();
+                        try {
+                            List<Address> ub0 = geocoder.getFromLocation(loc.getLatitude(), loc.getLongitude(), 1);
+                            List<Address> ub2 = DrawinMap.findLocationByAddress(destino.getText().toString() + " Temuco, Araucania, Chile", geocoder,getApplication());
+                            DrawinMap.DrawFindLocation(ub0, ub2, map, routesDraw,getApplication());
+                            GeoPoint pto1 = new GeoPoint(ub0.get(0).getLatitude(), ub0.get(0).getLongitude());
+                            GeoPoint pto2 = new GeoPoint(ub2.get(0).getLatitude(), ub2.get(0).getLongitude());
+                            List<Company> companies = myDbHelper.findCompanies();
+                            for (Company c : companies) {
+                                for (Route r : c.getRoutes()) {
+                                    if (isRouteInArea(r, pto1) && isRouteInArea(r, pto2)) {
+                                        int a = isRouteInArea2(r, pto1);
+                                        int b = isRouteInArea2(r, pto2);
+                                        if (a < b) {
+                                            compa.add(r);
+                                            Toast.makeText(getApplicationContext(), r.getName() + " Pasa cerca  " + String.valueOf(r.getIdRoute()), Toast.LENGTH_LONG).show();
+                                        }
+                                    }
+                                }
+                            }
+                            createListWithAdapter(compa,1);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    else {
+                        List<Address> ub1 = DrawinMap.findLocationByAddress(inicio.getText().toString() + " Temuco, Araucania, Chile", geocoder, getApplication());
+                        List<Address> ub2 = DrawinMap.findLocationByAddress(destino.getText().toString() + " Temuco, Araucania, Chile", geocoder, getApplication());
 
+                        DrawinMap.DrawFindLocation(ub1, ub2, map, routesDraw, getApplication());
+                        if (ub1.size() > 0 && ub2.size() >0) {
+                            GeoPoint pto1 = new GeoPoint(ub1.get(0).getLatitude(), ub1.get(0).getLongitude());
+                            GeoPoint pto2 = new GeoPoint(ub2.get(0).getLatitude(), ub2.get(0).getLongitude());
+                            List<Company> companies = myDbHelper.findCompanies();
+                            for (Company c : companies) {
+                                for (Route r : c.getRoutes()) {
+                                    if (isRouteInArea(r, pto1) && isRouteInArea(r, pto2)) {
+                                        int a = isRouteInArea2(r, pto1);
+                                        int b = isRouteInArea2(r, pto2);
+                                        if (a < b) {
+                                            compa.add(r);
+
+                                            Toast.makeText(getApplicationContext(), r.getName() + " Pasa cerca de los 2 puntos " + "orientacion del recorrido: ", Toast.LENGTH_LONG).show();
+                                        }
+                                    }
+                                }
+                            }
+                            createListWithAdapter(compa,1);
+                        }else{
+                            Toast.makeText(getApplicationContext(), "No se encontraron rutas", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                }
+                else{
+                    Toast.makeText(getApplicationContext(), "Debes ingresar destino.", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+
+        bar = (AppBarLayout) findViewById(R.id.MyAppbar);
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        morph = (FABToolbarLayout) findViewById(R.id.fabtoolbar);
+        morph.hide();
+        fab.setOnClickListener(this);
+        org.osmdroid.tileprovider.constants.OpenStreetMapTileProviderConstants.setUserAgentValue(android.support.v4.BuildConfig.APPLICATION_ID);
+        map = (MapView) findViewById(R.id.map);
+        map.setTileSource(TileSourceFactory.MAPNIK);
+        map.setBuiltInZoomControls(false);
+        map.setMultiTouchControls(true);
+        mapController = (MapController) map.getController();
+        mapController.setZoom(15);
+        GeoPoint Temuco = new GeoPoint(-38.7392, -72.6087);
+        mapController.setCenter(Temuco);
+
+        map.getOverlays().add(routesDraw);
+        Markers_stop = DrawinMap.Draw_Stops(map, myDbHelper, icon1 = this.getResources().getDrawable(R.drawable.ic_bustop));
+        for (CustomMarker mak : Markers_stop) {
+            mak.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
+                @Override
+                public boolean onMarkerClick(Marker marker, MapView mapView) {
+                    createListWithAdapter(myDbHelper.findRoutesByStop(mak.getIdMarker()),0);
+                    return false;
+                }
+            });
+        }
+
+        Overlay touchOverlay = new Overlay(this) {
+            ItemizedIconOverlay<OverlayItem> anotherItemizedIconOverlay = null;
+
+            @Override
+            protected void draw(Canvas arg0, MapView arg1, boolean arg2) {
+
+            }
+
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+            @Override
+            public boolean onLongPress(final MotionEvent e, final MapView mapView) {
+
+                final Drawable marker = getApplicationContext().getResources().getDrawable(R.drawable.marker_default);
+                Projection proj = mapView.getProjection();
+                GeoPoint loc = (GeoPoint) proj.fromPixels((int) e.getX(), (int) e.getY());
+                String longitude = Double.toString(((double) loc.getLongitudeE6()) / 1000000);
+                String latitude = Double.toString(((double) loc.getLatitudeE6()) / 1000000);
+
+                GeoPoint geoPointUser = new GeoPoint(Double.parseDouble(latitude), Double.parseDouble(longitude));
+
+                createListWithAdapter(findNearRoutes(geoPointUser),0);
+
+                mapController.animateTo(geoPointUser);
+                mapController.zoomTo(16);
+
+                ArrayList<OverlayItem> overlayArray = new ArrayList<OverlayItem>();
+                OverlayItem mapItem = new OverlayItem("", "", new GeoPoint((((double) loc.getLatitudeE6()) / 1000000), (((double) loc.getLongitudeE6()) / 1000000)));
+                mapItem.setMarker(marker);
+                overlayArray.add(mapItem);
+                if (anotherItemizedIconOverlay == null) {
+                    anotherItemizedIconOverlay = new ItemizedIconOverlay<OverlayItem>(getApplicationContext(), overlayArray, null);
+                    mapView.getOverlays().add(anotherItemizedIconOverlay);
+                    mapView.invalidate();
+                } else {
+                    mapView.getOverlays().remove(anotherItemizedIconOverlay);
+                    mapView.invalidate();
+                    anotherItemizedIconOverlay = new ItemizedIconOverlay<OverlayItem>(getApplicationContext(), overlayArray, null);
+                    mapView.getOverlays().add(anotherItemizedIconOverlay);
+                }
+                return true;
+            }
+        };
+
+        map.getOverlays().add(touchOverlay);
+
+        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
     }
-    private void setupTabIcons() {
 
-        TextView tabOne = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
-        tabOne.setText("Inicio");
-        tabOne.setCompoundDrawablesWithIntrinsicBounds(0,tabIcons[0] , 0, 0);
-        tabLayout.getTabAt(0).setCustomView(tabOne);
-        TextView tabTwo = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
-        tabTwo.setText("Recorrido");
-        tabTwo.setCompoundDrawablesWithIntrinsicBounds(0, tabIcons[1], 0, 0);
-        tabLayout.getTabAt(1).setCustomView(tabTwo);
-        TextView tabThree = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
-        tabThree.setText("Favoritos");
-        tabThree.setCompoundDrawablesWithIntrinsicBounds(0, tabIcons[2], 0, 0);
-        tabLayout.getTabAt(2).setCustomView(tabThree);
-        TextView tabFour = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
-        tabFour.setText("Mi Ruta");
-        tabFour.setCompoundDrawablesWithIntrinsicBounds(0, tabIcons[3], 0, 0);
-        tabLayout.getTabAt(3).setCustomView(tabFour);
-
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == R.id.fab) {
+            if (adapter.getCount() > 0) {
+                morph.show();
+            } else { Toast.makeText(getApplication(), "Presione un Punto en el Mapa", Toast.LENGTH_LONG).show();            }
+        }
+        morph.hide();
     }
 
-    private void setupViewPager(ViewPager viewPager) {
-        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(new FragmentMap(), "Inicio");
-        adapter.addFragment(new FragmentRoutes() , "Recorridos");
-        adapter.addFragment(new FragmentFavorites(), "Favoritos");
-        adapter.addFragment(new FragmentToplan(), "Mi Ruta");
-        viewPager.isHorizontalScrollBarEnabled();
-        viewPager.setAdapter(adapter);
+    public boolean isRouteInArea(Route route, GeoPoint geoPoint) {
+        for (Point p : route.getPoints()) {
+            int distance = new GeoPoint(p.getLatitude(), p.getLongitude()).distanceTo(geoPoint);
+            if (distance < POSITION_DIAMETER) return true;
+        }
+        return false;
     }
 
-    class ViewPagerAdapter extends FragmentPagerAdapter {
-        private final List<Fragment> mFragmentList = new ArrayList<>();
-        private final List<String> mFragmentTitleList = new ArrayList<>();
+    public int isRouteInArea2(Route route, GeoPoint geoPoint) {
+        int aux = 0;
+        for (Point p : route.getPoints()) {
+            aux = aux + 1;
+            int distance = new GeoPoint(p.getLatitude(), p.getLongitude()).distanceTo(geoPoint);
+            if (distance < POSITION_DIAMETER) {
+                return aux;
 
-        public ViewPagerAdapter(FragmentManager manager) {
-            super(manager);
+            }
         }
+        return -1;
+    }
 
-        @Override
-        public Fragment getItem(int position) {
-            return mFragmentList.get(position);
+    public List<Route> findNearRoutes(GeoPoint geoPointUser) {
+        List<Company> companies = myDbHelper.findCompanies();
+        List<Route> routes = new ArrayList<Route>();
+        routes.removeAll(routes);
+        for (Company c : companies) {
+            for (Route r : c.getRoutes()) {
+                if (isRouteInArea(r, geoPointUser)) {
+                    routes.add(r);
+                }
+            }
         }
-
-        @Override
-        public int getCount() {
-            return mFragmentList.size();
+        return routes;
+    }
+    public List<Company> findAllRoutes() {
+        List<Company> companies = myDbHelper.findCompanies();
+        allRoutes = new ArrayList<Route>();
+        companie = new ArrayList<Company>();
+        for (Company c : companies) {
+            companie.add(c);
+            for (Route r : c.getRoutes()) {
+                allRoutes.add(r);
+            }
         }
+        return companies;
+    }
 
-        public void addFragment(Fragment fragment, String title) {
-            mFragmentList.add(fragment);
-            mFragmentTitleList.add(title);
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    public void createListWithAdapter(List<Route> routes, int a) {
+        //si se llama al metodo desde el evento del boton.
+        if(a==1) {
+            if (routes.size() > 0) {
+                ArrayList<Route> category = new ArrayList<Route>();
+                Route cat;
+                if (routes != null && !routes.isEmpty()) {
+                    for (Route route : routes) {
+                        cat = new Route(route.getIdRoute(), route.getName(), route.getStops(), route.getPoints(), getDrawable(getResources().getIdentifier(route.getIcon(), "drawable", getPackageName())));
+                        category.add(cat);
+                    }
+                }
+                ListView lv = (ListView) findViewById(R.id.ListView);
+                adapter = new AdapterRoute(this, category);
+                lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        final int pos = position;
+                        System.out.println(category.get(pos).getPoints());
+                       // DrawinMap.DrawRoute(map, category.get(pos), routesDraw);
+                       // morph.hide();
+                        ParaActivityTraveler.add(category.get(pos).getIdRoute());
+                        Intent intent=new Intent(getApplicationContext(),traveling.class);
+                        intent.putExtra(rutasSeleccionadas,ParaActivityTraveler);
+                        startActivity(intent);
+                    }
+                });
+                morph.show();
+                lv.setAdapter(adapter);
+            }
+            routes.clear();
+            morph.hide();
+            bar.setExpanded(false);
         }
+        else{
+            if (routes.size() > 0) {
+                ArrayList<Route> category = new ArrayList<Route>();
+                Route cat;
+                if (routes != null && !routes.isEmpty()) {
+                    for (Route route : routes) {
+                        cat = new Route(route.getIdRoute(), route.getName(), route.getStops(), route.getPoints(), getDrawable(getResources().getIdentifier(route.getIcon(), "drawable", getPackageName())));
+                        category.add(cat);
+                    }
+                }
+                ListView lv = (ListView) findViewById(R.id.ListView);
+                adapter = new AdapterRoute(this, category);
+                lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        final int pos = position;
+                        System.out.println(category.get(pos).getPoints());
+                        DrawinMap.DrawRoute(map, category.get(pos), routesDraw);
+                        morph.hide();
+                    }
+                });
+                morph.show();
+                lv.setAdapter(adapter);
+            }
+            routes.clear();
+            morph.hide();
+            bar.setExpanded(false);
 
 
-        @Override
-        public CharSequence getPageTitle(int position) {
-            return mFragmentTitleList.get(position);
-
-        }
-        public void setTab(int tab){
-            viewPager.setCurrentItem(tab);
         }
     }
-}
+
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+
+        if (id == R.id.nav_camera) {
+            // Handle the camera action
+        } else if (id == R.id.nav_gallery) {
+
+        } else if (id == R.id.nav_slideshow) {
+
+        } else if (id == R.id.nav_manage) {
+
+        } else if (id == R.id.nav_share) {
+
+        } else if (id == R.id.nav_send) {
+
+        }
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    private void prepareListData() {
+        List<TreeNode> hijos;
+        TreeNode padre;
+        TreeNode hijo;
+
+        TreeNode root = TreeNode.root();
+        TreeNode abuelo = new TreeNode(new IconTreeItemHolder.IconTreeItem(getDrawable(R.drawable.bus), "Recoridos")).setViewHolder(new ProfileHolder(getApplicationContext()));
+
+        List<Route> r;
+
+        for (Company c : findAllRoutes()) {
+            hijos = new ArrayList<TreeNode>();
+
+            for (Route route : c.getRoutes()) {
+                cat = new Route(route.getIdRoute(), route.getName(), route.getStops(), route.getPoints(), getDrawable(getResources().getIdentifier(route.getIcon(),"drawable", getPackageName())));
+                hijo = new TreeNode(new PlaceHolderHolder.PlaceItem(route.getName(),cat.getImg())).setViewHolder(new PlaceHolderHolder(getApplicationContext()));
+                hijo.setClickListener(new TreeNode.TreeNodeClickListener() {
+                    @Override
+                    public void onClick(TreeNode node, Object value) {
+                        drawer.closeDrawer(GravityCompat.START);
+                        bar.setExpanded(false);
+                        DrawinMap.DrawRoute(map, route, routesDraw);
+                    }
+                });
+                hijos.add(hijo);
+            }
+            padre = new TreeNode(new IconTreeItemHolder.IconTreeItem(getDrawable(R.drawable.marker_default), c.getRut())).setViewHolder(new HeaderHolder(getApplicationContext()));
+
+            padre.addChildren(hijos);
+            abuelo.addChildren(padre);
+        }
+
+        root.addChild(abuelo);
+        AndroidTreeView tView = new AndroidTreeView(getApplicationContext(), root);
+        tView.setDefaultAnimation(true);
+        tView.setDefaultContainerStyle(R.style.TreeNodeStyleDivided, true);
+        layout_menu.addView(tView.getView());
+    }
+
+
+    public Location GetCurrentLocation(){
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        Criteria criteria = new Criteria();
+
+        mprovider = locationManager.getBestProvider(criteria, false);
+        if (mprovider != null && !mprovider.equals("")) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            }
+            Location location = locationManager.getLastKnownLocation(mprovider);
+            locationManager.requestLocationUpdates(mprovider, 15000, 1, (LocationListener) this);
+
+            if (location != null)
+                return location;
+            else
+                Toast.makeText(getBaseContext(), "No Location Provider Found Check Your Code", Toast.LENGTH_SHORT).show();
+        }
+        Location loc = null;
+        return loc;
+    }
+}//fin del main

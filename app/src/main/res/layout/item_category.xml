@@ -10,7 +10,7 @@
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="65dp"
+        android:layout_height="55dp"
         android:weightSum="10">
 
         <LinearLayout
@@ -18,7 +18,8 @@
             android:layout_weight="8"
             android:layout_height="match_parent"
             android:layout_width="0dp"
-            android:weightSum="5">
+            android:weightSum="10"
+            android:gravity="center_vertical">
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
@@ -26,25 +27,13 @@
                 android:text="Titulo Frase"
                 android:id="@+id/category"
                 android:textSize="21sp"
-                android:textColor="?attr/actionModeSplitBackground"
+                android:textColor="@color/colorPrimaryDark"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentStart="true"
                 android:layout_toStartOf="@+id/imageView4"
                 android:layout_marginLeft="10dp"
                 android:layout_marginTop="3dp"
-                android:layout_weight="3" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:text="Texto Frase"
-                android:id="@+id/texto"
-                android:layout_below="@+id/category"
-                android:layout_alignParentStart="true"
-                android:layout_toStartOf="@+id/imageView4"
-                android:layout_marginLeft="10dp"
-                android:layout_weight="2"
-                android:textColor="@android:color/holo_blue_dark" />
+                android:layout_weight="5" />
 
         </LinearLayout>
 

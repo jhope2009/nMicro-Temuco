@@ -1,5 +1,7 @@
 package inf.uct.nmicro.model;
 
+import java.util.List;
+
 /**
  * @author Javier
  *
@@ -8,25 +10,20 @@ public class Stop {
 
 	private int idStop;
 	private String address;
-	private Point point;
-	
+	private double latitude;
+	private double longitude;
+
 	public Stop(){}
-	
-	/**
-	 * @param idStop
-	 * @param address
-	 * @param point
-	 */
-	public Stop(int idStop, String address, Point point) {
+
+	public Stop(int idStop, String address, double lat, double lon) {
 		super();
 		this.idStop = idStop;
 		this.address = address;
-		this.point = point;
+		this.latitude=lat;
+		this.longitude=lon;
+
 	}
 
-	/**
-	 * @return the idStop
-	 */
 	public int getIdStop() {
 		return idStop;
 	}
@@ -52,18 +49,20 @@ public class Stop {
 		this.address = address;
 	}
 
-	/**
-	 * @return the point
-	 */
-	public Point getPoint() {
-		return point;
+	public double getLatitude() {
+		return latitude;
 	}
 
-	/**
-	 * @param point the point to set
-	 */
-	public void setPoint(Point point) {
-		this.point = point;
+	public double getLongitude() {
+		return longitude;
 	}
-	
+
+	public void setLatitude(double latitude) {
+		this.latitude = latitude;
+	}
+
+	public void setLongitude(double longitude) {
+		this.longitude = longitude;
+	}
+
 }

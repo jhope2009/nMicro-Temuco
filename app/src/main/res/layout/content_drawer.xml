@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="5dp"
+    android:paddingTop="20dp"
+    android:weightSum="10"
+    android:paddingRight="2dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:gravity="bottom"
+        android:orientation="horizontal"
+        android:layout_weight="1"
+        android:weightSum="10">
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            app:srcCompat="@android:drawable/ic_menu_mapmode"
+            android:id="@+id/imageView"
+            android:layout_weight="4" />
+
+        <TextView
+            android:text="NMicro"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:id="@+id/textView"
+            android:layout_weight="6"
+            android:textColor="@color/colorPrimaryDark"
+            android:gravity="center_vertical"
+            android:textSize="40dp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="9"
+        android:weightSum="1"
+        android:id="@+id/layout_drawer_list">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_weight="0.94">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/layout_menu">
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/animado"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/colorAccent"
+                android:gravity="center"
+                android:visibility="gone"
+                android:weightSum="10"
+                android:orientation="vertical">
+
+                <ExpandableListView
+                    android:id="@+id/lvExp"
+                    android:layout_height="0dp"
+                    android:layout_width="match_parent"
+                    android:layout_weight="10">
+
+                </ExpandableListView>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/animado1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/colorPrimary"
+                android:gravity="center_vertical"
+                android:visibility="gone"
+                android:orientation="vertical">
+                <!-- Tu codigo aqui -->
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/animado2"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/colorAccent"
+                android:gravity="center"
+                android:visibility="gone"
+                android:orientation="vertical">
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/animado3"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/colorAccent"
+                android:gravity="center"
+                android:visibility="gone"
+                android:orientation="vertical">
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/animado4"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/colorAccent"
+                android:gravity="center"
+                android:visibility="gone"
+                android:orientation="vertical">
+
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    <!--<ExpandableListView
+        android:id="@+id/lvExp"
+        android:layout_height="0dp"
+        android:layout_width="match_parent"
+        android:layout_weight="9">
+    </ExpandableListView>-->
+</LinearLayout>

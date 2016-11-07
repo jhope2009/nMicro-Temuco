@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/nMicro-Temuco.iml" filepath="$PROJECT_DIR$/nMicro-Temuco.iml" />
+      <module fileurl="file://$PROJECT_DIR$/osmbonuspack_v5.9/osmbonuspack_v5.9.iml" filepath="$PROJECT_DIR$/osmbonuspack_v5.9/osmbonuspack_v5.9.iml" />
     </modules>
   </component>
 </project>

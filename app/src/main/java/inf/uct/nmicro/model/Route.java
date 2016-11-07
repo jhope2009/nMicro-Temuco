@@ -1,5 +1,10 @@
 package inf.uct.nmicro.model;
 
+import android.graphics.drawable.Drawable;
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.widget.ImageView;
+
 import java.util.List;
 
 /**
@@ -7,27 +12,41 @@ import java.util.List;
  *
  */
 public class Route {
-	
+
 	private int idRoute;
 	private String name;
 	private List<Stop> stops;
 	private List<Point> points;
-	
+	private Drawable img;
+	private String icon;
+
 	public Route(){}
 
-	public Route(int idRoute, String name, List<Stop> stops, List<Point> points) {
+
+	public Route(int idRoute, String name, List<Stop> stops, List<Point> points, Drawable img) {
 		super();
 		this.idRoute = idRoute;
 		this.name = name;
 		this.stops = stops;
 		this.points = points;
+		this.img = img;
 	}
 
-	public Route(int idRoute, String name, List<Point> points) {
+	public Route(int idRoute, String name, List<Stop> stops, List<Point> points, String icon) {
+		super();
+		this.idRoute = idRoute;
+		this.name = name;
+		this.stops = stops;
+		this.points = points;
+        this.icon = icon;
+	}
+
+	public Route(int idRoute, String name, List<Point> points, String icon) {
 		super();
 		this.idRoute = idRoute;
 		this.name = name;
 		this.points = points;
+		this.icon = icon;
 	}
 
 	public int getIdRoute() {
@@ -46,6 +65,8 @@ public class Route {
 		return points;
 	}
 
+	public Drawable getImg() { return img;}
+
 	public void setIdRoute(int idRoute) {
 		this.idRoute = idRoute;
 	}
@@ -60,5 +81,15 @@ public class Route {
 
 	public void setPoints(List<Point> points) {
 		this.points = points;
+	}
+
+	public void setImg(Drawable img){ this.img = img; }
+
+	public String getIcon() {
+		return icon;
+	}
+
+	public void setIcon(String icon) {
+		this.icon = icon;
 	}
 }

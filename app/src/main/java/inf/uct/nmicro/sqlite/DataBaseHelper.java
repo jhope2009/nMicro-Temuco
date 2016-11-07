@@ -5,11 +5,9 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteCantOpenDatabaseException;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.database.sqlite.SQLiteQueryBuilder;
+import android.util.Log;
 
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,10 +17,13 @@ import java.util.List;
 
 import inf.uct.nmicro.model.Route;
 import inf.uct.nmicro.model.Point;
+import inf.uct.nmicro.model.Stop;
 import inf.uct.nmicro.sqlite.ITablesDB.Tables;
 import inf.uct.nmicro.sqlite.ITablesDB.Routes;
 import inf.uct.nmicro.sqlite.ITablesDB.Companies;
 import inf.uct.nmicro.sqlite.ITablesDB.Points;
+import inf.uct.nmicro.sqlite.ITablesDB.StopRoute;
+import inf.uct.nmicro.sqlite.ITablesDB.Stops;
 import inf.uct.nmicro.model.Company;
 
 public class DataBaseHelper extends SQLiteOpenHelper {
@@ -156,10 +157,12 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     }
 
     @Override
-    public void onCreate(SQLiteDatabase db) { }
+    public void onCreate(SQLiteDatabase db) {
+    }
 
     @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) { }
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+    }
 
     /*public List<Company> GetAllCompany() {
         System.out.println("Geting companys");
@@ -185,16 +188,17 @@ public class DataBaseHelper extends SQLiteOpenHelper {
      */
     public List<Route> findRoutesByCompany(int idCompany) {
         SQLiteDatabase db = this.getReadableDatabase();
-        if(db==null){
+        if (db == null) {
             return null;
         }
-        String sql = String.format("SELECT ID_ROUTE, NAME FROM %s WHERE %s=?", Tables.ROUTE, Routes.ID_COMPANY);
+        String sql = String.format("SELECT %s, %s, %s FROM %s WHERE %s=?", Routes.ID_ROUTE, Routes.NAME,
+                Routes.ICON, Tables.ROUTE, Routes.ID_COMPANY);
         String[] selectionArgs = {Integer.toString(idCompany)};
         Cursor cursor = db.rawQuery(sql, selectionArgs);
         List<Route> routes = new ArrayList<Route>();
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            routes.add(new Route(cursor.getInt(0), cursor.getString(1), findPointsByRoute(cursor.getInt(0))));
+            routes.add(new Route(cursor.getInt(0), cursor.getString(1), findStopByidRoute(0), findPointsByRoute(cursor.getInt(0)), cursor.getString(2)));
             cursor.moveToNext();
         }
         return routes;
@@ -205,17 +209,17 @@ public class DataBaseHelper extends SQLiteOpenHelper {
      */
     public List<Point> findPointsByRoute(int idRoute) {
         SQLiteDatabase db = this.getReadableDatabase();
-        if(db==null){
+        if (db == null) {
             return null;
         }
-        String sql = String.format("SELECT ID_POINT, LATITUDE, LONGITUDE FROM %s WHERE %s=?",
-                Tables.POINT, Points.ID_ROUTE);
+        String sql = String.format("SELECT %s, %s, %s FROM %s WHERE %s=?", Points.ID_POINT,
+                Points.LATITUDE, Points.LONGITUDE, Tables.POINT, Points.ID_ROUTE);
         String[] selectionArgs = {Integer.toString(idRoute)};
         Cursor cursor = db.rawQuery(sql, selectionArgs);
         List<Point> points = new ArrayList<Point>();
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            points.add(new Point(cursor.getInt(0), cursor.getDouble(1),cursor.getDouble(2)));
+            points.add(new Point(cursor.getInt(0), cursor.getDouble(1), cursor.getDouble(2)));
             cursor.moveToNext();
         }
         return points;
@@ -226,7 +230,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     */
     public List<Company> findCompanies() {
         SQLiteDatabase db = this.getReadableDatabase();
-        if(db==null){
+        if (db == null) {
             return null;
         }
         String sql = String.format("SELECT * FROM %s", Tables.COMPANY);
@@ -245,7 +249,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     */
     public List<Company> findCompaniesById(int idCompany) {
         SQLiteDatabase db = this.getReadableDatabase();
-        if(db==null){
+        if (db == null) {
             return null;
         }
         String sql = String.format("SELECT * FROM %s WHERE %s=?", Tables.COMPANY, Companies.ID_COMPANY);
@@ -259,4 +263,86 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         }
         return companies;
     }
+
+    public ArrayList<Stop> findAllStops() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        if (db == null) {
+            return null;
+        }
+        String sql = String.format("SELECT * FROM %s", Tables.STOP);
+        Cursor cursor = db.rawQuery(sql, null);
+        ArrayList<Stop> stops = new ArrayList<>();
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            stops.add(new Stop(cursor.getInt(0), cursor.getString(1), cursor.getDouble(2), cursor.getDouble(3)));
+            cursor.moveToNext();
+        }
+        return stops;
+    }
+
+    public Route findRouteById(int id){
+        SQLiteDatabase db = this.getReadableDatabase();
+        if (db == null) {
+            return null;
+        }
+        String sql= String.format("SELECT * FROM %s WHERE %s=?",Tables.ROUTE, Routes.ID_ROUTE);
+        String[] selectionargs = {Integer.toString(id)};
+        Cursor cursor= db.rawQuery(sql, selectionargs);
+        Route ruta= new Route(cursor.getInt(0),cursor.getString(2),findStopByidRoute(cursor.getInt(0)),findPointsByRoute(cursor.getInt(0)),cursor.getString(3));
+    return ruta;
+    }
+
+
+    public List<Stop> findStopByidRoute(int idroute){
+        SQLiteDatabase db = this.getReadableDatabase();
+        if (db == null) {
+            return null;
+        }
+        String sql = String.format("SELECT * FROM %s INNER JOIN %s ON %s=%s WHERE %s=?",
+                Tables.STOP_ROUTE,Tables.STOP, Tables.STOP_ROUTE+"."+StopRoute.ID_STOP, Tables.STOP+"."+
+                        Stops.ID_STOP, StopRoute.ID_ROUTE );
+        String[] selectionArgs = {Integer.toString(idroute)};
+        Cursor cursor = db.rawQuery(sql, selectionArgs);
+        ArrayList<Stop> stops = new ArrayList<>();
+        cursor.moveToFirst();
+
+        Log.d("cantidad de columnas",String.valueOf(cursor.getColumnCount()));
+        Log.d("nombre col 1",cursor.getColumnName(0));
+        Log.d("nombre col 2",cursor.getColumnName(1));
+        Log.d("nombre col 3",cursor.getColumnName(2));
+        Log.d("nombre col 4",cursor.getColumnName(3));
+        Log.d("nombre col 5",cursor.getColumnName(4));
+        Log.d("nombre col 6",cursor.getColumnName(5));
+        Log.d("nombre col 7",cursor.getColumnName(6));
+        while (!cursor.isAfterLast()) {
+            stops.add(new Stop(cursor.getInt(3), cursor.getString(4), cursor.getDouble(5), cursor.getDouble(6)));
+            cursor.moveToNext();
+
+        }
+        return stops;
+
+    }
+
+
+    public List<Route> findRoutesByStop(int idStop) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        if (db == null) {
+            return null;
+        }
+        String sql = String.format("SELECT * FROM %s INNER JOIN %s ON %s = %s WHERE %s = ?",
+                Tables.STOP_ROUTE, Tables.ROUTE, Tables.STOP_ROUTE+"."+StopRoute.ID_ROUTE, Tables.ROUTE+"."+
+                        Routes.ID_ROUTE, StopRoute.ID_STOP);
+        String[] selectionArgs = {Integer.toString(idStop)};
+        Cursor cursor = db.rawQuery(sql, selectionArgs);
+        List<Route> routes = new ArrayList<Route>();
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            routes.add(new Route(cursor.getInt(3), cursor.getString(5), findPointsByRoute(cursor.getInt(3)), cursor.getString(6)));
+            cursor.moveToNext();
+        }
+        return routes;
+    }
+
+
+
 }
