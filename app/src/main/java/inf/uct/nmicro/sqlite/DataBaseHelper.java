@@ -305,15 +305,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         Cursor cursor = db.rawQuery(sql, selectionArgs);
         ArrayList<Stop> stops = new ArrayList<>();
         cursor.moveToFirst();
-
-        Log.d("cantidad de columnas",String.valueOf(cursor.getColumnCount()));
-        Log.d("nombre col 1",cursor.getColumnName(0));
-        Log.d("nombre col 2",cursor.getColumnName(1));
-        Log.d("nombre col 3",cursor.getColumnName(2));
-        Log.d("nombre col 4",cursor.getColumnName(3));
-        Log.d("nombre col 5",cursor.getColumnName(4));
-        Log.d("nombre col 6",cursor.getColumnName(5));
-        Log.d("nombre col 7",cursor.getColumnName(6));
         while (!cursor.isAfterLast()) {
             stops.add(new Stop(cursor.getInt(3), cursor.getString(4), cursor.getDouble(5), cursor.getDouble(6)));
             cursor.moveToNext();

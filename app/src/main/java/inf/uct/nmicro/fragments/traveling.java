@@ -54,30 +54,28 @@ public class traveling extends Activity {
     private FABToolbarLayout morph;
     private MapController mMapController;
     private MapController mapController;
-    int mIncr = 10000;
     ArrayList<Integer> getRoutes;
-    private List<Company> companias;
+
     private DataBaseHelper myDbHelper;
-    List<Route> rutas;
-    List<Stop> paradas;
     DrawInMap DrawinMap = new DrawInMap();
     PathOverlay pathO;
     MapView map;
-    private AdapterRoute adapter;
-    private AppBarLayout bar;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //recibo los datos del main_activity
         Intent intent = getIntent();
         getRoutes = intent.getIntegerArrayListExtra(MainActivity.rutasSeleccionadas);
+        //inicio el asist de base de datos.
         myDbHelper = new DataBaseHelper(this);
         try {
             myDbHelper.NoCheckCreateDataBase();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        //recibo los datos del main_activity
+
         pathO = new PathOverlay(Color.BLACK, 10, this);
         setContentView(R.layout.traveling);
         org.osmdroid.tileprovider.constants.OpenStreetMapTileProviderConstants.setUserAgentValue(android.support.v4.BuildConfig.APPLICATION_ID);
@@ -98,7 +96,6 @@ public class traveling extends Activity {
             DrawinMap.DrawRoute(map,r,pathO);
         }
     }
-
     public List<Route> FindRoutes(List<Company> co, List<Integer> ru) {
         List<Route> rutas = new ArrayList<>();
         for (Company c : co) {

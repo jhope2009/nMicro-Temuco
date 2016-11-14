@@ -6,34 +6,29 @@ package inf.uct.nmicro.fragments;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.Icon;
 import android.location.Address;
 import android.location.Geocoder;
 import android.util.Log;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
-import org.osmdroid.views.overlay.Marker;
-import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.PathOverlay;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
-import inf.uct.nmicro.MainActivity;
-import inf.uct.nmicro.R;
 import inf.uct.nmicro.model.Point;
 import inf.uct.nmicro.model.Route;
 import inf.uct.nmicro.model.Stop;
 import inf.uct.nmicro.sqlite.DataBaseHelper;
 
 public class DrawInMap extends Activity {
+
+    //medida expresada en ... metros segun hope
+    private final int POSITION_DIAMETER = 150;
 
     public List<CustomMarker> Draw_Stops(MapView map, DataBaseHelper myDbHelper, Drawable dra){
         ArrayList<Stop> stops = myDbHelper.findAllStops();
@@ -127,7 +122,26 @@ public class DrawInMap extends Activity {
     public void drawStopsSelected(List<Stop> a){
 
     }
+    public boolean isRouteInArea(Route route, GeoPoint geoPoint) {
+        for (Point p : route.getPoints()) {
+            int distance = new GeoPoint(p.getLatitude(), p.getLongitude()).distanceTo(geoPoint);
+            if (distance < POSITION_DIAMETER) return true;
+        }
+        return false;
+    }
 
+    public int isRouteInArea2(Route route, GeoPoint geoPoint) {
+        int aux = 0;
+        for (Point p : route.getPoints()) {
+            aux = aux + 1;
+            int distance = new GeoPoint(p.getLatitude(), p.getLongitude()).distanceTo(geoPoint);
+            if (distance < POSITION_DIAMETER) {
+                return aux;
+
+            }
+        }
+        return -1;
+    }
 
 
 }//final de la clase
