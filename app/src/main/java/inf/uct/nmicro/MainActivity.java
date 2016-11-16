@@ -68,6 +68,7 @@ import inf.uct.nmicro.model.Travel;
 import inf.uct.nmicro.sqlite.DataBaseHelper;
 import inf.uct.nmicro.utils.AdapterRoute;
 import inf.uct.nmicro.utils.AdapterTravel;
+import inf.uct.nmicro.utils.ConnectWS;
 import inf.uct.nmicro.utils.HeaderHolder;
 import inf.uct.nmicro.utils.IconTreeItemHolder;
 import inf.uct.nmicro.utils.PlaceHolderHolder;
@@ -87,6 +88,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     DrawInMap DrawinMap = new DrawInMap();
     PathOverlay routesDraw;
     private LinearLayout layout_menu;
+    private LinearLayout animado;
     private AppBarLayout bar;
     private DrawerLayout drawer;
     private AdapterRoute adapter;
@@ -118,6 +120,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Geocoder geocoder = new Geocoder(getApplication(), Locale.getDefault());
         routesDraw = new PathOverlay(Color.BLUE, 10, this);
         layout_menu = (LinearLayout) findViewById(R.id.layout_menu);
+        animado = (LinearLayout) findViewById(R.id.fabtoolbar_toolbar);
         adapter = new AdapterRoute(this);
 
         myDbHelper = new DataBaseHelper(this);
@@ -206,6 +209,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             mak.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
                 @Override
                 public boolean onMarkerClick(Marker marker, MapView mapView) {
+                    //aqui llamo a la clase que realiza la coneccion con el WS y le paso parametros concatenados por coma
+                    new ConnectWS(getApplication(),animado,0).execute("id_route,"+mak.getPosition().getLatitude()+","+mak.getPosition().getLongitude());
                     createListWithAdapterRoute(myDbHelper.findRoutesByStop(mak.getIdMarker()),0);
                     return false;
                 }

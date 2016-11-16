@@ -13,6 +13,7 @@ import android.support.annotation.RequiresApi;
 import android.support.design.widget.AppBarLayout;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -39,6 +40,7 @@ import inf.uct.nmicro.model.Stop;
 import inf.uct.nmicro.sqlite.DataBaseHelper;
 import inf.uct.nmicro.fragments.CustomMarker;
 import inf.uct.nmicro.utils.AdapterRoute;
+import inf.uct.nmicro.utils.ConnectWS;
 
 /**
  * Created by Esteban Campos A on 02-11-2016.
@@ -54,9 +56,11 @@ public class traveling extends Activity {
     private FABToolbarLayout morph;
     private MapController mMapController;
     private MapController mapController;
+    private List<CustomMarker> Markers_stop;
     ArrayList<Integer> getRoutes;
 
     private DataBaseHelper myDbHelper;
+    private LinearLayout animado;
     DrawInMap DrawinMap = new DrawInMap();
     PathOverlay pathO;
     MapView map;
@@ -75,7 +79,6 @@ public class traveling extends Activity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         pathO = new PathOverlay(Color.BLACK, 10, this);
         setContentView(R.layout.traveling);
         org.osmdroid.tileprovider.constants.OpenStreetMapTileProviderConstants.setUserAgentValue(android.support.v4.BuildConfig.APPLICATION_ID);
@@ -89,9 +92,30 @@ public class traveling extends Activity {
         mapController.setCenter(Temuco);
         List<Company> companies = myDbHelper.findCompanies();
         List<Route> rutas = FindRoutes(companies, getRoutes);
+        animado = (LinearLayout) findViewById(R.id.fabtoolbar_toolbar);
         Drawable icon = this.getResources().getDrawable(R.drawable.ic_bustop);
         DrawinMap.DrawStopsByRoute(rutas, myDbHelper, icon, map);
 
+        for (CustomMarker mak : Markers_stop) {
+            mak.setOnMarkerClickListener(new org.osmdroid.views.overlay.Marker.OnMarkerClickListener() {
+                @Override
+                public boolean onMarkerClick(org.osmdroid.views.overlay.Marker marker, MapView mapView) {
+                    /*
+                    *
+                    *
+                    String username = usernameField.getText().toString();
+                    String password = passwordField.getText().toString();
+                    method.setText("Get Method");
+                    new SinginActivity(this,status,role,0).execute(username,password);
+                    *
+                    * */
+                    //createListWithAdapter(myDbHelper.findRoutesByStop(mak.getIdMarker()),0);
+                    //aqui llamo a la clase que realiza la coneccion con el WS y le paso parametros concatenados por coma
+                    new ConnectWS(getApplication(),animado,0).execute(getRoutes.get(0)+","+mak.getPosition().getLatitude()+","+mak.getPosition().getLongitude());
+                    return false;
+                }
+            });
+        }
         for(Route r : rutas){
             DrawinMap.DrawRoute(map,r,pathO);
         }
