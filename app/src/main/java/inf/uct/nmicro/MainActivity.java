@@ -64,8 +64,10 @@ import inf.uct.nmicro.fragments.SearchTraveling;
 import inf.uct.nmicro.fragments.traveling;
 import inf.uct.nmicro.model.Company;
 import inf.uct.nmicro.model.Route;
+import inf.uct.nmicro.model.Travel;
 import inf.uct.nmicro.sqlite.DataBaseHelper;
 import inf.uct.nmicro.utils.AdapterRoute;
+import inf.uct.nmicro.utils.AdapterTravel;
 import inf.uct.nmicro.utils.HeaderHolder;
 import inf.uct.nmicro.utils.IconTreeItemHolder;
 import inf.uct.nmicro.utils.PlaceHolderHolder;
@@ -88,6 +90,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private AppBarLayout bar;
     private DrawerLayout drawer;
     private AdapterRoute adapter;
+    private AdapterTravel adapterTravel;
     private List<CustomMarker> Markers_stop;
     LocationManager locationManager;
     String mprovider;
@@ -97,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public static final int DIALOG_DOWNLOAD_PROGRESS = 0;
     private ProgressDialog mProgressDialog;
     public ProgressDialog pDialog;
-    public static List<Route> compa;
+    public static List<Travel> compa;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -131,7 +134,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 List<Company> companies = myDbHelper.findCompanies();
                 InputMethodManager inputMethodManager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
                 inputMethodManager.hideSoftInputFromWindow(destino.getWindowToken(), 0);
-                compa = new ArrayList<Route>();
+                compa = new ArrayList<Travel>();
                 CustomTask buttonTask = new CustomTask();
 
                 if (!destino.equals("")) {
@@ -147,7 +150,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             //Ejecuta tarea asincronica
                             buttonTask.execute(companies, pto1, pto2);
                             if(!compa.isEmpty()){
-                                createListWithAdapter(compa,1);
+                                createListWithAdapterTravel(compa,1);
                             }
                         } catch (IOException e) {e.printStackTrace();}
                     }else {
@@ -161,7 +164,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             //Ejecuta tarea asincronica
                             buttonTask.execute(companies, pto1, pto2);
                             if(!compa.isEmpty()){
-                                createListWithAdapter(compa,1);
+                                createListWithAdapterTravel(compa,1);
                             }
                         }else{
                             Toast.makeText(getApplicationContext(), "No se encontraron Direcciones", Toast.LENGTH_LONG).show();
@@ -202,7 +205,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             mak.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
                 @Override
                 public boolean onMarkerClick(Marker marker, MapView mapView) {
-                    createListWithAdapter(myDbHelper.findRoutesByStop(mak.getIdMarker()),0);
+                    createListWithAdapterRoute(myDbHelper.findRoutesByStop(mak.getIdMarker()),0);
                     return false;
                 }
             });
@@ -228,7 +231,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 GeoPoint geoPointUser = new GeoPoint(Double.parseDouble(latitude), Double.parseDouble(longitude));
 
-                createListWithAdapter(findNearRoutes(geoPointUser),0);
+                createListWithAdapterRoute(findNearRoutes(geoPointUser),0);
 
                 mapController.animateTo(geoPointUser);
                 mapController.zoomTo(16);
@@ -301,7 +304,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    public void createListWithAdapter(List<Route> routes, int a) {
+    public void createListWithAdapterRoute(List<Route> routes, int a) {
         //si se llama al metodo desde el evento del boton.
         if(a==1) {
             if (routes.size() > 0) {
@@ -360,6 +363,73 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 lv.setAdapter(adapter);
             }
             routes.clear();
+            morph.hide();
+            bar.setExpanded(false);
+
+
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    public void createListWithAdapterTravel(List<Travel> travels, int a) {
+        //si se llama al metodo desde el evento del boton.
+        if(a==1) {
+            if (travels.size() > 0) {
+                ArrayList<Travel> category = new ArrayList<Travel>();
+                Travel cat;
+                if (travels != null && !travels.isEmpty()) {
+                    for (Travel travel : travels) {
+                        cat = new Travel(travel.getIdTravel(), travel.getRoutes(), travel.getPrice(), travel.getStartStop(), travel.getEndStop(), travel.getTotalTime(), travel.getStartHour(), travel.getEndHour(),travel.getInstructions());
+                        category.add(cat);
+                    }
+                }
+                ListView lv = (ListView) findViewById(R.id.ListView);
+                adapterTravel = new AdapterTravel(this, category);
+                lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        final int pos = position;
+                        System.out.println(category.get(pos).getRoutes().getPoints());
+                        // DrawinMap.DrawRoute(map, category.get(pos), routesDraw);
+                        // morph.hide();
+                        ParaActivityTraveler.add(category.get(pos).getIdTravel());
+                        Intent intent=new Intent(getApplicationContext(),traveling.class);
+                        intent.putExtra(rutasSeleccionadas,ParaActivityTraveler);
+                        startActivity(intent);
+                    }
+                });
+                morph.show();
+                lv.setAdapter(adapterTravel);
+            }
+            travels.clear();
+            morph.hide();
+            bar.setExpanded(false);
+        }
+        else{
+            if (travels.size() > 0) {
+                ArrayList<Travel> category = new ArrayList<Travel>();
+                Travel cat;
+                if (travels != null && !travels.isEmpty()) {
+                    for (Travel travel : travels) {
+                        cat = new Travel(travel.getIdTravel(), travel.getRoutes(), travel.getPrice(), travel.getStartStop(), travel.getEndStop(), travel.getTotalTime(), travel.getStartHour(), travel.getEndHour(),travel.getInstructions());
+                        category.add(cat);
+                    }
+                }
+                ListView lv = (ListView) findViewById(R.id.ListView);
+                adapterTravel = new AdapterTravel(this, category);
+                lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        final int pos = position;
+                        System.out.println(category.get(pos).getRoutes().getPoints());
+                        //DrawinMap.DrawRoute(map, category.get(pos), routesDraw);
+                        morph.hide();
+                    }
+                });
+                morph.show();
+                lv.setAdapter(adapterTravel);
+            }
+            travels.clear();
             morph.hide();
             bar.setExpanded(false);
 

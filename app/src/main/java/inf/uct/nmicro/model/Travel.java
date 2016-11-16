@@ -10,6 +10,7 @@ import java.util.List;
 
 public class Travel {
 
+    private int idTravel;
     private Route routes;
     private int price;
     private GeoPoint startStop;
@@ -30,6 +31,26 @@ public class Travel {
         this.startHour = startHour;
         this.endHour = endHour;
         this.instructions = instructions;
+    }
+
+    public Travel(int idTravel, Route routes, int price, GeoPoint endStop, GeoPoint startStop, int totalTime, String startHour, String endHour, List<Instruction> instructions) {
+        this.idTravel = idTravel;
+        this.routes = routes;
+        this.price = price;
+        this.endStop = endStop;
+        this.startStop = startStop;
+        this.totalTime = totalTime;
+        this.startHour = startHour;
+        this.endHour = endHour;
+        this.instructions = instructions;
+    }
+
+    public int getIdTravel() {
+        return idTravel;
+    }
+
+    public void setIdTravel(int idTravel) {
+        this.idTravel = idTravel;
     }
 
     public Route getRoutes() {
