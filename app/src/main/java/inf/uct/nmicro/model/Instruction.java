@@ -13,6 +13,11 @@ public class Instruction {
     public Instruction() {
     }
 
+    public Instruction(String indi, Stop parada){
+        this.indication=indi;
+        this.stop=parada;
+    }
+
     public Instruction(String indication, Stop stop, String hour) {
         this.indication = indication;
         this.stop = stop;

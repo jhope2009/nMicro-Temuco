@@ -22,6 +22,15 @@ public class Route {
 
 	public Route(){}
 
+	public Route(int id,String name,List<Point> pto,Drawable img){
+		super();
+		this.idRoute=id;
+		this.name=name;
+		this.points=pto;
+		this.img=img;
+
+	}
+
 
 	public Route(int idRoute, String name, List<Stop> stops, List<Point> points, Drawable img) {
 		super();

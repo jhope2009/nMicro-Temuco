@@ -62,8 +62,6 @@ public class DrawInMap extends Activity {
         map.invalidate();
     }
 
-
-
     public List<Address> findLocationByAddress(String text, Geocoder geocoder, Context contexto){
         List<Address> direcciones = new ArrayList<Address>();
         try{
@@ -87,10 +85,9 @@ public class DrawInMap extends Activity {
         routesDraw.clearPath();
             for (Point pto : route.getPoints()) {
             GeoPoint gp = new GeoPoint(pto.getLatitude(), pto.getLongitude());
-
                 routesDraw.addPoint(gp);
-
         }
+
         map.getOverlayManager().add(routesDraw);
         map.invalidate();
     }
@@ -110,14 +107,14 @@ public class DrawInMap extends Activity {
                     map.getOverlayManager().add(routesDraw);
                     map.invalidate();
                 } else {
-                    Toast.makeText(contexto, "Debes introducir una direccion valida", Toast.LENGTH_LONG).show();
+                    Toast.makeText(contexto, "Debes introducir una direccion valida :)", Toast.LENGTH_LONG).show();
                 }
             } else {
-                Toast.makeText(contexto, "Debes introducir una direccion valida", Toast.LENGTH_LONG).show();
+                Toast.makeText(contexto, "Debes introducir una direccion valida :(", Toast.LENGTH_LONG).show();
             }
         }
         else
-                Toast.makeText(contexto, "Debes introducir una direccion valida", Toast.LENGTH_LONG).show();
+                Toast.makeText(contexto, "Debes introducir una direccion valida :/", Toast.LENGTH_LONG).show();
     }
     public void drawStopsSelected(List<Stop> a){
 

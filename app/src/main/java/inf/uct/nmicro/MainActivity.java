@@ -102,6 +102,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public ProgressDialog pDialog;
     public static List<Travel> compa;
 
+
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -389,7 +390,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         final int pos = position;
-                        System.out.println(category.get(pos).getRoutes().getPoints());
+                     //   System.out.println(category.get(pos).getRoutes().getPoints());
                         // DrawinMap.DrawRoute(map, category.get(pos), routesDraw);
                         // morph.hide();
                         ParaActivityTraveler.add(category.get(pos).getIdTravel());
@@ -421,7 +422,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         final int pos = position;
-                        System.out.println(category.get(pos).getRoutes().getPoints());
+                      // System.out.println(category.get(pos).getRoutes().getPoints());
                         //DrawinMap.DrawRoute(map, category.get(pos), routesDraw);
                         morph.hide();
                     }
@@ -548,20 +549,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             List<Company> companies = (ArrayList<Company>)params[0];
             GeoPoint pto1 = (GeoPoint)params[1];
             GeoPoint pto2 = (GeoPoint)params[2];
-
+            List<Route> rutas=new ArrayList<>();
             for (Company c : companies) {
                 for (Route r : c.getRoutes()) {
                     if (DrawinMap.isRouteInArea(r, pto1) && DrawinMap.isRouteInArea(r, pto2)) {
                         int a = DrawinMap.isRouteInArea2(r, pto1);
                         int b = DrawinMap.isRouteInArea2(r, pto2);
                         if (a < b) {
-                            compa.add(r);
+                            rutas.add(r);
+                            Travel tr=new Travel(rutas);
+                            compa.add(tr);
                             //Toast.makeText(getApplicationContext(), r.getName() + " Pasa cerca de los 2 puntos " + "orientacion del recorrido: ", Toast.LENGTH_LONG).show();
                         }
                     }
                 }
             }
-            travel.GetTravel(companies,pto1,pto2);
+            List<Travel> travels=travel.GetTravel(companies,pto1,pto2);
             return true;
         }
 
