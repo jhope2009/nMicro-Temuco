@@ -97,6 +97,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public static final int DIALOG_DOWNLOAD_PROGRESS = 0;
     private ProgressDialog mProgressDialog;
     public ProgressDialog pDialog;
+    public static List<Route> compa;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -130,17 +131,52 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 List<Company> companies = myDbHelper.findCompanies();
                 InputMethodManager inputMethodManager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
                 inputMethodManager.hideSoftInputFromWindow(destino.getWindowToken(), 0);
-                List<Route> compa= new ArrayList<Route>();
+                compa = new ArrayList<Route>();
+                CustomTask buttonTask = new CustomTask();
+
+                if (!destino.equals("")) {
+                    if (inicio.equals("")) {
+                        Location loc = GetCurrentLocation();
+                        try {
+                            List<Address> ub0 = geocoder.getFromLocation(loc.getLatitude(), loc.getLongitude(), 1);
+                            List<Address> ub2 = DrawinMap.findLocationByAddress(destino + " Temuco, Araucania, Chile", geocoder,getApplication());
+                            DrawinMap.DrawFindLocation(ub0, ub2, map, routesDraw,getApplication());
+                            GeoPoint pto1 = new GeoPoint(ub0.get(0).getLatitude(), ub0.get(0).getLongitude());
+                            GeoPoint pto2 = new GeoPoint(ub2.get(0).getLatitude(), ub2.get(0).getLongitude());
+
+                            //Ejecuta tarea asincronica
+                            buttonTask.execute(companies, pto1, pto2);
+                            if(!compa.isEmpty()){
+                                createListWithAdapter(compa,1);
+                            }
+                        } catch (IOException e) {e.printStackTrace();}
+                    }else {
+                        List<Address> ub1 = DrawinMap.findLocationByAddress(inicio + " Temuco, Araucania, Chile", geocoder, getApplication());
+                        List<Address> ub2 = DrawinMap.findLocationByAddress(destino + " Temuco, Araucania, Chile", geocoder, getApplication());
+                        DrawinMap.DrawFindLocation(ub1, ub2, map, routesDraw, getApplication());
+                        if (ub1.size() > 0 && ub2.size() >0) {
+                            GeoPoint pto1 = new GeoPoint(ub1.get(0).getLatitude(), ub1.get(0).getLongitude());
+                            GeoPoint pto2 = new GeoPoint(ub2.get(0).getLatitude(), ub2.get(0).getLongitude());
+
+                            //Ejecuta tarea asincronica
+                            buttonTask.execute(companies, pto1, pto2);
+                            if(!compa.isEmpty()){
+                                createListWithAdapter(compa,1);
+                            }
+                        }else{
+                            Toast.makeText(getApplicationContext(), "No se encontraron Direcciones", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                }
+                else{
+                    Toast.makeText(getApplicationContext(), "Debes ingresar destino.", Toast.LENGTH_LONG).show();
+                }
 
                 pDialog = new ProgressDialog(MainActivity.this);
                 pDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
                 pDialog.setMessage("Procesando...");
                 pDialog.setCancelable(true);
                 pDialog.setMax(100);
-
-                CustomTask buttonTask = new CustomTask();
-                buttonTask.execute(inicio, destino, geocoder, companies, compa);
-
 
             }
         });
@@ -439,75 +475,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
         @Override
         protected Object doInBackground(Object[] params) {
-            String inicio = (String)params[0];
-            String destino = (String)params[1];
-            Geocoder geocoder = (Geocoder)params[2];
-            List<Company> companies = (ArrayList<Company>)params[3];
-            List<Route> compa= (ArrayList<Route>)params[4];
+            List<Company> companies = (ArrayList<Company>)params[0];
+            GeoPoint pto1 = (GeoPoint)params[1];
+            GeoPoint pto2 = (GeoPoint)params[2];
 
-            if (!destino.equals("")) {
-                if (inicio.equals("")) {
-                    Location loc = GetCurrentLocation();
-                    try {
-                        List<Address> ub0 = geocoder.getFromLocation(loc.getLatitude(), loc.getLongitude(), 1);
-                        List<Address> ub2 = DrawinMap.findLocationByAddress(destino + " Temuco, Araucania, Chile", geocoder,getApplication());
-                        DrawinMap.DrawFindLocation(ub0, ub2, map, routesDraw,getApplication());
-                        GeoPoint pto1 = new GeoPoint(ub0.get(0).getLatitude(), ub0.get(0).getLongitude());
-                        GeoPoint pto2 = new GeoPoint(ub2.get(0).getLatitude(), ub2.get(0).getLongitude());
-                        for (Company c : companies) {
-                            for (Route r : c.getRoutes()) {
-                                if (DrawinMap.isRouteInArea(r, pto1) && DrawinMap.isRouteInArea(r, pto2)) {
-                                    int a = DrawinMap.isRouteInArea2(r, pto1);
-                                    int b = DrawinMap.isRouteInArea2(r, pto2);
-                                    if (a < b) {compa.add(r);}
-                                }
-                            }
+            for (Company c : companies) {
+                for (Route r : c.getRoutes()) {
+                    if (DrawinMap.isRouteInArea(r, pto1) && DrawinMap.isRouteInArea(r, pto2)) {
+                        int a = DrawinMap.isRouteInArea2(r, pto1);
+                        int b = DrawinMap.isRouteInArea2(r, pto2);
+                        if (a < b) {
+                            compa.add(r);
+                            //Toast.makeText(getApplicationContext(), r.getName() + " Pasa cerca de los 2 puntos " + "orientacion del recorrido: ", Toast.LENGTH_LONG).show();
                         }
-
-                        travel.GetTravel(companies,pto1,pto2);
-                        createListWithAdapter(compa,1);
-                    } catch (IOException e) {e.printStackTrace();}
-                }//
-
-                else {
-                    List<Address> ub1 = DrawinMap.findLocationByAddress(inicio + " Temuco, Araucania, Chile", geocoder, getApplication());
-                    List<Address> ub2 = DrawinMap.findLocationByAddress(destino + " Temuco, Araucania, Chile", geocoder, getApplication());
-                    DrawinMap.DrawFindLocation(ub1, ub2, map, routesDraw, getApplication());
-                    if (ub1.size() > 0 && ub2.size() >0) {
-                        GeoPoint pto1 = new GeoPoint(ub1.get(0).getLatitude(), ub1.get(0).getLongitude());
-                        GeoPoint pto2 = new GeoPoint(ub2.get(0).getLatitude(), ub2.get(0).getLongitude());
-
-                        for (Company c : companies) {
-                            for (Route r : c.getRoutes()) {
-                                if (DrawinMap.isRouteInArea(r, pto1) && DrawinMap.isRouteInArea(r, pto2)) {
-                                    int a = DrawinMap.isRouteInArea2(r, pto1);
-                                    int b = DrawinMap.isRouteInArea2(r, pto2);
-                                    if (a < b) {
-                                        compa.add(r);
-                                        Toast.makeText(getApplicationContext(), r.getName() + " Pasa cerca de los 2 puntos " + "orientacion del recorrido: ", Toast.LENGTH_LONG).show();
-                                    }
-                                }
-
-                            }
-                        }
-                        travel.GetTravel(companies,pto1,pto2);
-                        createListWithAdapter(compa,1);
-                    }else{
-
-                        Toast.makeText(getApplicationContext(), "No se encontraron Direcciones", Toast.LENGTH_LONG).show();
                     }
                 }
             }
-            else{
-                Toast.makeText(getApplicationContext(), "Debes ingresar destino.", Toast.LENGTH_LONG).show();
-            }
+            travel.GetTravel(companies,pto1,pto2);
             return true;
         }
 
         protected void onPostExecute(boolean result) {
             if(result){
-                Toast.makeText(MainActivity.this, "Tarea finalizada!",
-                        Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "Tarea finalizada!", Toast.LENGTH_SHORT).show();
             }
         }
     }
