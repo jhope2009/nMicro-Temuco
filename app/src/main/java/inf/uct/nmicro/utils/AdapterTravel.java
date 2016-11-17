@@ -80,14 +80,17 @@ public class AdapterTravel extends BaseAdapter {
 
         TextView title = (TextView) v.findViewById(R.id.category);
         String txt="";
-        for(Route r : dir.getRoutes()){
-            txt=txt+r.getName();
+
+        title.setText(dir.getname());
+/*
+        ImageView imagen = (ImageView) v.findViewById(R.id.imageView4);
+        imagen.setImageDrawable(dir.getRoutes().get(0).getImg());
+        if(dir.getRoutes().size()>1){
+            ImageView imagen2 = (ImageView) v.findViewById(R.id.imageView5);
+            imagen.setImageDrawable(dir.getRoutes().get(1).getImg());
+
         }
-        title.setText(txt);
-
-        //ImageView imagen = (ImageView) v.findViewById(R.id.imageView4);
-        //imagen.setImageDrawable(dir.getRoutes().getImg());
-
+        */
         return v;
     }
 }

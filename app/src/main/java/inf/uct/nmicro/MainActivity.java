@@ -29,6 +29,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -63,6 +64,7 @@ import inf.uct.nmicro.fragments.DrawInMap;
 import inf.uct.nmicro.fragments.SearchTraveling;
 import inf.uct.nmicro.fragments.traveling;
 import inf.uct.nmicro.model.Company;
+import inf.uct.nmicro.model.Instruction;
 import inf.uct.nmicro.model.Route;
 import inf.uct.nmicro.model.Travel;
 import inf.uct.nmicro.sqlite.DataBaseHelper;
@@ -175,12 +177,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             GeoPoint pto2 = new GeoPoint(ub2.get(0).getLatitude(), ub2.get(0).getLongitude());
                             //Ejecuta tarea asincronica
                             buttonTask.execute(companies, pto1, pto2);
-                            /*
-                            createListWithAdapterTravel(compa,1);
-                            Toast.makeText(getApplicationContext(), "fuera de la task "+compa.toString(), Toast.LENGTH_SHORT).show();
-                            if(!compa.isEmpty()){
-                                createListWithAdapterTravel(compa,1);
-                            }*/
+
                         }else{
                             Toast.makeText(getApplicationContext(), "No se encontraron Direcciones", Toast.LENGTH_LONG).show();
                         }
@@ -395,9 +392,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         final int pos = position;
-                     //   System.out.println(category.get(pos).getRoutes().getPoints());
-                        // DrawinMap.DrawRoute(map, category.get(pos), routesDraw);
-                        // morph.hide();
+
                         ParaActivityTraveler.add(category.get(pos).getIdTravel());
                         Intent intent=new Intent(getApplicationContext(),traveling.class);
                         intent.putExtra(rutasSeleccionadas,ParaActivityTraveler);
@@ -427,8 +422,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         final int pos = position;
-                      // System.out.println(category.get(pos).getRoutes().getPoints());
-                        //DrawinMap.DrawRoute(map, category.get(pos), routesDraw);
+
                         morph.hide();
                     }
                 });
@@ -550,7 +544,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         protected Object doInBackground(Object[] params) {
 
-
             List<Company> companies = (ArrayList<Company>)params[0];
             GeoPoint pto1 = (GeoPoint)params[1];
             GeoPoint pto2 = (GeoPoint)params[2];
@@ -562,19 +555,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         int b = DrawinMap.isRouteInArea2(r, pto2);
                         if (a < b) {
                             rutas.add(r);
-                            Travel tr=new Travel(rutas);
+                            Travel tr=new Travel(rutas.get(0).getIdRoute(),r.getName(),rutas);
                             compa.add(tr);
-                            //Toast.makeText(getApplicationContext(), r.getName() + " Pasa cerca de los 2 puntos " + "orientacion del recorrido: ", Toast.LENGTH_LONG).show();
                         }
                     }
                 }
             }
             travels=travel.GetTravel(companies,pto1,pto2);
-            /*
-            if(!compa.isEmpty()){
-                createListWithAdapterTravel(compa,1);
+            Log.i("Datos de los viajes obtenidos","si no pasa gg"+String.valueOf(travels.size()));
+            for(Travel tr :travels){
+                Log.i("Mostarndo el nombre de los paraderos",tr.getname());
+                for(Instruction ins : tr.getInstructions()){
+                    Log.i("Mostarndo el nombre de los paraderos",ins.getIndication());
+                    break;
+                }
+
             }
-            */
             return true;
         }
 
@@ -584,6 +580,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             super.onPostExecute(o);
             pDialog.dismiss();
             createListWithAdapterTravel(compa,1);
+            if(compa.size()==0){
+                createListWithAdapterTravel(travels,1);
+            }
         }
     }
 

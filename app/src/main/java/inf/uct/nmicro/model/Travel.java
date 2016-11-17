@@ -11,6 +11,7 @@ import java.util.List;
 public class Travel {
 
     private int idTravel;
+    private String name;
     private List<Route> routes;
     private int price;
     private GeoPoint startStop;
@@ -22,11 +23,18 @@ public class Travel {
 
     public Travel() {}
 
-    public Travel(List<Route> rt){
+    public Travel(int id,String name,List<Route> rt,List<Instruction> ins){
+        this.name=name;
         this.routes=rt;
+        this.idTravel=id;
+        this.instructions=ins;
 
     }
-
+    public Travel(int id,String name,List<Route> rt){
+        this.name=name;
+        this.routes=rt;
+        this.idTravel=id;
+        }
     public Travel(List<Route> routes, int price, GeoPoint startStop, GeoPoint endStop, int totalTime, String startHour, String endHour, List<Instruction> instructions) {
         this.routes = routes;
         this.price = price;
@@ -37,6 +45,7 @@ public class Travel {
         this.endHour = endHour;
         this.instructions = instructions;
     }
+
 
     public Travel(int idTravel, List<Route> routes, int price, GeoPoint endStop, GeoPoint startStop, int totalTime, String startHour, String endHour, List<Instruction> instructions) {
         this.idTravel = idTravel;
@@ -50,6 +59,10 @@ public class Travel {
         this.instructions = instructions;
     }
 
+    public String getname(){
+        return this.name;
+
+    }
     public int getIdTravel() {
         return idTravel;
     }
