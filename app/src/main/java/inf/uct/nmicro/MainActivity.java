@@ -92,6 +92,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private AppBarLayout bar;
     private DrawerLayout drawer;
     private AdapterRoute adapter;
+    private EditText inicio;
+    private EditText destino;
     private AdapterTravel adapterTravel;
     private List<CustomMarker> Markers_stop;
     LocationManager locationManager;
@@ -102,9 +104,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public static final int DIALOG_DOWNLOAD_PROGRESS = 0;
     private ProgressDialog mProgressDialog;
     public ProgressDialog pDialog;
-    public static List<Travel> compa;
-
-
+    public List<Travel> compa;
+    public List<Travel> travels;
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,10 +114,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         final Toolbar toolbar = (Toolbar) findViewById(R.id.MyToolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        final EditText inicio = (EditText) findViewById(R.id.editText4);
-        final EditText destino = (EditText) findViewById(R.id.editText3);
+        inicio = (EditText) findViewById(R.id.editText3);
+        destino = (EditText) findViewById(R.id.editText4);
+
         inicio.setText("");
         destino.setText("");
+
         Geocoder geocoder = new Geocoder(getApplication(), Locale.getDefault());
         routesDraw = new PathOverlay(Color.BLUE, 10, this);
         layout_menu = (LinearLayout) findViewById(R.id.layout_menu);
@@ -136,40 +139,48 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onClick(View v) {
                 List<Company> companies = myDbHelper.findCompanies();
-                InputMethodManager inputMethodManager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-                inputMethodManager.hideSoftInputFromWindow(destino.getWindowToken(), 0);
+                //InputMethodManager inputMethodManager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                //inputMethodManager.hideSoftInputFromWindow(destino.getWindowToken(), 0);
                 compa = new ArrayList<Travel>();
                 CustomTask buttonTask = new CustomTask();
 
-                if (!destino.equals("")) {
-                    if (inicio.equals("")) {
+                String ori = inicio.getText().toString();
+                String des = destino.getText().toString();
+
+                if (!des.isEmpty()) {
+                    if (ori.isEmpty()) {
                         Location loc = GetCurrentLocation();
                         try {
                             List<Address> ub0 = geocoder.getFromLocation(loc.getLatitude(), loc.getLongitude(), 1);
-                            List<Address> ub2 = DrawinMap.findLocationByAddress(destino + " Temuco, Araucania, Chile", geocoder,getApplication());
+                            List<Address> ub2 = DrawinMap.findLocationByAddress(des + " Temuco, Araucania, Chile", geocoder,getApplication());
                             DrawinMap.DrawFindLocation(ub0, ub2, map, routesDraw,getApplication());
                             GeoPoint pto1 = new GeoPoint(ub0.get(0).getLatitude(), ub0.get(0).getLongitude());
                             GeoPoint pto2 = new GeoPoint(ub2.get(0).getLatitude(), ub2.get(0).getLongitude());
-
                             //Ejecuta tarea asincronica
                             buttonTask.execute(companies, pto1, pto2);
+                            /*
+                            createListWithAdapterTravel(compa,1);
+                            Toast.makeText(getApplicationContext(), "fuera de la task "+compa.toString(), Toast.LENGTH_SHORT).show();
                             if(!compa.isEmpty()){
                                 createListWithAdapterTravel(compa,1);
-                            }
+                            }*/
                         } catch (IOException e) {e.printStackTrace();}
                     }else {
-                        List<Address> ub1 = DrawinMap.findLocationByAddress(inicio + " Temuco, Araucania, Chile", geocoder, getApplication());
-                        List<Address> ub2 = DrawinMap.findLocationByAddress(destino + " Temuco, Araucania, Chile", geocoder, getApplication());
+                        List<Address> ub1 = DrawinMap.findLocationByAddress(ori + " Temuco, Araucania, Chile", geocoder, getApplication());
+                        List<Address> ub2 = DrawinMap.findLocationByAddress(des + " Temuco, Araucania, Chile", geocoder, getApplication());
                         DrawinMap.DrawFindLocation(ub1, ub2, map, routesDraw, getApplication());
+
                         if (ub1.size() > 0 && ub2.size() >0) {
                             GeoPoint pto1 = new GeoPoint(ub1.get(0).getLatitude(), ub1.get(0).getLongitude());
                             GeoPoint pto2 = new GeoPoint(ub2.get(0).getLatitude(), ub2.get(0).getLongitude());
-
                             //Ejecuta tarea asincronica
                             buttonTask.execute(companies, pto1, pto2);
+                            /*
+                            createListWithAdapterTravel(compa,1);
+                            Toast.makeText(getApplicationContext(), "fuera de la task "+compa.toString(), Toast.LENGTH_SHORT).show();
                             if(!compa.isEmpty()){
                                 createListWithAdapterTravel(compa,1);
-                            }
+                            }*/
                         }else{
                             Toast.makeText(getApplicationContext(), "No se encontraron Direcciones", Toast.LENGTH_LONG).show();
                         }
@@ -178,13 +189,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 else{
                     Toast.makeText(getApplicationContext(), "Debes ingresar destino.", Toast.LENGTH_LONG).show();
                 }
-
-                pDialog = new ProgressDialog(MainActivity.this);
-                pDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-                pDialog.setMessage("Procesando...");
-                pDialog.setCancelable(true);
-                pDialog.setMax(100);
-
             }
         });
 
@@ -271,7 +275,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
     }
-
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.fab) {
@@ -281,8 +284,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         morph.hide();
     }
-
-
     public List<Route> findNearRoutes(GeoPoint geoPointUser) {
         List<Company> companies = myDbHelper.findCompanies();
         List<Route> routes = new ArrayList<Route>();
@@ -308,7 +309,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         return companies;
     }
-
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void createListWithAdapterRoute(List<Route> routes, int a) {
         //si se llama al metodo desde el evento del boton.
@@ -375,12 +375,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         }
     }
-
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void createListWithAdapterTravel(List<Travel> travels, int a) {
         //si se llama al metodo desde el evento del boton.
         if(a==1) {
             if (travels.size() > 0) {
+                Toast.makeText(getApplication(), "Entre al create"+travels.toString(), Toast.LENGTH_LONG).show();
                 ArrayList<Travel> category = new ArrayList<Travel>();
                 Travel cat;
                 if (travels != null && !travels.isEmpty()) {
@@ -442,7 +442,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         }
     }
-
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -452,7 +451,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             super.onBackPressed();
         }
     }
-
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -476,7 +474,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
-
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void prepareListData() {
@@ -517,8 +514,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         tView.setDefaultContainerStyle(R.style.TreeNodeStyleDivided, true);
         layout_menu.addView(tView.getView());
     }
-
-
     public Location GetCurrentLocation(){
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         Criteria criteria = new Criteria();
@@ -538,19 +533,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Location loc = null;
         return loc;
     }
-
-
     // tarea asincornica para la buueda de rutas por origen y destino
-    class CustomTask extends AsyncTask {
+    class CustomTask extends AsyncTask{
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            pDialog = new ProgressDialog(MainActivity.this);
+            pDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            pDialog.setMessage("Procesando...");
+            pDialog.setCancelable(true);
+            pDialog.setMax(100);
+            pDialog.show();
         }
-
         @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
         @Override
         protected Object doInBackground(Object[] params) {
+
+
             List<Company> companies = (ArrayList<Company>)params[0];
             GeoPoint pto1 = (GeoPoint)params[1];
             GeoPoint pto2 = (GeoPoint)params[2];
@@ -569,14 +569,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 }
             }
-            List<Travel> travels=travel.GetTravel(companies,pto1,pto2);
+            travels=travel.GetTravel(companies,pto1,pto2);
+            /*
+            if(!compa.isEmpty()){
+                createListWithAdapterTravel(compa,1);
+            }
+            */
             return true;
         }
 
-        protected void onPostExecute(boolean result) {
-            if(result){
-                Toast.makeText(MainActivity.this, "Tarea finalizada!", Toast.LENGTH_SHORT).show();
-            }
+        @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+        @Override
+        protected void onPostExecute(Object o) {
+            super.onPostExecute(o);
+            pDialog.dismiss();
+            createListWithAdapterTravel(compa,1);
         }
     }
 

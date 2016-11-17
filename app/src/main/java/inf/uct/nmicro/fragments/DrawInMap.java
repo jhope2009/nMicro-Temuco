@@ -28,7 +28,7 @@ import inf.uct.nmicro.sqlite.DataBaseHelper;
 public class DrawInMap extends Activity {
 
     //medida expresada en ... metros segun hope
-    private final int POSITION_DIAMETER = 150;
+    private final int POSITION_DIAMETER = 250;
 
     public List<CustomMarker> Draw_Stops(MapView map, DataBaseHelper myDbHelper, Drawable dra){
         ArrayList<Stop> stops = myDbHelper.findAllStops();

@@ -94,21 +94,12 @@ public class traveling extends Activity {
         List<Route> rutas = FindRoutes(companies, getRoutes);
         animado = (LinearLayout) findViewById(R.id.fabtoolbar_toolbar);
         Drawable icon = this.getResources().getDrawable(R.drawable.ic_bustop);
-        DrawinMap.DrawStopsByRoute(rutas, myDbHelper, icon, map);
+        Markers_stop = DrawinMap.DrawStopsByRoute(rutas, myDbHelper, icon, map);
 
         for (CustomMarker mak : Markers_stop) {
             mak.setOnMarkerClickListener(new org.osmdroid.views.overlay.Marker.OnMarkerClickListener() {
                 @Override
                 public boolean onMarkerClick(org.osmdroid.views.overlay.Marker marker, MapView mapView) {
-                    /*
-                    *
-                    *
-                    String username = usernameField.getText().toString();
-                    String password = passwordField.getText().toString();
-                    method.setText("Get Method");
-                    new SinginActivity(this,status,role,0).execute(username,password);
-                    *
-                    * */
                     //createListWithAdapter(myDbHelper.findRoutesByStop(mak.getIdMarker()),0);
                     //aqui llamo a la clase que realiza la coneccion con el WS y le paso parametros concatenados por coma
                     new ConnectWS(getApplication(),animado,0).execute(getRoutes.get(0)+","+mak.getPosition().getLatitude()+","+mak.getPosition().getLongitude());
@@ -116,6 +107,7 @@ public class traveling extends Activity {
                 }
             });
         }
+
         for(Route r : rutas){
             DrawinMap.DrawRoute(map,r,pathO);
         }
