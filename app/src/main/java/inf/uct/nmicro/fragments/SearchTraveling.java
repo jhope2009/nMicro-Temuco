@@ -93,7 +93,7 @@ public class SearchTraveling extends Activity {
 
 //terminar el metodo
 
-    public List<Travel> GetTravel(List<Company> companies, GeoPoint origen, GeoPoint destino) {
+    public List<Travel> GetTravel(List<Company> companies, GeoPoint origen, GeoPoint destino, Geocoder geocoder) {
         List<Route> candidato1 = GetRoutebyStartPoint(origen, companies);
         List<Route> candidato2 = GetRoutebyEndpoint(destino, companies);
         List<Route> finales1 = new ArrayList<>();
@@ -147,38 +147,36 @@ public class SearchTraveling extends Activity {
         intermedios.clear();
         intermedios.addAll(aux3);
 
-        List<Travel> viajes = GetFinalTravels(finales2, finales1, intermedios);
+        List<Travel> viajes = GetFinalTravels(finales2, finales1, intermedios,geocoder);
         return viajes;
 
     }//metodo de busqueda del viaje
 
-public List<Travel> GetFinalTravels(List<Route> Rxorigen,List<Route> Rxdestino, List<GeoPoint> intermedios){
+public List<Travel> GetFinalTravels(List<Route> Rxorigen,List<Route> Rxdestino, List<GeoPoint> intermedios,Geocoder geocoder){
         int aux=0;
         List<Travel> travels=new ArrayList<>();
-        List<Route> rtravel=new ArrayList<>();
+
         List<Instruction> instr=new ArrayList<>();
+
         int a=0;
+        int b=0;
         Instruction inst=new Instruction();
         for(Route r1 :Rxorigen){
             aux++;
             for(Route r2 :Rxdestino){
-                for(GeoPoint gp: intermedios){
-                if(DrawinMap.isRouteInArea(r1,gp) && DrawinMap.isRouteInArea(r2,gp)){
-                   // inst.setIndication("Bajete en:"+gp.getLongitude()+" - "+ gp.getLongitude());
-                    instr.add(inst);
-                    break;
-                }
-
-                }
+                List<Route> rtravel=new ArrayList<>();
                 rtravel.add(r2);
                 rtravel.add(r1);
                 Log.i("Combinadas",r2.getName()+" - "+r1.getName());
                 travels.add(new Travel(aux, r2.getName()+" - "+r1.getName(), rtravel,instr));
-                rtravel.clear();
-
-            }
             }
 
+            }
+
+    Set<Travel> viajesclean=new HashSet<>();
+    viajesclean.addAll(travels);
+    travels.clear();
+    travels.addAll(viajesclean);
     return travels;
 
 }

@@ -60,7 +60,7 @@ public class Travel {
     }
 
     public String getname(){
-        return this.name;
+        return name;
 
     }
     public int getIdTravel() {

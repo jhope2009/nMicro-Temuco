@@ -141,8 +141,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onClick(View v) {
                 List<Company> companies = myDbHelper.findCompanies();
-                //InputMethodManager inputMethodManager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-                //inputMethodManager.hideSoftInputFromWindow(destino.getWindowToken(), 0);
+                for(Company c :companies){
+                  for(Route r :c.getRoutes()){
+                      r.setImg(getDrawable(getResources().getIdentifier(r.getIcon(), "drawable", getPackageName())));
+
+                  }
+                }
+                InputMethodManager inputMethodManager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                inputMethodManager.hideSoftInputFromWindow(destino.getWindowToken(), 0);
                 compa = new ArrayList<Travel>();
                 CustomTask buttonTask = new CustomTask();
 
@@ -160,12 +166,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             GeoPoint pto2 = new GeoPoint(ub2.get(0).getLatitude(), ub2.get(0).getLongitude());
                             //Ejecuta tarea asincronica
                             buttonTask.execute(companies, pto1, pto2);
-                            /*
-                            createListWithAdapterTravel(compa,1);
-                            Toast.makeText(getApplicationContext(), "fuera de la task "+compa.toString(), Toast.LENGTH_SHORT).show();
-                            if(!compa.isEmpty()){
-                                createListWithAdapterTravel(compa,1);
-                            }*/
+
                         } catch (IOException e) {e.printStackTrace();}
                     }else {
                         List<Address> ub1 = DrawinMap.findLocationByAddress(ori + " Temuco, Araucania, Chile", geocoder, getApplication());
@@ -377,12 +378,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //si se llama al metodo desde el evento del boton.
         if(a==1) {
             if (travels.size() > 0) {
-                Toast.makeText(getApplication(), "Entre al create"+travels.toString(), Toast.LENGTH_LONG).show();
                 ArrayList<Travel> category = new ArrayList<Travel>();
                 Travel cat;
                 if (travels != null && !travels.isEmpty()) {
                     for (Travel travel : travels) {
-                        cat = new Travel(travel.getIdTravel(), travel.getRoutes(), travel.getPrice(), travel.getStartStop(), travel.getEndStop(), travel.getTotalTime(), travel.getStartHour(), travel.getEndHour(),travel.getInstructions());
+                        cat = new Travel(travel.getIdTravel(),travel.getname(), travel.getRoutes()) ;
                         category.add(cat);
                     }
                 }
@@ -529,7 +529,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
     // tarea asincornica para la buueda de rutas por origen y destino
     class CustomTask extends AsyncTask{
-
+        Geocoder geocoder2 = new Geocoder(getApplication(), Locale.getDefault());
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -554,21 +554,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         int a = DrawinMap.isRouteInArea2(r, pto1);
                         int b = DrawinMap.isRouteInArea2(r, pto2);
                         if (a < b) {
-                            rutas.add(r);
-                            Travel tr=new Travel(rutas.get(0).getIdRoute(),r.getName(),rutas);
+                            rutas.add(new Route(r.getIdRoute(),r.getName(),r.getStops(),r.getPoints(),getDrawable(getResources().getIdentifier(r.getIcon(), "drawable", getPackageName()))));
+                            Travel tr=new Travel(rutas.get(0).getIdRoute(),r.getName().toString(),rutas);
                             compa.add(tr);
                         }
                     }
                 }
             }
-            travels=travel.GetTravel(companies,pto1,pto2);
+            travels=travel.GetTravel(companies,pto1,pto2,geocoder2);
             Log.i("Datos de los viajes obtenidos","si no pasa gg"+String.valueOf(travels.size()));
             for(Travel tr :travels){
                 Log.i("Mostarndo el nombre de los paraderos",tr.getname());
                 for(Instruction ins : tr.getInstructions()){
-                    Log.i("Mostarndo el nombre de los paraderos",ins.getIndication());
+                    Log.i("las instrucciones",ins.getIndication());
                     break;
                 }
+                for(Route r: tr.getRoutes()){
+                    Log.i("las rutas",r.getName());
+                }
+
 
             }
             return true;
