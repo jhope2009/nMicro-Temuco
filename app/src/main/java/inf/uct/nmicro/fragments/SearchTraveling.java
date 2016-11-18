@@ -32,31 +32,35 @@ public class SearchTraveling extends Activity {
     private final int POSITION_POINT = 150;
     DrawInMap DrawinMap = new DrawInMap();
 
-    public List<Route> GetRoutebyStartPoint(GeoPoint startPoint,List<Company> companies) {
+    public List<Route> GetRoutebyStartPoint(GeoPoint startPoint, List<Company> companies) {
         List<Route> candidatos = new ArrayList<>();
         for (Company c : companies) {
             for (Route ruta : c.getRoutes()) {
-                if (DrawinMap.isRouteInArea(ruta, startPoint)) {candidatos.add(ruta);}
+                if (DrawinMap.isRouteInArea(ruta, startPoint)) {
+                    candidatos.add(ruta);
+                }
             }
         }
         return candidatos;
     }
 
-    public List<Route> GetRoutebyEndpoint(GeoPoint endpoint,List<Company> companies){
-            List<Route> utiles=new ArrayList<>();
-            for(Company c : companies){
-                for(Route ruta : c.getRoutes()){
-                    if (DrawinMap.isRouteInArea(ruta, endpoint)){utiles.add(ruta);}
+    public List<Route> GetRoutebyEndpoint(GeoPoint endpoint, List<Company> companies) {
+        List<Route> utiles = new ArrayList<>();
+        for (Company c : companies) {
+            for (Route ruta : c.getRoutes()) {
+                if (DrawinMap.isRouteInArea(ruta, endpoint)) {
+                    utiles.add(ruta);
                 }
             }
+        }
         return utiles;
     }
 
-    public List<Stop> GetStops4Travel(List<Route> inicio, List<Route> finales, List<GeoPoint> puntos){
-        List<Stop> paradas=new ArrayList<>();
+    public List<Stop> GetStops4Travel(List<Route> inicio, List<Route> finales, List<GeoPoint> puntos) {
+        List<Stop> paradas = new ArrayList<>();
 
-        for(Route r :inicio) {
-            for(Stop st : r.getStops()) {
+        for (Route r : inicio) {
+            for (Stop st : r.getStops()) {
                 for (GeoPoint gp : puntos) {
                     int distance = new GeoPoint(st.getLatitude(), st.getLongitude()).distanceTo(gp);
                     if (distance < POSITION_DIAMETER) {
@@ -66,7 +70,7 @@ public class SearchTraveling extends Activity {
                 }
             }
         }
-        for(Route ro : finales) {
+        for (Route ro : finales) {
             for (Stop st : ro.getStops()) {
                 for (GeoPoint gp : puntos) {
                     int distance = new GeoPoint(st.getLatitude(), st.getLongitude()).distanceTo(gp);
@@ -77,14 +81,15 @@ public class SearchTraveling extends Activity {
                 }
             }
         }
-    return paradas;
+        return paradas;
     }
-    public List<String> GetAdress4Intermedios(Geocoder geocoder,List<GeoPoint> pinteres) throws IOException {
-        List<String> direction4points=new ArrayList<>();
-        String direccion="";
-        for(GeoPoint gp : pinteres){
-            List<Address> ub0 = geocoder.getFromLocation(gp.getLatitude(),gp.getLongitude(),1);
-            direccion=ub0.get(0).toString();
+
+    public List<String> GetAdress4Intermedios(Geocoder geocoder, List<GeoPoint> pinteres) throws IOException {
+        List<String> direction4points = new ArrayList<>();
+        String direccion = "";
+        for (GeoPoint gp : pinteres) {
+            List<Address> ub0 = geocoder.getFromLocation(gp.getLatitude(), gp.getLongitude(), 1);
+            direccion = ub0.get(0).toString();
             direction4points.add(direccion);
             ub0.clear();
         }
@@ -93,7 +98,7 @@ public class SearchTraveling extends Activity {
 
 //terminar el metodo
 
-    public List<Travel> GetTravel(List<Company> companies, GeoPoint origen, GeoPoint destino, Geocoder geocoder) {
+    public List<Travel> GetTravel(List<Company> companies, GeoPoint origen, GeoPoint destino, Geocoder geocoder, String Punto_Origen, String Punto_Destino) {
         List<Route> candidato1 = GetRoutebyStartPoint(origen, companies);
         List<Route> candidato2 = GetRoutebyEndpoint(destino, companies);
         List<Route> finales1 = new ArrayList<>();
@@ -138,49 +143,87 @@ public class SearchTraveling extends Activity {
         aux.addAll(finales2);
         finales2.clear();
         finales2.addAll(aux);
+
         Set<Route> aux2 = new HashSet<Route>();
         aux2.addAll(finales1);
         finales1.clear();
         finales1.addAll(aux2);
+
         Set<GeoPoint> aux3 = new HashSet<GeoPoint>();
         aux3.addAll(intermedios);
         intermedios.clear();
         intermedios.addAll(aux3);
 
-        List<Travel> viajes = GetFinalTravels(finales2, finales1, intermedios,geocoder);
+        List<Travel> viajes = GetFinalTravels(finales2, finales1, intermedios, geocoder, Punto_Origen, Punto_Destino);
         return viajes;
 
     }//metodo de busqueda del viaje
 
-public List<Travel> GetFinalTravels(List<Route> Rxorigen,List<Route> Rxdestino, List<GeoPoint> intermedios,Geocoder geocoder){
-        int aux=0;
-        List<Travel> travels=new ArrayList<>();
+    public List<Travel> GetFinalTravels(List<Route> Rxorigen, List<Route> Rxdestino, List<GeoPoint> intermedios, Geocoder geocoder, String Punto_Origen, String Punto_Destino) {
+        int aux = 0;
+        List<Travel> travels = new ArrayList<>();
 
-        List<Instruction> instr=new ArrayList<>();
-
-        int a=0;
-        int b=0;
-        Instruction inst=new Instruction();
-        for(Route r1 :Rxorigen){
+        for (Route r1 : Rxorigen) {
             aux++;
-            for(Route r2 :Rxdestino){
-                List<Route> rtravel=new ArrayList<>();
+            for (Route r2 : Rxdestino) {
+                List<Instruction> instruccionesFinales=GetInstruccions4Travel(intermedios,r1,r2,Punto_Origen,Punto_Destino,geocoder);
+                List<Route> rtravel = new ArrayList<>();
                 rtravel.add(r2);
                 rtravel.add(r1);
-                Log.i("Combinadas",r2.getName()+" - "+r1.getName());
-                travels.add(new Travel(aux, r2.getName()+" - "+r1.getName(), rtravel,instr));
+                travels.add(new Travel(r2.getName() + " - " + r1.getName(), rtravel, instruccionesFinales));
             }
+        }
 
+        Set<Travel> viajesclean = new HashSet<Travel>();
+        viajesclean.addAll(travels);
+        travels.clear();
+        travels.addAll(viajesclean);
+        return travels;
+
+    }
+
+public List<Instruction> GetInstruccions4Travel(List<GeoPoint> intermedios, Route Ruta_Origen, Route RutaDestino, String Punto_Origen, String Punto_Destino, Geocoder geocoder){
+    List<Instruction> Instructions4Travel=new ArrayList<Instruction>();
+    Instructions4Travel.clear();
+    List<String> direcciones = new ArrayList<>();
+    Instruction bajada1=new Instruction();
+    Instruction subida=new Instruction();
+    subida.setIndication("Toma la micro en: "+Punto_Origen);
+    Instructions4Travel.add(subida);
+    int diferencia=0;
+
+    outloop2:
+    for(Stop st :RutaDestino.getStops()){
+        for(GeoPoint gpI: intermedios) {
+            GeoPoint gp = new GeoPoint(st.getLatitude(), st.getLongitude());
+            diferencia=gp.distanceTo(gpI);
+            if(diferencia<=250){
+                bajada1.setIndication("Bajate en: "+st.getAddress());
+                bajada1.setStop(st);
+                Instructions4Travel.add(bajada1);
+                break outloop2;
             }
-
-    Set<Travel> viajesclean=new HashSet<>();
-    viajesclean.addAll(travels);
-    travels.clear();
-    travels.addAll(viajesclean);
-    return travels;
-
+        }
+    }
+    diferencia=0;
+    Instruction bajada2=new Instruction();
+    outloop:
+    for(Stop st :Ruta_Origen.getStops()){
+        for(GeoPoint gp : intermedios){
+            diferencia=gp.distanceTo(new GeoPoint(st.getLatitude(),gp.getLongitude()));
+            if(diferencia<=150){
+                bajada2.setIndication("Toma la micro :"+Ruta_Origen.getName()+" en: "+st.getAddress());
+                bajada2.setStop(st);
+                Instructions4Travel.add(bajada2);
+                break outloop;
+            }
+        }
+    }
+    Instruction DestinoFinal=new Instruction();
+    DestinoFinal.setIndication("Camina hasta"+Punto_Destino);
+    Instructions4Travel.add(DestinoFinal);
+    return Instructions4Travel;
 }
-
 
 
 }
