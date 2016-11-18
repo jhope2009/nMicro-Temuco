@@ -13,19 +13,17 @@ public class Travel {
     private int idTravel;
     private String name;
     private List<Route> routes;
+    private Stop startStop;
+    private Stop endStop;
     private int price;
-    private GeoPoint startStop;
-    private GeoPoint endStop;
-    private int totalTime;
-    private String startHour;
-    private String endHour;
     private List<Instruction> instructions;
 
     public Travel() {}
 
-    public Travel(String name,List<Route> rt,List<Instruction> ins){
+    public Travel(int id,String name,List<Route> rt,List<Instruction> ins){
         this.name=name;
         this.routes=rt;
+        this.idTravel=id;
         this.instructions=ins;
 
     }
@@ -33,28 +31,15 @@ public class Travel {
         this.name=name;
         this.routes=rt;
         this.idTravel=id;
-        }
-    public Travel(List<Route> routes, int price, GeoPoint startStop, GeoPoint endStop, int totalTime, String startHour, String endHour, List<Instruction> instructions) {
-        this.routes = routes;
-        this.price = price;
-        this.startStop = startStop;
-        this.endStop = endStop;
-        this.totalTime = totalTime;
-        this.startHour = startHour;
-        this.endHour = endHour;
-        this.instructions = instructions;
     }
 
-
-    public Travel(int idTravel, List<Route> routes, int price, GeoPoint endStop, GeoPoint startStop, int totalTime, String startHour, String endHour, List<Instruction> instructions) {
+    public Travel(int idTravel, String name, List<Route> routes, Stop start_stop, Stop end_stop, int price, List<Instruction> instructions) {
         this.idTravel = idTravel;
+        this.name = name;
         this.routes = routes;
+        this.startStop = start_stop;
+        this.endStop = end_stop;
         this.price = price;
-        this.endStop = endStop;
-        this.startStop = startStop;
-        this.totalTime = totalTime;
-        this.startHour = startHour;
-        this.endHour = endHour;
         this.instructions = instructions;
     }
 
@@ -78,26 +63,6 @@ public class Travel {
         return price;
     }
 
-    public GeoPoint getStartStop() {
-        return startStop;
-    }
-
-    public GeoPoint getEndStop() {
-        return endStop;
-    }
-
-    public int getTotalTime() {
-        return totalTime;
-    }
-
-    public String getStartHour() {
-        return startHour;
-    }
-
-    public String getEndHour() {
-        return endHour;
-    }
-
     public List<Instruction> getInstructions() {
         return instructions;
     }
@@ -110,27 +75,23 @@ public class Travel {
         this.price = price;
     }
 
-    public void setStartStop(GeoPoint startStop) {
+    public void setInstructions(List<Instruction> instructions) {
+        this.instructions = instructions;
+    }
+
+    public Stop getStartStop() {
+        return startStop;
+    }
+
+    public Stop getEndStop() {
+        return endStop;
+    }
+
+    public void setStartStop(Stop startStop) {
         this.startStop = startStop;
     }
 
-    public void setEndStop(GeoPoint endStop) {
+    public void setEndStop(Stop endStop) {
         this.endStop = endStop;
-    }
-
-    public void setTotalTime(int totalTime) {
-        this.totalTime = totalTime;
-    }
-
-    public void setStartHour(String startHour) {
-        this.startHour = startHour;
-    }
-
-    public void setEndHour(String endHour) {
-        this.endHour = endHour;
-    }
-
-    public void setInstructions(List<Instruction> instructions) {
-        this.instructions = instructions;
     }
 }

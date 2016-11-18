@@ -1,5 +1,6 @@
 package inf.uct.nmicro.sqlite;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
@@ -15,15 +16,20 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import inf.uct.nmicro.model.Instruction;
 import inf.uct.nmicro.model.Route;
 import inf.uct.nmicro.model.Point;
 import inf.uct.nmicro.model.Stop;
+import inf.uct.nmicro.model.Travel;
 import inf.uct.nmicro.sqlite.ITablesDB.Tables;
 import inf.uct.nmicro.sqlite.ITablesDB.Routes;
 import inf.uct.nmicro.sqlite.ITablesDB.Companies;
 import inf.uct.nmicro.sqlite.ITablesDB.Points;
 import inf.uct.nmicro.sqlite.ITablesDB.StopRoute;
 import inf.uct.nmicro.sqlite.ITablesDB.Stops;
+import inf.uct.nmicro.sqlite.ITablesDB.Travels;
+import inf.uct.nmicro.sqlite.ITablesDB.TravelRoutes;
+import inf.uct.nmicro.sqlite.ITablesDB.Instructions;
 import inf.uct.nmicro.model.Company;
 
 public class DataBaseHelper extends SQLiteOpenHelper {
@@ -332,6 +338,137 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             cursor.moveToNext();
         }
         return routes;
+    }
+
+    public boolean removeAllTravels(){
+        SQLiteDatabase db = this.getReadableDatabase();
+        if (db == null) {
+            return false;
+        }
+        db.delete(Tables.TRAVEL, null, null);
+        db.delete(Tables.TRAVEL_ROUTE, null, null);
+        db.delete(Tables.INSTRUCTION, null, null);
+        return true;
+    }
+
+    public Travel findTravelById(int id){
+        SQLiteDatabase db = this.getReadableDatabase();
+        if (db == null) {
+            return null;
+        }
+        String sql= String.format("select * from %s where %s = ?;",Tables.TRAVEL, Travels.ID_TRAVEL);
+        String[] selectionargs = {Integer.toString(id)};
+        Cursor cursor= db.rawQuery(sql, selectionargs);
+        Travel travel= new Travel(cursor.getInt(0), cursor.getString(1), findRoutesByTravel(cursor.getInt(0)),
+                findStopById(cursor.getInt(3)), findStopById(cursor.getInt(4)), cursor.getInt(2), findAllInstruction());
+        return travel;
+    }
+
+    public Stop findStopById(int id){
+        SQLiteDatabase db = this.getReadableDatabase();
+        if (db == null) {
+            return null;
+        }
+        String sql= String.format("select * from %s where %s = ?;",Tables.STOP, Stops.ID_STOP);
+        String[] selectionargs = {Integer.toString(id)};
+        Cursor cursor= db.rawQuery(sql, selectionargs);
+        Stop stop = new Stop(cursor.getInt(0), cursor.getString(1), cursor.getDouble(2), cursor.getDouble(3));
+        return stop;
+    }
+
+    public List<Route> findRoutesByTravel(int idTravel) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        if (db == null) {
+            return null;
+        }
+        String sql = String.format("SELECT * FROM %s INNER JOIN %s ON %s = %s WHERE %s = ?",
+                Tables.TRAVEL_ROUTE, Tables.ROUTE, Tables.TRAVEL_ROUTE+"."+ TravelRoutes.ID_ROUTE, Tables.ROUTE+"."+
+                        Routes.ID_ROUTE, TravelRoutes.ID_TRAVEL);
+        String[] selectionArgs = {Integer.toString(idTravel)};
+        Cursor cursor = db.rawQuery(sql, selectionArgs);
+        List<Route> routes = new ArrayList<Route>();
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            routes.add(new Route(cursor.getInt(1), cursor.getString(4), findStopByidRoute(cursor.getInt(1)),
+                    findPointsByRoute(cursor.getInt(1)), cursor.getString(5)));
+            cursor.moveToNext();
+        }
+        return routes;
+    }
+
+    public List<Instruction> findAllInstruction() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        if (db == null) {
+            return null;
+        }
+        String sql = String.format("SELECT * FROM %s", Tables.INSTRUCTION);
+        Cursor cursor = db.rawQuery(sql, null);
+        List<Instruction> instructions = new ArrayList<>();
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            instructions.add(new Instruction(cursor.getString(0), findStopById(cursor.getInt(0))));
+            cursor.moveToNext();
+        }
+        return instructions;
+    }
+
+    public boolean saveTravel(Travel travel) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        if (db == null) {
+            return false;
+        }
+        //Creamos el registro a insertar como objeto ContentValues
+        ContentValues nuevoRegistro = new ContentValues();
+        nuevoRegistro.put(Travels.NAME, travel.getname());
+        nuevoRegistro.put(Travels.PRICE,travel.getPrice());
+        nuevoRegistro.put(Travels.START_STOP,travel.getStartStop().getIdStop());
+        nuevoRegistro.put(Travels.END_STOP,travel.getEndStop().getIdStop());
+
+        //Insertamos el registro en la base de datos
+        Long id = db.insert(Tables.TRAVEL, null, nuevoRegistro);
+
+        if(id!=-1){
+            String sql= String.format("select %s from %s where ROWID = ?;",Travels.ID_TRAVEL, Tables.TRAVEL);
+            String[] selectionargs = {Long.toString(id)};
+            Cursor cursor= db.rawQuery(sql, selectionargs);
+            int idTravel = cursor.getInt(0);
+            for(Route r : travel.getRoutes()){
+                saveTravelRoute(idTravel, r.getIdRoute());
+            }
+            if(saveInstruction(idTravel, travel.getInstructions())) return true;
+            else return false;
+        }else return false;
+    }
+
+    public boolean saveTravelRoute(int idTravel, int idRoute) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        if (db == null) {
+            return false;
+        }
+        //Creamos el registro a insertar como objeto ContentValues
+        ContentValues nuevoRegistro = new ContentValues();
+        nuevoRegistro.put(TravelRoutes.ID_TRAVEL, idTravel);
+        nuevoRegistro.put(TravelRoutes.ID_ROUTE,idRoute);
+
+        //Insertamos el registro en la base de datos
+        if(db.insert(Tables.TRAVEL_ROUTE, null, nuevoRegistro)!=-1) return true;
+        else return false;
+    }
+
+    public boolean saveInstruction(int idTravel, List<Instruction> ins) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        if (db == null) {
+            return false;
+        }
+        //Creamos el registro a insertar como objeto ContentValues
+        for(Instruction i : ins){
+            ContentValues nuevoRegistro = new ContentValues();
+            nuevoRegistro.put(Instructions.ID_TRAVEL, idTravel);
+            nuevoRegistro.put(Instructions.INDICATION, i.getIndication());
+            nuevoRegistro.put(Instructions.STOP, i.getStop().getIdStop());
+            db.insert(Tables.TRAVEL_ROUTE, null, nuevoRegistro);
+        }
+        return true;
     }
 
 
