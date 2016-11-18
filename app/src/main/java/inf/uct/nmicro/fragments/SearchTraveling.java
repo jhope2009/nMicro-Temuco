@@ -173,13 +173,11 @@ public class SearchTraveling extends Activity {
                 travels.add(new Travel(r2.getName() + " - " + r1.getName(), rtravel, instruccionesFinales));
             }
         }
-
         Set<Travel> viajesclean = new HashSet<Travel>();
         viajesclean.addAll(travels);
         travels.clear();
         travels.addAll(viajesclean);
         return travels;
-
     }
 
 public List<Instruction> GetInstruccions4Travel(List<GeoPoint> intermedios, Route Ruta_Origen, Route RutaDestino, String Punto_Origen, String Punto_Destino, Geocoder geocoder){
@@ -191,7 +189,6 @@ public List<Instruction> GetInstruccions4Travel(List<GeoPoint> intermedios, Rout
     subida.setIndication("Toma la micro en: "+Punto_Origen);
     Instructions4Travel.add(subida);
     int diferencia=0;
-
     outloop2:
     for(Stop st :RutaDestino.getStops()){
         for(GeoPoint gpI: intermedios) {
@@ -220,12 +217,10 @@ public List<Instruction> GetInstruccions4Travel(List<GeoPoint> intermedios, Rout
         }
     }
     Instruction DestinoFinal=new Instruction();
-    DestinoFinal.setIndication("Camina hasta"+Punto_Destino);
+    DestinoFinal.setIndication("Camina hasta: "+Punto_Destino);
     Instructions4Travel.add(DestinoFinal);
     return Instructions4Travel;
-}
-
-
+    }
 }
 
 
