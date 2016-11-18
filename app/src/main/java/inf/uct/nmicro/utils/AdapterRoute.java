@@ -13,6 +13,8 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.osmdroid.util.GeoPoint;
+
 import java.util.ArrayList;
 
 import inf.uct.nmicro.R;
@@ -24,15 +26,17 @@ public class AdapterRoute extends BaseAdapter {
     protected Activity activity;
     protected Fragment fragment;
     protected ArrayList<Route> items;
+    protected GeoPoint p;
 
     public AdapterRoute(Activity activity) {
         this.activity = activity;
         items = new ArrayList<Route>();
     }
 
-    public AdapterRoute(Activity activity, ArrayList<Route> items) {
+    public AdapterRoute(Activity activity, ArrayList<Route> items, GeoPoint p) {
         this.activity = activity;
         this.items = items;
+        this.p = p;
     }
 
     public AdapterRoute(Fragment fragment, ArrayList<Route> items) {
@@ -69,20 +73,29 @@ public class AdapterRoute extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
 
         View v = convertView;
+        Route dir = items.get(position);
+        //aqui llamo a la clase que realiza la coneccion con el WS y le paso parametros concatenados por coma
+
 
         if (convertView == null) {
             LayoutInflater inf = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             v = inf.inflate(R.layout.item_category, null);
         }
 
-        Route dir = items.get(position);
+
 
         TextView title = (TextView) v.findViewById(R.id.category);
         title.setText(dir.getName());
 
+        TextView title1 = (TextView) v.findViewById(R.id.textView4);
+        TextView title2 = (TextView) v.findViewById(R.id.textView5);
+        TextView title3 = (TextView) v.findViewById(R.id.textView6);
+
         ImageView imagen = (ImageView) v.findViewById(R.id.imageView4);
         imagen.setImageDrawable(dir.getImg());
 
+
+        new ConnectWS(activity, title1, title2, title3, 0).execute(dir.getIdRoute()+","+p.getLatitude()+","+p.getLongitude());
         return v;
     }
 }

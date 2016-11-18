@@ -101,8 +101,9 @@ public class traveling extends Activity {
                 @Override
                 public boolean onMarkerClick(org.osmdroid.views.overlay.Marker marker, MapView mapView) {
                     //createListWithAdapter(myDbHelper.findRoutesByStop(mak.getIdMarker()),0);
+                    Toast.makeText(getApplication(), ""+getRoutes.toString(), Toast.LENGTH_SHORT).show();
                     //aqui llamo a la clase que realiza la coneccion con el WS y le paso parametros concatenados por coma
-                    new ConnectWS(getApplication(),animado,0).execute(getRoutes.get(0)+","+mak.getPosition().getLatitude()+","+mak.getPosition().getLongitude());
+                    //new ConnectWS(getApplication(),animado,0).execute(getRoutes.get(0)+","+mak.getPosition().getLatitude()+","+mak.getPosition().getLongitude());
                     return false;
                 }
             });

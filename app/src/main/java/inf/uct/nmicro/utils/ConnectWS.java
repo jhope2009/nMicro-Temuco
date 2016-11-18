@@ -23,12 +23,17 @@ public class ConnectWS extends AsyncTask{
     private LinearLayout animado;
     private Context context;
     private int byGetOrPost = 0;
+    private TextView te1;
+    private TextView te2;
+    private TextView te3;
 
     //flag 0 means get and 1 means post.(By default it is get.)
-    public ConnectWS(Context context, LinearLayout animado, int flag) {
-        this.context = context;
-        this.animado = animado;
-        byGetOrPost = flag;
+    public ConnectWS(Context cont, TextView t1,TextView t2,TextView t3,int flag) {
+        this.context = cont;
+        this.byGetOrPost = flag;
+        this.te1 = t1;
+        this.te2 = t2;
+        this.te3 = t3;
     }
 
     @Override
@@ -106,6 +111,9 @@ public class ConnectWS extends AsyncTask{
     protected void onPostExecute(Object o) {
         super.onPostExecute(o);
         //aqui esta la respuesta del webservice
-        Toast.makeText(context, "Respuesta del WS "+o.toString(), Toast.LENGTH_LONG).show();
+        te1.setText("eso");
+        te2.setText("es");
+        te3.setText("funca");
+        //Toast.makeText(context, "Respuesta del WS "+o.toString(), Toast.LENGTH_LONG).show();
     }
 }

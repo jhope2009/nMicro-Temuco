@@ -211,9 +211,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             mak.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
                 @Override
                 public boolean onMarkerClick(Marker marker, MapView mapView) {
-                    //aqui llamo a la clase que realiza la coneccion con el WS y le paso parametros concatenados por coma
-                    new ConnectWS(getApplication(),animado,0).execute("id_route,"+mak.getPosition().getLatitude()+","+mak.getPosition().getLongitude());
-                    createListWithAdapterRoute(myDbHelper.findRoutesByStop(mak.getIdMarker()),0);
+                    createListWithAdapterRoute(myDbHelper.findRoutesByStop(mak.getIdMarker()),0,marker.getPosition());
                     return false;
                 }
             });
@@ -239,7 +237,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 GeoPoint geoPointUser = new GeoPoint(Double.parseDouble(latitude), Double.parseDouble(longitude));
 
-                createListWithAdapterRoute(findNearRoutes(geoPointUser),0);
+                createListWithAdapterRoute(findNearRoutes(geoPointUser),0, geoPointUser);
 
                 mapController.animateTo(geoPointUser);
                 mapController.zoomTo(16);
@@ -308,7 +306,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return companies;
     }
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    public void createListWithAdapterRoute(List<Route> routes, int a) {
+    public void createListWithAdapterRoute(List<Route> routes, int a, GeoPoint p) {
         //si se llama al metodo desde el evento del boton.
         if(a==1) {
             if (routes.size() > 0) {
@@ -321,7 +319,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 }
                 ListView lv = (ListView) findViewById(R.id.ListView);
-                adapter = new AdapterRoute(this, category);
+                adapter = new AdapterRoute(this, category, p);
                 lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -353,7 +351,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 }
                 ListView lv = (ListView) findViewById(R.id.ListView);
-                adapter = new AdapterRoute(this, category);
+                adapter = new AdapterRoute(this, category, p);
                 lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
