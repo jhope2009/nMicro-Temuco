@@ -15,6 +15,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -81,6 +82,6 @@ public class ConnectWS extends AsyncTask{
         te1.setText("15 min");
         te2.setText("12 km");
         te3.setText("+ info?");
-        //Toast.makeText(context, "Respuesta del WS "+o.toString(), Toast.LENGTH_LONG).show();
+        Log.i("Respuesta del WS",o.toString());
     }
 }
