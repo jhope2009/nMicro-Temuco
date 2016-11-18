@@ -15,6 +15,7 @@ import org.osmdroid.util.GeoPoint;
 import java.util.ArrayList;
 
 import inf.uct.nmicro.R;
+import inf.uct.nmicro.model.Instruction;
 import inf.uct.nmicro.model.Route;
 import inf.uct.nmicro.model.Travel;
 
@@ -86,8 +87,11 @@ public class AdapterTravel extends BaseAdapter {
         TextView title = (TextView) v.findViewById(R.id.category);
 
         TextView title1 = (TextView) v.findViewById(R.id.textView4);
+
         TextView title2 = (TextView) v.findViewById(R.id.textView5);
+
         TextView title3 = (TextView) v.findViewById(R.id.textView6);
+        title3.setText("Precio $900");
 
         title.setText(dir.getname());
 

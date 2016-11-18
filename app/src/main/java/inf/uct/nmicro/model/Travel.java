@@ -23,10 +23,9 @@ public class Travel {
 
     public Travel() {}
 
-    public Travel(int id,String name,List<Route> rt,List<Instruction> ins){
+    public Travel(String name,List<Route> rt,List<Instruction> ins){
         this.name=name;
         this.routes=rt;
-        this.idTravel=id;
         this.instructions=ins;
 
     }

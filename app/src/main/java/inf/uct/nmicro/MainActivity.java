@@ -165,7 +165,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             GeoPoint pto1 = new GeoPoint(ub0.get(0).getLatitude(), ub0.get(0).getLongitude());
                             GeoPoint pto2 = new GeoPoint(ub2.get(0).getLatitude(), ub2.get(0).getLongitude());
                             //Ejecuta tarea asincronica
-                            buttonTask.execute(companies, pto1, pto2);
+                            buttonTask.execute(companies, pto1, pto2,ub0.get(0).toString(),ub2.get(0).toString());
 
                         } catch (IOException e) {e.printStackTrace();}
                     }else {
@@ -177,7 +177,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             GeoPoint pto1 = new GeoPoint(ub1.get(0).getLatitude(), ub1.get(0).getLongitude());
                             GeoPoint pto2 = new GeoPoint(ub2.get(0).getLatitude(), ub2.get(0).getLongitude());
                             //Ejecuta tarea asincronica
-                            buttonTask.execute(companies, pto1, pto2);
+                            buttonTask.execute(companies, pto1, pto2,ub1.get(0).toString(),ub2.get(0).toString());
 
                         }else{
                             Toast.makeText(getApplicationContext(), "No se encontraron Direcciones", Toast.LENGTH_LONG).show();
@@ -543,7 +543,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Location loc = null;
         return loc;
     }
-    // tarea asincornica para la buueda de rutas por origen y destino
+
+
+    // tarea asincornica para la busqueda de rutas por origen y destino
     class CustomTask extends AsyncTask{
         Geocoder geocoder2 = new Geocoder(getApplication(), Locale.getDefault());
         @Override
@@ -563,9 +565,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             List<Company> companies = (ArrayList<Company>)params[0];
             GeoPoint pto1 = (GeoPoint)params[1];
             GeoPoint pto2 = (GeoPoint)params[2];
+            String Origen=(String)params[3];
+            String Destino=(String)params[4];
             List<Route> rutas=new ArrayList<>();
+
             for (Company c : companies) {
                 for (Route r : c.getRoutes()) {
+
                     if (DrawinMap.isRouteInArea(r, pto1) && DrawinMap.isRouteInArea(r, pto2)) {
                         int a = DrawinMap.isRouteInArea2(r, pto1);
                         int b = DrawinMap.isRouteInArea2(r, pto2);
@@ -577,19 +583,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 }
             }
-            travels=travel.GetTravel(companies,pto1,pto2,geocoder2);
-            Log.i("Datos de los viajes obtenidos","si no pasa gg"+String.valueOf(travels.size()));
+            travels=travel.GetTravel(companies,pto1,pto2,geocoder2,Origen,Destino);
             for(Travel tr :travels){
-                Log.i("Mostarndo el nombre de los paraderos",tr.getname());
+                Log.i("Mostarndo el nombre del viaje",tr.getname());
                 for(Instruction ins : tr.getInstructions()){
                     Log.i("las instrucciones",ins.getIndication());
-                    break;
                 }
-                for(Route r: tr.getRoutes()){
-                    Log.i("las rutas",r.getName());
-                }
-
-
             }
             return (GeoPoint)params[1];
         }
