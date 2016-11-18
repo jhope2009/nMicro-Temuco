@@ -38,6 +38,7 @@ public class ConnectWS extends AsyncTask{
 
     @Override
     protected Object doInBackground(Object[] objects) {
+        StringBuffer sb = new StringBuffer("");
         if(byGetOrPost == 0){ //means by Get Method
 
             try{
@@ -53,7 +54,7 @@ public class ConnectWS extends AsyncTask{
                 BufferedReader in = new BufferedReader(new
                         InputStreamReader(response.getEntity().getContent()));
 
-                StringBuffer sb = new StringBuffer("");
+
                 String line="";
 
                 while ((line = in.readLine()) != null) {
@@ -66,42 +67,8 @@ public class ConnectWS extends AsyncTask{
             } catch(Exception e){
                 return new String("Exception: " + e.getMessage());
             }
-        } else{
-            try{
-                String username = (String)objects[0];
-                String password = (String)objects[1];
-
-                String link="http://192.168.1.35/selectalljson.php";
-                String data  = URLEncoder.encode("username", "UTF-8") + "=" +
-                        URLEncoder.encode(username, "UTF-8");
-                data += "&" + URLEncoder.encode("password", "UTF-8") + "=" +
-                        URLEncoder.encode(password, "UTF-8");
-
-                URL url = new URL(link);
-                URLConnection conn = url.openConnection();
-
-                conn.setDoOutput(true);
-                OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
-
-                wr.write( data );
-                wr.flush();
-
-                BufferedReader reader = new BufferedReader(new
-                        InputStreamReader(conn.getInputStream()));
-
-                StringBuilder sb = new StringBuilder();
-                String line = null;
-
-                // Read Server Response
-                while((line = reader.readLine()) != null) {
-                    sb.append(line);
-                    break;
-                }
-                return sb.toString();
-            } catch(Exception e){
-                return new String("Exception: " + e.getMessage());
-            }
         }
+        return sb.toString();
     }
 
     protected void onPreExecute(){
@@ -111,9 +78,9 @@ public class ConnectWS extends AsyncTask{
     protected void onPostExecute(Object o) {
         super.onPostExecute(o);
         //aqui esta la respuesta del webservice
-        te1.setText("eso");
-        te2.setText("es");
-        te3.setText("funca");
+        te1.setText("15 min");
+        te2.setText("12 km");
+        te3.setText("+ info?");
         //Toast.makeText(context, "Respuesta del WS "+o.toString(), Toast.LENGTH_LONG).show();
     }
 }

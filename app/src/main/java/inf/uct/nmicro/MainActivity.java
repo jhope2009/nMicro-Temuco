@@ -211,6 +211,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             mak.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
                 @Override
                 public boolean onMarkerClick(Marker marker, MapView mapView) {
+                    mapController.animateTo(marker.getPosition());
+                    mapController.zoomTo(16);
                     createListWithAdapterRoute(myDbHelper.findRoutesByStop(mak.getIdMarker()),0,marker.getPosition());
                     return false;
                 }
@@ -229,6 +231,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public boolean onLongPress(final MotionEvent e, final MapView mapView) {
 
+                /*
+                *
+                * Esta es una posibilidad pero creo que no lo sera de momento
+                * y lo otro que podria hacer es crear otro adapter
+                *
+                GeoPoint pto1 = null;
+                try {
+                    Location loc = GetCurrentLocation();
+                    List<Address> ub0 = geocoder.getFromLocation(loc.getLatitude(), loc.getLongitude(), 1);
+                    pto1 = new GeoPoint(ub0.get(0).getLatitude(), ub0.get(0).getLongitude());
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+                *
+                *
+                * */
                 final Drawable marker = getApplicationContext().getResources().getDrawable(R.drawable.marker_default);
                 Projection proj = mapView.getProjection();
                 GeoPoint loc = (GeoPoint) proj.fromPixels((int) e.getX(), (int) e.getY());
@@ -372,7 +390,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    public void createListWithAdapterTravel(List<Travel> travels, int a) {
+    public void createListWithAdapterTravel(List<Travel> travels, int a, GeoPoint p) {
         //si se llama al metodo desde el evento del boton.
         if(a==1) {
             if (travels.size() > 0) {
@@ -385,7 +403,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 }
                 ListView lv = (ListView) findViewById(R.id.ListView);
-                adapterTravel = new AdapterTravel(this, category);
+                adapterTravel = new AdapterTravel(this, category, p);
                 lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -415,7 +433,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 }
                 ListView lv = (ListView) findViewById(R.id.ListView);
-                adapterTravel = new AdapterTravel(this, category);
+                adapterTravel = new AdapterTravel(this, category, p);
                 lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -573,7 +591,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
             }
-            return true;
+            return (GeoPoint)params[1];
         }
 
         @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -581,9 +599,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         protected void onPostExecute(Object o) {
             super.onPostExecute(o);
             pDialog.dismiss();
-            createListWithAdapterTravel(compa,1);
+            createListWithAdapterTravel(compa,1,(GeoPoint)o);
             if(compa.size()==0){
-                createListWithAdapterTravel(travels,1);
+                createListWithAdapterTravel(travels,1,(GeoPoint)o);
             }
         }
     }

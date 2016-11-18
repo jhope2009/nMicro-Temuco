@@ -10,6 +10,8 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.osmdroid.util.GeoPoint;
+
 import java.util.ArrayList;
 
 import inf.uct.nmicro.R;
@@ -25,15 +27,18 @@ public class AdapterTravel extends BaseAdapter {
     protected Activity activity;
     protected Fragment fragment;
     protected ArrayList<Travel> items;
+    protected GeoPoint p;
 
     public AdapterTravel(Activity activity) {
         this.activity = activity;
         items = new ArrayList<Travel>();
+
     }
 
-    public AdapterTravel(Activity activity, ArrayList<Travel> items) {
+    public AdapterTravel(Activity activity, ArrayList<Travel> items, GeoPoint p) {
         this.activity = activity;
         this.items = items;
+        this.p = p;
     }
 
     public AdapterTravel(Fragment fragment, ArrayList<Travel> items) {
@@ -80,6 +85,10 @@ public class AdapterTravel extends BaseAdapter {
 
         TextView title = (TextView) v.findViewById(R.id.category);
 
+        TextView title1 = (TextView) v.findViewById(R.id.textView4);
+        TextView title2 = (TextView) v.findViewById(R.id.textView5);
+        TextView title3 = (TextView) v.findViewById(R.id.textView6);
+
         title.setText(dir.getname());
 
         ImageView imagen =  (ImageView) v.findViewById(R.id.imageView4);
@@ -89,6 +98,8 @@ public class AdapterTravel extends BaseAdapter {
             imagen2.setImageDrawable(dir.getRoutes().get(1).getImg());
         }
 
+        //esto me falta analizar y encontrar solucion puesto que son dos rutas las que debo unir y calcular aproximado
+        new ConnectWS(activity, title1, title2, title3, 0).execute(dir.getRoutes().get(0).getIdRoute()+","+p.getLatitude()+","+p.getLongitude());
         return v;
     }
 }
