@@ -343,8 +343,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         final int pos = position;
                         System.out.println(category.get(pos).getPoints());
-                       // DrawinMap.DrawRoute(map, category.get(pos), routesDraw);
-                       // morph.hide();
+                        // DrawinMap.DrawRoute(map, category.get(pos), routesDraw);
+                        // morph.hide();
                         ParaActivityTraveler.add(category.get(pos).getIdRoute());
                         Intent intent=new Intent(getApplicationContext(),traveling.class);
                         intent.putExtra(rutasSeleccionadas,ParaActivityTraveler);
@@ -352,11 +352,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 });
                 morph.show();
+                bar.setExpanded(false);
                 lv.setAdapter(adapter);
+            }else {
+                morph.hide();
+                bar.setExpanded(true);
+                routes.clear();
+                Toast.makeText(getBaseContext(), "No se encontraron Rutas", Toast.LENGTH_SHORT).show();
             }
-            routes.clear();
-            morph.hide();
-            bar.setExpanded(false);
         }
         else{
             if (routes.size() > 0) {
@@ -381,12 +384,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 });
                 morph.show();
                 lv.setAdapter(adapter);
+                bar.setExpanded(false);
+            }else {
+                morph.hide();
+                bar.setExpanded(true);
+                routes.clear();
+                Toast.makeText(getBaseContext(), "No se encontraron Rutas", Toast.LENGTH_SHORT).show();
             }
-            routes.clear();
-            morph.hide();
-            bar.setExpanded(false);
-
-
         }
     }
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)

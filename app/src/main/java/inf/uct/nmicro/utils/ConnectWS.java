@@ -79,9 +79,10 @@ public class ConnectWS extends AsyncTask{
     protected void onPostExecute(Object o) {
         super.onPostExecute(o);
         //aqui esta la respuesta del webservice
-        te1.setText("15 min");
-        te2.setText("12 km");
-        te3.setText("+ info?");
+        String diaArray[] = o.toString().split(",");
+        te1.setText(""+((Float.parseFloat(diaArray[0].substring(0,3))/60)*60)+" min");
+        te2.setText(""+diaArray[0].substring(0,4)+" km");
+        te3.setText("micro "+diaArray[1]);
         Log.i("Respuesta del WS",o.toString());
     }
 }
