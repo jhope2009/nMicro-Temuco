@@ -19,12 +19,18 @@ public class Travel {
     private List<Instruction> instructions;
 
     public Travel() {}
+    public Travel(String name, List<Route> routes){
+        this.name=name;
+        this.routes=routes;
+    }
 
-    public Travel(int id,String name,List<Route> rt,List<Instruction> ins){
+    public Travel(int id,String name,List<Route> rt,List<Instruction> ins,Stop st1,Stop st2){
+        this.idTravel=id;
         this.name=name;
         this.routes=rt;
-        this.idTravel=id;
         this.instructions=ins;
+        this.startStop=st1;
+        this.endStop=st2;
 
     }
     public Travel(int id,String name,List<Route> rt){

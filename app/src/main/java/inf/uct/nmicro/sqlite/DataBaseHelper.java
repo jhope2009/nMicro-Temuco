@@ -419,6 +419,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         }
         //Creamos el registro a insertar como objeto ContentValues
         ContentValues nuevoRegistro = new ContentValues();
+        nuevoRegistro.put(Travels.ID_TRAVEL, travel.getIdTravel());
         nuevoRegistro.put(Travels.NAME, travel.getname());
         nuevoRegistro.put(Travels.PRICE,travel.getPrice());
         nuevoRegistro.put(Travels.START_STOP,travel.getStartStop().getIdStop());
@@ -428,19 +429,19 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         Long id = db.insert(Tables.TRAVEL, null, nuevoRegistro);
 
         if(id!=-1){
-            String sql= String.format("select %s from %s where ROWID = ?;",Travels.ID_TRAVEL, Tables.TRAVEL);
-            String[] selectionargs = {Long.toString(id)};
-            Cursor cursor= db.rawQuery(sql, selectionargs);
-            int idTravel = cursor.getInt(0);
+//            String sql= String.format("select %s from %s where id_travel = ?",Travels.ID_TRAVEL, Tables.TRAVEL);
+//            String[] selectionargs = {Long.toString(id)};
+//            Cursor cursor= db.rawQuery(sql, selectionargs);
+//            int idTravel = cursor.getInt(0);
             for(Route r : travel.getRoutes()){
-                saveTravelRoute(idTravel, r.getIdRoute());
+                saveTravelRoute(travel.getIdTravel(), r.getIdRoute());
             }
-            if(saveInstruction(idTravel, travel.getInstructions())) return true;
+            if(saveInstruction(travel.getIdTravel(), travel.getInstructions())) return true;
             else return false;
         }else return false;
     }
 
-    public boolean saveTravelRoute(int idTravel, int idRoute) {
+    public boolean saveTravelRoute(int idTravel, int idRoute){
         SQLiteDatabase db = this.getReadableDatabase();
         if (db == null) {
             return false;
@@ -465,8 +466,8 @@ public class DataBaseHelper extends SQLiteOpenHelper {
             ContentValues nuevoRegistro = new ContentValues();
             nuevoRegistro.put(Instructions.ID_TRAVEL, idTravel);
             nuevoRegistro.put(Instructions.INDICATION, i.getIndication());
-            nuevoRegistro.put(Instructions.STOP, i.getStop().getIdStop());
-            db.insert(Tables.TRAVEL_ROUTE, null, nuevoRegistro);
+            if(i.getStop()!=null) nuevoRegistro.put(Instructions.STOP, i.getStop().getIdStop());
+            db.insert(Tables.INSTRUCTION, null, nuevoRegistro);
         }
         return true;
     }

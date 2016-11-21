@@ -1,3 +1,4 @@
+
 package inf.uct.nmicro.fragments;
 
 import android.app.Activity;
@@ -6,6 +7,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.util.Log;
 
+import org.osmdroid.util.GEMFFile;
 import org.osmdroid.util.GeoPoint;
 
 import java.io.IOException;
@@ -22,6 +24,7 @@ import inf.uct.nmicro.model.Point;
 import inf.uct.nmicro.model.Route;
 import inf.uct.nmicro.model.Stop;
 import inf.uct.nmicro.model.Travel;
+import inf.uct.nmicro.sqlite.DataBaseHelper;
 
 /**
  * Created by Esteban Campos A on 11-11-2016.
@@ -98,7 +101,7 @@ public class SearchTraveling extends Activity {
 
 //terminar el metodo
 
-    public List<Travel> GetTravel(List<Company> companies, GeoPoint origen, GeoPoint destino, Geocoder geocoder, String Punto_Origen, String Punto_Destino) {
+    public List<Travel> GetTravel(List<Company> companies, GeoPoint origen, GeoPoint destino, Geocoder geocoder, String Punto_Origen, String Punto_Destino, DataBaseHelper mydb) {
         List<Route> candidato1 = GetRoutebyStartPoint(origen, companies);
         List<Route> candidato2 = GetRoutebyEndpoint(destino, companies);
         List<Route> finales1 = new ArrayList<>();
@@ -155,6 +158,10 @@ public class SearchTraveling extends Activity {
         intermedios.addAll(aux3);
 
         List<Travel> viajes = GetFinalTravels(finales2, finales1, intermedios, geocoder, Punto_Origen, Punto_Destino);
+        for(Travel tr :viajes){
+                mydb.saveTravel(tr);
+
+        }
         return viajes;
 
     }//metodo de busqueda del viaje
@@ -162,21 +169,29 @@ public class SearchTraveling extends Activity {
     public List<Travel> GetFinalTravels(List<Route> Rxorigen, List<Route> Rxdestino, List<GeoPoint> intermedios, Geocoder geocoder, String Punto_Origen, String Punto_Destino) {
         int aux = 0;
         List<Travel> travels = new ArrayList<>();
+        Stop SOringe=new Stop();
+        Stop SFinal=new Stop();
+        List<Address> ub1 = DrawinMap.findLocationByAddress(Punto_Origen + " Temuco, Araucania, Chile", geocoder, getApplication());
+        List<Address> ub2 = DrawinMap.findLocationByAddress(Punto_Destino + " Temuco, Araucania, Chile", geocoder, getApplication());
 
         for (Route r1 : Rxorigen) {
-            aux++;
+
             for (Route r2 : Rxdestino) {
+                SOringe=GetStops(new GeoPoint(ub1.get(0).getLatitude(),ub1.get(0).getLongitude()),r1);
+                SFinal= GetStops(new GeoPoint(ub2.get(0).getLatitude(),ub2.get(0).getLongitude()),r2);
                 List<Instruction> instruccionesFinales=GetInstruccions4Travel(intermedios,r1,r2,Punto_Origen,Punto_Destino,geocoder);
                 List<Route> rtravel = new ArrayList<>();
                 rtravel.add(r2);
                 rtravel.add(r1);
-                travels.add(new Travel(r2.getName() + " - " + r1.getName(), rtravel, instruccionesFinales));
+                travels.add(new Travel(aux,r2.getName() + " - " + r1.getName(), rtravel, instruccionesFinales,SOringe,SFinal));
+                aux++;
             }
         }
         Set<Travel> viajesclean = new HashSet<Travel>();
         viajesclean.addAll(travels);
         travels.clear();
         travels.addAll(viajesclean);
+
         return travels;
     }
 
@@ -221,6 +236,24 @@ public List<Instruction> GetInstruccions4Travel(List<GeoPoint> intermedios, Rout
     Instructions4Travel.add(DestinoFinal);
     return Instructions4Travel;
     }
+
+    public Stop GetStops(GeoPoint gp, Route r){
+        Stop st1=new Stop();
+        for(Stop st : r.getStops()){
+            int a=new GeoPoint(st.getLatitude(),st.getLongitude()).distanceTo(gp);
+            if(a<=150){
+                st1=st;
+                break;
+            }
+        }
+        return st1;
+    }
+
+
+
+
+
+
 }
 
 

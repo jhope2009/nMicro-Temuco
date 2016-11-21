@@ -177,7 +177,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             GeoPoint pto1 = new GeoPoint(ub1.get(0).getLatitude(), ub1.get(0).getLongitude());
                             GeoPoint pto2 = new GeoPoint(ub2.get(0).getLatitude(), ub2.get(0).getLongitude());
                             //Ejecuta tarea asincronica
-                            buttonTask.execute(companies, pto1, pto2,ub1.get(0).toString(),ub2.get(0).toString());
+                            buttonTask.execute(companies, pto1, pto2,ori,des);
 
                         }else{
                             Toast.makeText(getApplicationContext(), "No se encontraron Direcciones", Toast.LENGTH_LONG).show();
@@ -432,8 +432,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Travel cat;
                 if (travels != null && !travels.isEmpty()) {
                     for (Travel travel : travels) {
-                        cat = new Travel(travel.getIdTravel(), travel.getRoutes(), travel.getPrice(), travel.getStartStop(), travel.getEndStop(), travel.getTotalTime(), travel.getStartHour(), travel.getEndHour(),travel.getInstructions());
-                        category.add(cat);
+                      //  cat = new Travel(travel.getIdTravel(), travel.getRoutes(), travel.getPrice(), travel.getStartStop(), travel.getEndStop(), travel.getTotalTime(), travel.getStartHour(), travel.getEndHour(),travel.getInstructions());
+                       // category.add(cat);
                     }
                 }
                 ListView lv = (ListView) findViewById(R.id.ListView);
@@ -581,19 +581,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         int b = DrawinMap.isRouteInArea2(r, pto2);
                         if (a < b) {
                             rutas.add(new Route(r.getIdRoute(),r.getName(),r.getStops(),r.getPoints(),getDrawable(getResources().getIdentifier(r.getIcon(), "drawable", getPackageName()))));
-                            Travel tr=new Travel(rutas.get(0).getIdRoute(),r.getName().toString(),rutas);
+                            Travel tr=new Travel(r.getName().toString(),rutas);
                             compa.add(tr);
                         }
                     }
                 }
             }
-            travels=travel.GetTravel(companies,pto1,pto2,geocoder2,Origen,Destino);
-            for(Travel tr :travels){
-                Log.i("Mostarndo el nombre del viaje",tr.getname());
-                for(Instruction ins : tr.getInstructions()){
-                    Log.i("las instrucciones",ins.getIndication());
-                }
-            }
+            travels=travel.GetTravel(companies,pto1,pto2,geocoder2,Origen,Destino,myDbHelper);
             return (GeoPoint)params[1];
         }
 

@@ -45,7 +45,7 @@ public class ConnectWS extends AsyncTask{
             try{
                 String username = "admin";
                 String password = "admin";
-                String link = "http://192.168.1.35/microenparaderoconid.php?cadena="+(String)objects[0];
+                String link = "http://169.254.38.37/microenparaderoconid.php?cadena="+(String)objects[0];
 
                 URL url = new URL(link);
                 HttpClient client = new DefaultHttpClient();
