@@ -53,6 +53,9 @@ public class Travel {
         return name;
 
     }
+    public void SetName(String g){
+        this.name=g;
+    }
     public int getIdTravel() {
         return idTravel;
     }

@@ -37,6 +37,7 @@ import java.util.Locale;
 import inf.uct.nmicro.MainActivity;
 import inf.uct.nmicro.R;
 import inf.uct.nmicro.model.Company;
+import inf.uct.nmicro.model.Instruction;
 import inf.uct.nmicro.model.Route;
 import inf.uct.nmicro.model.Stop;
 import inf.uct.nmicro.model.Travel;
@@ -61,13 +62,13 @@ public class traveling extends Activity {
     private MapController mapController;
     private List<CustomMarker> Markers_stop;
     ArrayList<Integer> getRoutes;
-
+    ArrayList<String> getDirections;
     private DataBaseHelper myDbHelper;
     private LinearLayout animado;
     DrawInMap DrawinMap = new DrawInMap();
     PathOverlay pathO;
     MapView map;
-
+    SearchTraveling Straveling=new SearchTraveling();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +76,7 @@ public class traveling extends Activity {
         //recibo los datos del main_activity
         Intent intent = getIntent();
         getRoutes = intent.getIntegerArrayListExtra(MainActivity.rutasSeleccionadas);
+        getDirections=intent.getStringArrayListExtra(MainActivity.rutasSeleccionadas2);
         //inicio el asist de base de datos.
         myDbHelper = new DataBaseHelper(this);
         try {
@@ -82,6 +84,8 @@ public class traveling extends Activity {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        List<Company> companies=myDbHelper.findCompanies();
+
         pathO = new PathOverlay(Color.BLACK, 10, this);
         setContentView(R.layout.traveling);
         org.osmdroid.tileprovider.constants.OpenStreetMapTileProviderConstants.setUserAgentValue(android.support.v4.BuildConfig.APPLICATION_ID);
@@ -93,10 +97,19 @@ public class traveling extends Activity {
         mapController.setZoom(15);
         GeoPoint Temuco = new GeoPoint(-38.7392, -72.6087);
         mapController.setCenter(Temuco);
-        //List<Company> companies = myDbHelper.findCompanies();
-        //List<Route> rutas = FindRoutes(companies, getRoutes);
-        Log.i("El id del viaje",String.valueOf(getRoutes.get(0)));
-        Travel travel =myDbHelper.findTravelById(getRoutes.get(0));
+        //paso los dos rutas desde el activity armo el viaje de nuevo y no ocupo la base  de datos.
+        List<Route> NewViaje= FindRoutes(companies,getRoutes);
+        Travel viaje=Straveling.GetTheTravel(NewViaje,getDirections);
+        Log.i("El nombre del viaje",viaje.getname());
+        for(Route r :viaje.getRoutes()){
+            Log.i("rutas del viaje",r.getName());
+        }
+        for(Instruction instruction :viaje.getInstructions()) {
+            Log.i("instrucciones del viaje", instruction.getIndication());
+        }
+
+
+
 
         animado = (LinearLayout) findViewById(R.id.fabtoolbar_toolbar);
         Drawable icon = this.getResources().getDrawable(R.drawable.ic_bustop);
@@ -115,9 +128,6 @@ public class traveling extends Activity {
             });
         }
 
-        for(Route r : travel.getRoutes()){
-            DrawinMap.DrawRoute(map,r,pathO);
-        }
     }
     public List<Route> FindRoutes(List<Company> co, List<Integer> ru) {
         List<Route> rutas = new ArrayList<>();

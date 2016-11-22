@@ -102,7 +102,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     LocationManager locationManager;
     String mprovider;
     public final static String rutasSeleccionadas = "traveling";
+    public final static String rutasSeleccionadas2 = "traveling";
     public ArrayList<Integer> ParaActivityTraveler=new ArrayList<>();
+    public ArrayList<String> ParaActivityTraveler2=new ArrayList<>();
     SearchTraveling travel=new SearchTraveling();
     public static final int DIALOG_DOWNLOAD_PROGRESS = 0;
     private ProgressDialog mProgressDialog;
@@ -156,7 +158,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 String ori = inicio.getText().toString();
                 String des = destino.getText().toString();
-
+                ParaActivityTraveler2.add(ori);
+                ParaActivityTraveler2.add(des);
                 if (!des.isEmpty()) {
                     if (ori.isEmpty()) {
                         Location loc = GetCurrentLocation();
@@ -368,6 +371,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         ParaActivityTraveler.add(category.get(pos).getIdRoute());
                         Intent intent=new Intent(getApplicationContext(),traveling.class);
                         intent.putExtra(rutasSeleccionadas,ParaActivityTraveler);
+                        intent.putExtra(rutasSeleccionadas2,ParaActivityTraveler2);
                         startActivity(intent);
                     }
                 });
@@ -432,8 +436,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         final int pos = position;
-                        myDbHelper.saveTravel(category.get(pos));
-                        ParaActivityTraveler.add(category.get(pos).getIdTravel());
+                       // myDbHelper.saveTravel(category.get(pos));
+                       for(Travel tr : travels){
+                           for(Route r : tr.getRoutes()) {
+                               ParaActivityTraveler.add(r.getIdRoute());}
+
+                       }
                         Intent intent=new Intent(getApplicationContext(),traveling.class);
                         intent.putExtra(rutasSeleccionadas,ParaActivityTraveler);
                         startActivity(intent);

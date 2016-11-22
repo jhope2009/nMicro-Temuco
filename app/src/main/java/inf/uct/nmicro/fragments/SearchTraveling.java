@@ -101,6 +101,34 @@ public class SearchTraveling extends Activity {
 
 //terminar el metodo
 
+    public Travel GetTheTravel(List<Route> r,List<String> direcciones){
+                Travel viaje=new Travel();
+                List<GeoPoint> intermedio=getIntermedios(r.get(0),r.get(1));
+                List<Instruction> instructions=GetInstruccions4Travel(intermedio,r.get(0),r.get(1),direcciones.get(0),direcciones.get(1));
+                viaje.setRoutes(r);
+                viaje.SetName(r.get(0).getName()+r.get(1).getName());
+                viaje.setInstructions(instructions);
+
+
+        return viaje;
+
+    }
+
+
+    public List<GeoPoint> getIntermedios(Route Origen,Route Destino){
+        List<GeoPoint> intermedios = new ArrayList<>();
+        for(Point pt1 :Origen.getPoints()){
+                GeoPoint gp =new GeoPoint(pt1.getLatitude(),pt1.getLongitude());
+                if(DrawinMap.isRouteInArea(Destino,gp)){
+                    intermedios.add(gp);
+
+                }
+        }
+        return intermedios;
+    }
+
+
+
     public List<Travel> GetTravel(List<Company> companies, GeoPoint origen, GeoPoint destino, Geocoder geocoder, String Punto_Origen, String Punto_Destino, DataBaseHelper mydb) {
         List<Route> candidato1 = GetRoutebyStartPoint(origen, companies);
         List<Route> candidato2 = GetRoutebyEndpoint(destino, companies);
@@ -175,7 +203,7 @@ public class SearchTraveling extends Activity {
             for (Route r2 : Rxdestino) {
                 SOringe=GetStops(new GeoPoint(ub1.get(0).getLatitude(),ub1.get(0).getLongitude()),r1);
                 SFinal= GetStops(new GeoPoint(ub2.get(0).getLatitude(),ub2.get(0).getLongitude()),r2);
-                List<Instruction> instruccionesFinales=GetInstruccions4Travel(intermedios,r1,r2,Punto_Origen,Punto_Destino,geocoder);
+                List<Instruction> instruccionesFinales=GetInstruccions4Travel(intermedios,r1,r2,Punto_Origen,Punto_Destino);
                 List<Route> rtravel = new ArrayList<>();
                 rtravel.add(r2);
                 rtravel.add(r1);
@@ -191,7 +219,7 @@ public class SearchTraveling extends Activity {
         return travels;
     }
 
-public List<Instruction> GetInstruccions4Travel(List<GeoPoint> intermedios, Route Ruta_Origen, Route RutaDestino, String Punto_Origen, String Punto_Destino, Geocoder geocoder){
+public List<Instruction> GetInstruccions4Travel(List<GeoPoint> intermedios, Route Ruta_Origen, Route RutaDestino, String Punto_Origen, String Punto_Destino){
     List<Instruction> Instructions4Travel=new ArrayList<Instruction>();
     Instructions4Travel.clear();
     List<String> direcciones = new ArrayList<>();
