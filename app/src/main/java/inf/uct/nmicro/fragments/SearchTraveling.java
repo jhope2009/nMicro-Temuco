@@ -113,8 +113,6 @@ public class SearchTraveling extends Activity {
         return viaje;
 
     }
-
-
     public List<GeoPoint> getIntermedios(Route Origen,Route Destino){
         List<GeoPoint> intermedios = new ArrayList<>();
         for(Point pt1 :Origen.getPoints()){
@@ -193,16 +191,15 @@ public class SearchTraveling extends Activity {
     public List<Travel> GetFinalTravels(List<Route> Rxorigen, List<Route> Rxdestino, List<GeoPoint> intermedios, Geocoder geocoder, String Punto_Origen, String Punto_Destino) {
         int aux = 0;
         List<Travel> travels = new ArrayList<>();
-        Stop SOringe=new Stop();
-        Stop SFinal=new Stop();
+
         List<Address> ub1 = DrawinMap.findLocationByAddress(Punto_Origen + " Temuco, Araucania, Chile", geocoder, getApplication());
         List<Address> ub2 = DrawinMap.findLocationByAddress(Punto_Destino + " Temuco, Araucania, Chile", geocoder, getApplication());
 
         for (Route r1 : Rxorigen) {
 
             for (Route r2 : Rxdestino) {
-                SOringe=GetStops(new GeoPoint(ub1.get(0).getLatitude(),ub1.get(0).getLongitude()),r1);
-                SFinal= GetStops(new GeoPoint(ub2.get(0).getLatitude(),ub2.get(0).getLongitude()),r2);
+               Stop SOringe=GetStops(new GeoPoint(ub1.get(0).getLatitude(),ub1.get(0).getLongitude()),r1);
+               Stop  SFinal= GetStops(new GeoPoint(ub2.get(0).getLatitude(),ub2.get(0).getLongitude()),r2);
                 List<Instruction> instruccionesFinales=GetInstruccions4Travel(intermedios,r1,r2,Punto_Origen,Punto_Destino);
                 List<Route> rtravel = new ArrayList<>();
                 rtravel.add(r2);
@@ -233,8 +230,9 @@ public List<Instruction> GetInstruccions4Travel(List<GeoPoint> intermedios, Rout
         for(GeoPoint gpI: intermedios) {
             GeoPoint gp = new GeoPoint(st.getLatitude(), st.getLongitude());
             diferencia=gp.distanceTo(gpI);
-            if(diferencia<=250){
+            if(diferencia<=550){
                 bajada1.setIndication("Bajate en: "+st.getAddress());
+                Log.i("La parada ",String.valueOf(st.getIdStop())+st.getAddress());
                 bajada1.setStop(st);
                 Instructions4Travel.add(bajada1);
                 break outloop2;
@@ -265,7 +263,7 @@ public List<Instruction> GetInstruccions4Travel(List<GeoPoint> intermedios, Rout
         Stop st1=new Stop();
         for(Stop st : r.getStops()){
             int a=new GeoPoint(st.getLatitude(),st.getLongitude()).distanceTo(gp);
-            if(a<=250){
+            if(a<=5250){
                 st1=st;
                 break;
             }

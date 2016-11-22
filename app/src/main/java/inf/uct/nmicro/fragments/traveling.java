@@ -76,7 +76,7 @@ public class traveling extends Activity {
         //recibo los datos del main_activity
         Intent intent = getIntent();
         getRoutes = intent.getIntegerArrayListExtra(MainActivity.rutasSeleccionadas);
-        getDirections=intent.getStringArrayListExtra(MainActivity.rutasSeleccionadas2);
+       // getDirections=intent.getStringArrayListExtra(MainActivity.rutasSeleccionadas2);
         //inicio el asist de base de datos.
         myDbHelper = new DataBaseHelper(this);
         try {
@@ -97,36 +97,12 @@ public class traveling extends Activity {
         mapController.setZoom(15);
         GeoPoint Temuco = new GeoPoint(-38.7392, -72.6087);
         mapController.setCenter(Temuco);
-        //paso los dos rutas desde el activity armo el viaje de nuevo y no ocupo la base  de datos.
-        List<Route> NewViaje= FindRoutes(companies,getRoutes);
-        Travel viaje=Straveling.GetTheTravel(NewViaje,getDirections);
-        Log.i("El nombre del viaje",viaje.getname());
-        for(Route r :viaje.getRoutes()){
-            Log.i("rutas del viaje",r.getName());
-        }
-        for(Instruction instruction :viaje.getInstructions()) {
-            Log.i("instrucciones del viaje", instruction.getIndication());
-        }
 
-
-
+      //  Travel viaje=myDbHelper.findTravelById(getRoutes.get(0));
 
         animado = (LinearLayout) findViewById(R.id.fabtoolbar_toolbar);
         Drawable icon = this.getResources().getDrawable(R.drawable.ic_bustop);
-        //Markers_stop = DrawinMap.DrawStopsByRoute(rutas, myDbHelper, icon, map);
 
-        for (CustomMarker mak : Markers_stop) {
-            mak.setOnMarkerClickListener(new org.osmdroid.views.overlay.Marker.OnMarkerClickListener() {
-                @Override
-                public boolean onMarkerClick(org.osmdroid.views.overlay.Marker marker, MapView mapView) {
-                    //createListWithAdapter(myDbHelper.findRoutesByStop(mak.getIdMarker()),0);
-                    Toast.makeText(getApplication(), ""+getRoutes.toString(), Toast.LENGTH_SHORT).show();
-                    //aqui llamo a la clase que realiza la coneccion con el WS y le paso parametros concatenados por coma
-                    //new ConnectWS(getApplication(),animado,0).execute(getRoutes.get(0)+","+mak.getPosition().getLatitude()+","+mak.getPosition().getLongitude());
-                    return false;
-                }
-            });
-        }
 
     }
     public List<Route> FindRoutes(List<Company> co, List<Integer> ru) {

@@ -256,22 +256,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public boolean onLongPress(final MotionEvent e, final MapView mapView) {
 
-                /*
-                *
-                * Esta es una posibilidad pero creo que no lo sera de momento
-                * y lo otro que podria hacer es crear otro adapter
-                *
-                GeoPoint pto1 = null;
-                try {
-                    Location loc = GetCurrentLocation();
-                    List<Address> ub0 = geocoder.getFromLocation(loc.getLatitude(), loc.getLongitude(), 1);
-                    pto1 = new GeoPoint(ub0.get(0).getLatitude(), ub0.get(0).getLongitude());
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
-                *
-                *
-                * */
                 final Drawable marker = getApplicationContext().getResources().getDrawable(R.drawable.marker_default);
                 Projection proj = mapView.getProjection();
                 GeoPoint loc = (GeoPoint) proj.fromPixels((int) e.getX(), (int) e.getY());
@@ -371,7 +355,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         ParaActivityTraveler.add(category.get(pos).getIdRoute());
                         Intent intent=new Intent(getApplicationContext(),traveling.class);
                         intent.putExtra(rutasSeleccionadas,ParaActivityTraveler);
-                        intent.putExtra(rutasSeleccionadas2,ParaActivityTraveler2);
+                       // intent.putExtra(rutasSeleccionadas2,ParaActivityTraveler2);
                         startActivity(intent);
                     }
                 });
@@ -426,7 +410,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Travel cat;
                 if (travels != null && !travels.isEmpty()) {
                     for (Travel travel : travels) {
-                        cat = new Travel(travel.getIdTravel(),travel.getname(), travel.getRoutes()) ;
+                        cat = new Travel(travel.getIdTravel(),travel.getname(), travel.getRoutes(),travel.getInstructions(), travel.getStartStop(),travel.getEndStop()) ;
                         category.add(cat);
                     }
                 }
@@ -436,12 +420,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         final int pos = position;
-                       // myDbHelper.saveTravel(category.get(pos));
-                       for(Travel tr : travels){
-                           for(Route r : tr.getRoutes()) {
-                               ParaActivityTraveler.add(r.getIdRoute());}
 
-                       }
+                        myDbHelper.saveTravel(category.get(pos));
+                        Travel tr=myDbHelper.findTravelById(category.get(pos).getIdTravel());
+                        Log.i("tr",tr.getname()+tr.getIdTravel());
+                        ParaActivityTraveler.add(category.get(pos).getIdTravel());
                         Intent intent=new Intent(getApplicationContext(),traveling.class);
                         intent.putExtra(rutasSeleccionadas,ParaActivityTraveler);
                         startActivity(intent);
@@ -470,6 +453,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         final int pos = position;
+                        myDbHelper.saveTravel(category.get(pos));
                         ParaActivityTraveler.add(category.get(pos).getIdTravel());
                         Intent intent=new Intent(getApplicationContext(),traveling.class);
                         intent.putExtra(rutasSeleccionadas,ParaActivityTraveler);
@@ -628,7 +612,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             pDialog.dismiss();
             createListWithAdapterTravel(compa,1,(GeoPoint)o);
             if(compa.size()==0){
-                createListWithAdapterTravel(travels,1,(GeoPoint)o);
+                createListWithAdapterTravel(travels,0,(GeoPoint)o);
             }
         }
     }
