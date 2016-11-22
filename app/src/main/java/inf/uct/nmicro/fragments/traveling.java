@@ -11,6 +11,8 @@ import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.TabLayout;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.LinearLayout;
@@ -37,6 +39,7 @@ import inf.uct.nmicro.R;
 import inf.uct.nmicro.model.Company;
 import inf.uct.nmicro.model.Route;
 import inf.uct.nmicro.model.Stop;
+import inf.uct.nmicro.model.Travel;
 import inf.uct.nmicro.sqlite.DataBaseHelper;
 import inf.uct.nmicro.fragments.CustomMarker;
 import inf.uct.nmicro.utils.AdapterRoute;
@@ -90,11 +93,14 @@ public class traveling extends Activity {
         mapController.setZoom(15);
         GeoPoint Temuco = new GeoPoint(-38.7392, -72.6087);
         mapController.setCenter(Temuco);
-        List<Company> companies = myDbHelper.findCompanies();
-        List<Route> rutas = FindRoutes(companies, getRoutes);
+        //List<Company> companies = myDbHelper.findCompanies();
+        //List<Route> rutas = FindRoutes(companies, getRoutes);
+        Log.i("El id del viaje",String.valueOf(getRoutes.get(0)));
+        Travel travel =myDbHelper.findTravelById(getRoutes.get(0));
+
         animado = (LinearLayout) findViewById(R.id.fabtoolbar_toolbar);
         Drawable icon = this.getResources().getDrawable(R.drawable.ic_bustop);
-        Markers_stop = DrawinMap.DrawStopsByRoute(rutas, myDbHelper, icon, map);
+        //Markers_stop = DrawinMap.DrawStopsByRoute(rutas, myDbHelper, icon, map);
 
         for (CustomMarker mak : Markers_stop) {
             mak.setOnMarkerClickListener(new org.osmdroid.views.overlay.Marker.OnMarkerClickListener() {
@@ -109,7 +115,7 @@ public class traveling extends Activity {
             });
         }
 
-        for(Route r : rutas){
+        for(Route r : travel.getRoutes()){
             DrawinMap.DrawRoute(map,r,pathO);
         }
     }

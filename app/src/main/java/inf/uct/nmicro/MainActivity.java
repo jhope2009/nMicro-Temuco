@@ -141,6 +141,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         butS.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                myDbHelper.removeAllTravels();
                 List<Company> companies = myDbHelper.findCompanies();
                 for(Company c :companies){
                   for(Route r :c.getRoutes()){
@@ -364,8 +365,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         final int pos = position;
                         System.out.println(category.get(pos).getPoints());
-                        // DrawinMap.DrawRoute(map, category.get(pos), routesDraw);
-                        // morph.hide();
                         ParaActivityTraveler.add(category.get(pos).getIdRoute());
                         Intent intent=new Intent(getApplicationContext(),traveling.class);
                         intent.putExtra(rutasSeleccionadas,ParaActivityTraveler);
@@ -433,7 +432,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         final int pos = position;
-
+                        myDbHelper.saveTravel(category.get(pos));
                         ParaActivityTraveler.add(category.get(pos).getIdTravel());
                         Intent intent=new Intent(getApplicationContext(),traveling.class);
                         intent.putExtra(rutasSeleccionadas,ParaActivityTraveler);
@@ -453,8 +452,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Travel cat;
                 if (travels != null && !travels.isEmpty()) {
                     for (Travel travel : travels) {
-                      //  cat = new Travel(travel.getIdTravel(), travel.getRoutes(), travel.getPrice(), travel.getStartStop(), travel.getEndStop(), travel.getTotalTime(), travel.getStartHour(), travel.getEndHour(),travel.getInstructions());
-                       // category.add(cat);
+                        cat = new Travel(travel.getIdTravel(),travel.getname(), travel.getRoutes(), travel.getStartStop(), travel.getEndStop(),travel.getPrice(),travel.getInstructions());
+                        category.add(cat);
                     }
                 }
                 ListView lv = (ListView) findViewById(R.id.ListView);
@@ -463,6 +462,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         final int pos = position;
+                        ParaActivityTraveler.add(category.get(pos).getIdTravel());
+                        Intent intent=new Intent(getApplicationContext(),traveling.class);
+                        intent.putExtra(rutasSeleccionadas,ParaActivityTraveler);
+                        startActivity(intent);
 
                         morph.hide();
                     }

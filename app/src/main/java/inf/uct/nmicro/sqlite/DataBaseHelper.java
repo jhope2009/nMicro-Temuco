@@ -356,7 +356,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         if (db == null) {
             return null;
         }
-        String sql= String.format("select * from %s where %s = ?;",Tables.TRAVEL, Travels.ID_TRAVEL);
+        String sql= String.format("select * from %s where %s = ?",Tables.TRAVEL, Travels.ID_TRAVEL);
         String[] selectionargs = {Integer.toString(id)};
         Cursor cursor= db.rawQuery(sql, selectionargs);
         Travel travel= new Travel(cursor.getInt(0), cursor.getString(1), findRoutesByTravel(cursor.getInt(0)),
@@ -369,7 +369,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         if (db == null) {
             return null;
         }
-        String sql= String.format("select * from %s where %s = ?;",Tables.STOP, Stops.ID_STOP);
+        String sql= String.format("select * from %s where %s = ?",Tables.STOP, Stops.ID_STOP);
         String[] selectionargs = {Integer.toString(id)};
         Cursor cursor= db.rawQuery(sql, selectionargs);
         Stop stop = new Stop(cursor.getInt(0), cursor.getString(1), cursor.getDouble(2), cursor.getDouble(3));
@@ -429,10 +429,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         Long id = db.insert(Tables.TRAVEL, null, nuevoRegistro);
 
         if(id!=-1){
-//            String sql= String.format("select %s from %s where id_travel = ?",Travels.ID_TRAVEL, Tables.TRAVEL);
-//            String[] selectionargs = {Long.toString(id)};
-//            Cursor cursor= db.rawQuery(sql, selectionargs);
-//            int idTravel = cursor.getInt(0);
             for(Route r : travel.getRoutes()){
                 saveTravelRoute(travel.getIdTravel(), r.getIdRoute());
             }

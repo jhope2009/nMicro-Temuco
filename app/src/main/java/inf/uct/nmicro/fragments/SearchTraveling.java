@@ -158,10 +158,6 @@ public class SearchTraveling extends Activity {
         intermedios.addAll(aux3);
 
         List<Travel> viajes = GetFinalTravels(finales2, finales1, intermedios, geocoder, Punto_Origen, Punto_Destino);
-        for(Travel tr :viajes){
-                mydb.saveTravel(tr);
-
-        }
         return viajes;
 
     }//metodo de busqueda del viaje
@@ -224,7 +220,7 @@ public List<Instruction> GetInstruccions4Travel(List<GeoPoint> intermedios, Rout
         for(GeoPoint gp : intermedios){
             diferencia=gp.distanceTo(new GeoPoint(st.getLatitude(),gp.getLongitude()));
             if(diferencia<=150){
-                bajada2.setIndication("Toma la micro :"+Ruta_Origen.getName()+" en: "+st.getAddress());
+                bajada2.setIndication("Toma la micro: "+Ruta_Origen.getName()+" en: "+st.getAddress());
                 bajada2.setStop(st);
                 Instructions4Travel.add(bajada2);
                 break outloop;
@@ -241,7 +237,7 @@ public List<Instruction> GetInstruccions4Travel(List<GeoPoint> intermedios, Rout
         Stop st1=new Stop();
         for(Stop st : r.getStops()){
             int a=new GeoPoint(st.getLatitude(),st.getLongitude()).distanceTo(gp);
-            if(a<=150){
+            if(a<=250){
                 st1=st;
                 break;
             }
