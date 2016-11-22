@@ -21,25 +21,25 @@ import inf.uct.nmicro.R;
 import inf.uct.nmicro.model.Route;
 
 
-public class AdapterRoute extends BaseAdapter {
+public class AdapterIndicator extends BaseAdapter {
 
     protected Activity activity;
     protected Fragment fragment;
-    protected ArrayList<Route> items;
+    protected ArrayList<String> items;
     protected GeoPoint p;
 
-    public AdapterRoute(Activity activity) {
+    public AdapterIndicator(Activity activity) {
         this.activity = activity;
-        items = new ArrayList<Route>();
+        items = new ArrayList<String>();
     }
 
-    public AdapterRoute(Activity activity, ArrayList<Route> items, GeoPoint p) {
+    public AdapterIndicator(Activity activity, ArrayList<String> items, GeoPoint p) {
         this.activity = activity;
         this.items = items;
         this.p = p;
     }
 
-    public AdapterRoute(Fragment fragment, ArrayList<Route> items) {
+    public AdapterIndicator(Fragment fragment, ArrayList<String> items) {
         this.fragment = fragment;
         this.items = items;
     }
@@ -53,12 +53,6 @@ public class AdapterRoute extends BaseAdapter {
         items.clear();
     }
 
-    public void addAll(ArrayList<Route> route) {
-        for (int i = 0; i < route.size(); i++) {
-            items.add(route.get(i));
-        }
-    }
-
     @Override
     public Object getItem(int arg0) {
         return items.get(arg0);
@@ -66,14 +60,13 @@ public class AdapterRoute extends BaseAdapter {
 
     @Override
     public long getItemId(int position) {
-        return items.get(position).getIdRoute();
+        return position;
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
         View v = convertView;
-        Route dir = items.get(position);
         //aqui llamo a la clase que realiza la coneccion con el WS y le paso parametros concatenados por coma
 
 
@@ -85,17 +78,11 @@ public class AdapterRoute extends BaseAdapter {
 
 
         TextView title = (TextView) v.findViewById(R.id.category);
-        title.setText(dir.getName());
+        //title.setText(dir.getName());
 
         TextView title1 = (TextView) v.findViewById(R.id.textView4);
-        TextView title2 = (TextView) v.findViewById(R.id.textView5);
-        TextView title3 = (TextView) v.findViewById(R.id.textView6);
 
-        ImageView imagen = (ImageView) v.findViewById(R.id.imageView4);
-        imagen.setImageDrawable(dir.getImg());
-
-
-        new ConnectWS(activity, title1, title2, title3, 0).execute(dir.getIdRoute()+","+p.getLatitude()+","+p.getLongitude());
+        //new ConnectWS(activity, title1, title2, title3, 0).execute(dir.getIdRoute()+","+p.getLatitude()+","+p.getLongitude());
         return v;
     }
 }

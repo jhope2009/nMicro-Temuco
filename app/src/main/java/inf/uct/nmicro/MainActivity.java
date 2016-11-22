@@ -45,6 +45,7 @@ import com.github.fafaldo.fabtoolbar.widget.FABToolbarLayout;
 import com.unnamed.b.atv.model.TreeNode;
 import com.unnamed.b.atv.view.AndroidTreeView;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.BoundingBoxE6;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
@@ -164,6 +165,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             DrawinMap.DrawFindLocation(ub0, ub2, map, routesDraw,getApplication());
                             GeoPoint pto1 = new GeoPoint(ub0.get(0).getLatitude(), ub0.get(0).getLongitude());
                             GeoPoint pto2 = new GeoPoint(ub2.get(0).getLatitude(), ub2.get(0).getLongitude());
+                            //este es un cambio
+                            int minLat = Integer.MAX_VALUE;
+                            int maxLat = Integer.MIN_VALUE;
+                            int minLong = Integer.MAX_VALUE;
+                            int maxLong = Integer.MIN_VALUE;
+                            List<GeoPoint> pont = new ArrayList<GeoPoint>();
+                            pont.add(pto1);
+                            pont.add(pto2);
+                            for (GeoPoint gp : pont) {
+                                if (gp.getLatitudeE6() < minLat)
+                                    minLat = gp.getLatitudeE6();
+                                if (gp.getLatitudeE6() > maxLat)
+                                    maxLat = gp.getLatitudeE6();
+                                if (gp.getLongitudeE6() < minLong)
+                                    minLong = gp.getLongitudeE6();
+                                if (gp.getLongitudeE6() > maxLong)
+                                    maxLong = gp.getLongitudeE6();
+                            }
+                            BoundingBoxE6 boundingBox = new BoundingBoxE6(maxLat, maxLong, minLat, minLong);
+                            mapController.zoomToSpan(boundingBox);
                             //Ejecuta tarea asincronica
                             buttonTask.execute(companies, pto1, pto2,ub0.get(0).toString(),ub2.get(0).toString());
 
@@ -547,8 +568,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Location loc = null;
         return loc;
     }
-
-
     // tarea asincornica para la busqueda de rutas por origen y destino
     class CustomTask extends AsyncTask{
         Geocoder geocoder2 = new Geocoder(getApplication(), Locale.getDefault());

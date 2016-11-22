@@ -15,7 +15,7 @@
 
         <LinearLayout
             android:orientation="vertical"
-            android:layout_weight="8"
+            android:layout_weight="10"
             android:layout_height="match_parent"
             android:layout_width="0dp"
             android:weightSum="10"
@@ -28,7 +28,7 @@
                 android:text="Titulo Frase"
                 android:id="@+id/category"
                 android:textSize="21sp"
-                android:textColor="@color/colorPrimaryDark"
+                android:textColor="@color/common_google_signin_btn_text_dark_focused"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentStart="true"
                 android:layout_toStartOf="@+id/imageView4"
@@ -52,42 +52,8 @@
                     android:id="@+id/textView4"
                     android:layout_weight="1" />
 
-                <TextView
-                    android:text="TextView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:id="@+id/textView5"
-                    android:layout_weight="1" />
-
-                <TextView
-                    android:text="TextView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:id="@+id/textView6"
-                    android:layout_weight="1" />
             </LinearLayout>
 
-        </LinearLayout>
-
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_weight="2"
-            android:layout_height="match_parent"
-            android:layout_width="0dp">
-
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="73dp"
-                android:id="@+id/imageView4"
-                android:src="@drawable/marker_default"
-                android:adjustViewBounds="false"
-                android:scaleType="fitStart"
-                android:cropToPadding="false"
-                android:layout_alignTop="@+id/category"
-                android:layout_alignParentEnd="true"
-                android:layout_weight="0.81"
-                android:layout_marginTop="2dp"
-                android:layout_marginBottom="2dp" />
         </LinearLayout>
 
     </LinearLayout>
