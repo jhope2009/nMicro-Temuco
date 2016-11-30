@@ -23,13 +23,6 @@ public class ITablesDB {
 		String ICON = "icon";
 	}
 
-	interface ColumnsBus{
-		String ID_BUS = "id_bus";
-		String ID_ROUTE_GOING = "id_route_going";
-		String ID_ROUTE_RETURN = "id_route_return";
-		String REGISTER = "register";
-	}
-
 	interface ColumnsStop{
 		String ID_STOP = "id_stop";
 		String ADDRESS = "address";
@@ -77,7 +70,6 @@ public class ITablesDB {
     }
 
 	public static class Routes implements ColumnsRoute{	}
-	public static class Buses implements ColumnsBus{ }
 	public static class Stops implements ColumnsStop{ }
 	public static class Companies implements ColumnsCompany{ }
 	public static class Points implements ColumnsPoint{	}

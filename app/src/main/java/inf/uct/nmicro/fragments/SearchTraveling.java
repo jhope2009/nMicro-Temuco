@@ -32,7 +32,6 @@ import inf.uct.nmicro.sqlite.DataBaseHelper;
 public class SearchTraveling extends Activity {
 
     private final int POSITION_DIAMETER = 250;
-    private final int POSITION_POINT = 150;
     DrawInMap DrawinMap = new DrawInMap();
 
     public List<Route> GetRoutebyStartPoint(GeoPoint startPoint, List<Company> companies) {
@@ -196,7 +195,6 @@ public class SearchTraveling extends Activity {
         List<Address> ub2 = DrawinMap.findLocationByAddress(Punto_Destino + " Temuco, Araucania, Chile", geocoder, getApplication());
 
         for (Route r1 : Rxorigen) {
-
             for (Route r2 : Rxdestino) {
                Stop SOringe=GetStops(new GeoPoint(ub1.get(0).getLatitude(),ub1.get(0).getLongitude()),r1);
                Stop  SFinal= GetStops(new GeoPoint(ub2.get(0).getLatitude(),ub2.get(0).getLongitude()),r2);

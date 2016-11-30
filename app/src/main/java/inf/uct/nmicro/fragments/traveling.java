@@ -43,7 +43,9 @@ import inf.uct.nmicro.model.Stop;
 import inf.uct.nmicro.model.Travel;
 import inf.uct.nmicro.sqlite.DataBaseHelper;
 import inf.uct.nmicro.fragments.CustomMarker;
+import inf.uct.nmicro.utils.AdapterIndicator;
 import inf.uct.nmicro.utils.AdapterRoute;
+import inf.uct.nmicro.utils.AdapterTravel;
 import inf.uct.nmicro.utils.ConnectWS;
 
 /**
@@ -63,12 +65,14 @@ public class traveling extends Activity {
     private List<CustomMarker> Markers_stop;
     ArrayList<Integer> getRoutes;
     ArrayList<String> getDirections;
+    private AppBarLayout bar;
     private DataBaseHelper myDbHelper;
     private LinearLayout animado;
     DrawInMap DrawinMap = new DrawInMap();
     PathOverlay pathO;
     MapView map;
     SearchTraveling Straveling=new SearchTraveling();
+    private AdapterIndicator adapterIndicator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +80,6 @@ public class traveling extends Activity {
         //recibo los datos del main_activity
         Intent intent = getIntent();
         getRoutes = intent.getIntegerArrayListExtra(MainActivity.rutasSeleccionadas);
-       // getDirections=intent.getStringArrayListExtra(MainActivity.rutasSeleccionadas2);
         //inicio el asist de base de datos.
         myDbHelper = new DataBaseHelper(this);
         try {
@@ -84,7 +87,6 @@ public class traveling extends Activity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        List<Company> companies=myDbHelper.findCompanies();
 
         pathO = new PathOverlay(Color.BLACK, 10, this);
         setContentView(R.layout.traveling);
@@ -97,12 +99,7 @@ public class traveling extends Activity {
         mapController.setZoom(15);
         GeoPoint Temuco = new GeoPoint(-38.7392, -72.6087);
         mapController.setCenter(Temuco);
-
-      //  Travel viaje=myDbHelper.findTravelById(getRoutes.get(0));
-
         animado = (LinearLayout) findViewById(R.id.fabtoolbar_toolbar);
-        Drawable icon = this.getResources().getDrawable(R.drawable.ic_bustop);
-
 
     }
     public List<Route> FindRoutes(List<Company> co, List<Integer> ru) {
@@ -117,6 +114,59 @@ public class traveling extends Activity {
             }
         }
         return rutas;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    public void createListWithAdapterIndicator(List<Travel> travels, int a, GeoPoint p) {
+        //si se llama al metodo desde el evento del boton.
+        if(a==1) {
+            if (travels.size() > 0) {
+                ArrayList<String> category = new ArrayList<String>();
+                String cat;
+                if (travels != null && !travels.isEmpty()) {
+                    for (Travel travel : travels) {
+                        for(Instruction ins : travel.getInstructions()){
+                            cat = ins.getIndication();
+                            category.add(cat);
+                            cat = ins.getStop().getAddress();
+                            category.add(cat);
+                        }
+                    }
+                }
+                ListView lv = (ListView) findViewById(R.id.ListView);
+                adapterIndicator = new AdapterIndicator(this, category, p);
+                morph.show();
+                lv.setAdapter(adapterIndicator);
+            }
+            travels.clear();
+            morph.hide();
+            bar.setExpanded(false);
+        }
+        else{
+            if (travels.size() > 0) {
+                ArrayList<String> category = new ArrayList<String>();
+                String cat;
+                if (travels != null && !travels.isEmpty()) {
+                    for (Travel travel : travels) {
+                        for(Instruction ins : travel.getInstructions()){
+                            cat = ins.getIndication();
+                            category.add(cat);
+                            cat = ins.getStop().getAddress();
+                            category.add(cat);
+                        }
+                    }
+                }
+                ListView lv = (ListView) findViewById(R.id.ListView);
+                adapterIndicator = new AdapterIndicator(this, category, p);
+                morph.show();
+                lv.setAdapter(adapterIndicator);
+            }
+            travels.clear();
+            morph.hide();
+            bar.setExpanded(false);
+
+
+        }
     }
 }
 

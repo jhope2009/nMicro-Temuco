@@ -31,7 +31,6 @@ public class Route {
 
 	}
 
-
 	public Route(int idRoute, String name, List<Stop> stops, List<Point> points, Drawable img) {
 		super();
 		this.idRoute = idRoute;

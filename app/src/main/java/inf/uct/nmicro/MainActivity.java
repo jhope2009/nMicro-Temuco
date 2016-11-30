@@ -102,7 +102,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     LocationManager locationManager;
     String mprovider;
     public final static String rutasSeleccionadas = "traveling";
-    public final static String rutasSeleccionadas2 = "traveling";
     public ArrayList<Integer> ParaActivityTraveler=new ArrayList<>();
     public ArrayList<String> ParaActivityTraveler2=new ArrayList<>();
     SearchTraveling travel=new SearchTraveling();
@@ -169,7 +168,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             DrawinMap.DrawFindLocation(ub0, ub2, map, routesDraw,getApplication());
                             GeoPoint pto1 = new GeoPoint(ub0.get(0).getLatitude(), ub0.get(0).getLongitude());
                             GeoPoint pto2 = new GeoPoint(ub2.get(0).getLatitude(), ub2.get(0).getLongitude());
-                            //este es un cambio
                             int minLat = Integer.MAX_VALUE;
                             int maxLat = Integer.MIN_VALUE;
                             int minLong = Integer.MAX_VALUE;
@@ -189,7 +187,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             }
                             BoundingBoxE6 boundingBox = new BoundingBoxE6(maxLat, maxLong, minLat, minLong);
                             mapController.zoomToSpan(boundingBox);
-                            //Ejecuta tarea asincronica
                             buttonTask.execute(companies, pto1, pto2,ub0.get(0).toString(),ub2.get(0).toString());
 
                         } catch (IOException e) {e.printStackTrace();}
@@ -201,7 +198,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         if (ub1.size() > 0 && ub2.size() >0) {
                             GeoPoint pto1 = new GeoPoint(ub1.get(0).getLatitude(), ub1.get(0).getLongitude());
                             GeoPoint pto2 = new GeoPoint(ub2.get(0).getLatitude(), ub2.get(0).getLongitude());
-                            //Ejecuta tarea asincronica
                             buttonTask.execute(companies, pto1, pto2,ori,des);
 
                         }else{
@@ -355,7 +351,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         ParaActivityTraveler.add(category.get(pos).getIdRoute());
                         Intent intent=new Intent(getApplicationContext(),traveling.class);
                         intent.putExtra(rutasSeleccionadas,ParaActivityTraveler);
-                       // intent.putExtra(rutasSeleccionadas2,ParaActivityTraveler2);
                         startActivity(intent);
                     }
                 });
@@ -411,6 +406,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (travels != null && !travels.isEmpty()) {
                     for (Travel travel : travels) {
                         cat = new Travel(travel.getIdTravel(),travel.getname(), travel.getRoutes(),travel.getInstructions(), travel.getStartStop(),travel.getEndStop()) ;
+                        myDbHelper.saveTravel(cat);
                         category.add(cat);
                     }
                 }
@@ -420,10 +416,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         final int pos = position;
-
-                        myDbHelper.saveTravel(category.get(pos));
-                        Travel tr=myDbHelper.findTravelById(category.get(pos).getIdTravel());
-                        Log.i("tr",tr.getname()+tr.getIdTravel());
                         ParaActivityTraveler.add(category.get(pos).getIdTravel());
                         Intent intent=new Intent(getApplicationContext(),traveling.class);
                         intent.putExtra(rutasSeleccionadas,ParaActivityTraveler);
@@ -563,7 +555,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Location loc = null;
         return loc;
     }
-    // tarea asincornica para la busqueda de rutas por origen y destino
+
     class CustomTask extends AsyncTask{
         Geocoder geocoder2 = new Geocoder(getApplication(), Locale.getDefault());
         @Override
@@ -589,7 +581,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             for (Company c : companies) {
                 for (Route r : c.getRoutes()) {
-
                     if (DrawinMap.isRouteInArea(r, pto1) && DrawinMap.isRouteInArea(r, pto2)) {
                         int a = DrawinMap.isRouteInArea2(r, pto1);
                         int b = DrawinMap.isRouteInArea2(r, pto2);

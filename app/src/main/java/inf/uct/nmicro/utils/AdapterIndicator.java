@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import inf.uct.nmicro.R;
 import inf.uct.nmicro.model.Route;
 
-
 public class AdapterIndicator extends BaseAdapter {
 
     protected Activity activity;
@@ -68,21 +67,10 @@ public class AdapterIndicator extends BaseAdapter {
 
         View v = convertView;
         //aqui llamo a la clase que realiza la coneccion con el WS y le paso parametros concatenados por coma
-
-
         if (convertView == null) {
             LayoutInflater inf = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             v = inf.inflate(R.layout.item_info, null);
         }
-
-
-
-        TextView title = (TextView) v.findViewById(R.id.category);
-        //title.setText(dir.getName());
-
-        TextView title1 = (TextView) v.findViewById(R.id.textView4);
-
-        //new ConnectWS(activity, title1, title2, title3, 0).execute(dir.getIdRoute()+","+p.getLatitude()+","+p.getLongitude());
         return v;
     }
 }
